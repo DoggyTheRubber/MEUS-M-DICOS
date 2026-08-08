@@ -253,7 +253,8 @@
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Responsável</label>
                             <select id="responsible" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
-                                <option value="Kelen Mesquita Reis">Kelen Mesquita Reis</option>
+                                <option value="Kelen Mesquita">Kelen Mesquita</option>
+                                <option value="Vitório Quites">Vitório Quites</option>
                             </select>
                         </div>
                         <div>
@@ -511,7 +512,7 @@
                                 secretary: 'Márcia',
                                 indicates: 'sim',
                                 present: 'Vinho',
-                                responsible: 'Kelen Mesquita Reis',
+                                responsible: 'Kelen Mesquita',
                                 status: 'Concluído',
                                 reportStatus: 'Concluido',
                                 lastIndicationDate: '2026-06-20',
@@ -941,19 +942,19 @@
                 filtered.forEach(d => {
                     let badge = '';
                     if (d.indicates === 'sim') {
-                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-check mr-1"></i> Sim</span>';
+                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200"><i class="fa-solid fa-check mr-1 text-emerald-700"></i> Sim</span>';
                     } else if (d.indicates === 'deixou') {
-                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Deixou de indicar</span>';
+                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-900 border border-amber-200"><i class="fa-solid fa-triangle-exclamation mr-1 text-amber-700"></i> Deixou de indicar</span>';
                     } else {
-                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200"><i class="fa-solid fa-xmark mr-1"></i> Não</span>';
+                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-900 border border-rose-200"><i class="fa-solid fa-xmark mr-1 text-rose-700"></i> Não</span>';
                     }
 
-                    // Status com verde para Concluído e vermelho para Visitar
-                    let statusColorClass = "bg-slate-100 text-slate-700 border-slate-200";
+                    // Status com tom legível e escuro para Concluído/Visitar
+                    let statusColorClass = "bg-slate-100 text-slate-900 border-slate-200";
                     if (d.status === 'Concluído') {
-                        statusColorClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                        statusColorClass = "bg-emerald-50 text-emerald-900 border-emerald-200";
                     } else if (d.status === 'Visitar') {
-                        statusColorClass = "bg-rose-50 text-rose-700 border-rose-200";
+                        statusColorClass = "bg-rose-50 text-rose-900 border-rose-200";
                     }
 
                     html += `
@@ -964,10 +965,10 @@
                                     ${badge}
                                     <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold border ${statusColorClass}">Status: ${d.status}</span>
                                 </div>
-                                <p class="text-xs text-slate-500 flex items-center gap-1.5">
-                                    <span class="font-semibold text-amber-700">CRM: ${d.crm}</span> | <i class="fa-solid fa-hospital text-slate-400"></i> ${d.hospital} (${d.room || 'Sala não inf.'})
+                                <p class="text-xs text-slate-600 flex items-center gap-1.5">
+                                    <span class="font-semibold text-slate-900">CRM: ${d.crm}</span> | <i class="fa-solid fa-hospital text-slate-500"></i> ${d.hospital} (${d.room || 'Sala não inf.'})
                                 </p>
-                                <p class="text-[11px] text-slate-400">Especialidade: ${d.specialization} ${d.subspecialties?.length ? '• ' + d.subspecialties.join(', ') : ''}</p>
+                                <p class="text-[11px] text-slate-600">Especialidade: ${d.specialization} ${d.subspecialties?.length ? '• ' + d.subspecialties.join(', ') : ''}</p>
                             </div>
                             <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-amber-50 text-slate-400 group-hover:text-amber-600 flex items-center justify-center transition">
                                 <i class="fa-solid fa-chevron-right text-xs"></i>
@@ -1005,11 +1006,9 @@
                     cb.checked = d.subspecialties && d.subspecialties.includes(cb.value);
                 });
 
-                // Se houver dob antigo armazenado em formato completo (YYYY-MM-DD), extrai dia e mês
                 if(d.dob && d.dob.includes('-')) {
                     const parts = d.dob.split('-');
                     if(parts.length === 3) {
-                        document.getElementById('dobYear') ? null : null; // compatibilidade
                         document.getElementById('dobDay').value = parts[2];
                         document.getElementById('dobMonth').value = parts[1];
                     }
@@ -1047,7 +1046,7 @@
                 }
 
                 document.getElementById('present').value = d.present || 'Bombom';
-                document.getElementById('responsible').value = d.responsible || 'Kelen Mesquita Reis';
+                document.getElementById('responsible').value = d.responsible || 'Kelen Mesquita';
                 document.getElementById('status').value = d.status || 'Visitar';
                 document.getElementById('reportStatus').value = d.reportStatus || 'Não iniciada';
                 document.getElementById('lastIndicationDate').value = d.lastIndicationDate || '';
@@ -1355,99 +1354,99 @@
                 };
 
                 let indicaTexto = 'Não';
-                let indicaCor = 'text-rose-600';
+                let indicaCor = 'text-rose-900 font-bold';
                 if(d.indicates === 'sim') {
                     indicaTexto = 'Sim, já indica';
-                    indicaCor = 'text-emerald-600';
+                    indicaCor = 'text-emerald-900 font-bold';
                 } else if(d.indicates === 'deixou') {
                     indicaTexto = 'Deixou de indicar';
-                    indicaCor = 'text-amber-600';
+                    indicaCor = 'text-amber-900 font-bold';
                 }
 
-                let statusBadgeClass = "text-slate-800 font-semibold";
-                if(d.status === 'Concluído') statusBadgeClass = "text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block";
-                if(d.status === 'Visitar') statusBadgeClass = "text-rose-700 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200 inline-block";
+                let statusBadgeClass = "text-slate-900 font-semibold";
+                if(d.status === 'Concluído') statusBadgeClass = "text-emerald-900 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block";
+                if(d.status === 'Visitar') statusBadgeClass = "text-rose-900 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200 inline-block";
 
                 const conteudo = `
                     <div class="space-y-3">
                         <div class="grid grid-cols-2 gap-3">
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">CRM</span>
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">CRM</span>
                                 <span class="font-bold text-slate-900">${d.crm}</span>
                             </div>
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Status Indicação</span>
-                                <span class="font-bold ${indicaCor}">${indicaTexto}</span>
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Status Indicação</span>
+                                <span class="${indicaCor}">${indicaTexto}</span>
                             </div>
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Especialização & Subespecializações</span>
-                            <span class="text-slate-800 font-medium">${d.specialization}</span>
-                            <p class="text-xs text-slate-600 mt-1"><b>Subs:</b> ${subsHtml}</p>
+                            <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Especialização & Subespecializações</span>
+                            <span class="text-slate-900 font-medium">${d.specialization}</span>
+                            <p class="text-xs text-slate-700 mt-1"><b>Subs:</b> ${subsHtml}</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Aniversário</span>
-                                <span class="text-slate-800 font-medium"><i class="fa-solid fa-cake-candles text-amber-500 mr-1"></i> ${formatarAniversario(d)}</span>
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Aniversário</span>
+                                <span class="text-slate-900 font-medium"><i class="fa-solid fa-cake-candles text-amber-500 mr-1"></i> ${formatarAniversario(d)}</span>
                             </div>
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Data da Visita</span>
-                                <span class="text-slate-800 font-medium"><i class="fa-solid fa-calendar-check text-amber-500 mr-1"></i> ${formatarDataBR(d.visitDate)}</span>
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Data da Visita</span>
+                                <span class="text-slate-900 font-medium"><i class="fa-solid fa-calendar-check text-amber-500 mr-1"></i> ${formatarDataBR(d.visitDate)}</span>
                             </div>
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Clínica & Endereço</span>
+                            <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Clínica & Endereço</span>
                             <span class="text-slate-900 font-semibold text-sm block">${d.hospital} - ${d.room || ''}</span>
-                            <span class="text-xs text-slate-600">${enderecoClinica}</span>
+                            <span class="text-xs text-slate-700">${enderecoClinica}</span>
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Dias e Horários de Atendimento</span>
+                            <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Dias e Horários de Atendimento</span>
                             <ul class="mt-1 space-y-1">${horariosHtml}</ul>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Tel. Comercial</span>
-                                <span class="text-slate-800 font-medium">${d.phone || 'Não informado'}</span>
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Tel. Comercial</span>
+                                <span class="text-slate-900 font-medium">${d.phone || 'Não informado'}</span>
                             </div>
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Celular Pessoal</span>
-                                <span class="text-slate-800 font-medium">${d.cellphone || 'Não informado'}</span>
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Celular Pessoal</span>
+                                <span class="text-slate-900 font-medium">${d.cellphone || 'Não informado'}</span>
                             </div>
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Secretária(s) & Responsável</span>
-                            <p class="text-xs text-slate-800"><b>Secretária:</b> ${d.secretary || 'Não informada'}</p>
-                            <p class="text-xs text-slate-800 mt-0.5"><b>Responsável Atendimento:</b> ${d.responsible}</p>
+                            <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Secretária(s) & Responsável</span>
+                            <p class="text-xs text-slate-900"><b>Secretária:</b> ${d.secretary || 'Não informada'}</p>
+                            <p class="text-xs text-slate-900 mt-0.5"><b>Responsável Atendimento:</b> ${d.responsible}</p>
                         </div>
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Situação / Status</span>
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Situação / Status</span>
                                 <span class="${statusBadgeClass}">${d.status}</span>
                             </div>
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Relatório</span>
-                                <span class="text-slate-800 font-semibold">${d.reportStatus || 'Não iniciada'}</span>
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Relatório</span>
+                                <span class="text-slate-900 font-semibold">${d.reportStatus || 'Não iniciada'}</span>
                             </div>
                         </div>
 
                         <!-- Presente & Unidade Próxima atualizado conforme solicitado -->
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
-                            <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Presente & Unidade Próxima</span>
-                            <p class="text-xs text-slate-800"><b>Presente:</b> ${d.present}</p>
-                            <p class="text-xs text-slate-800"><b>Unidade Próxima:</b> ${d.nearbyUnit || 'Não informada'}</p>
-                            <p class="text-xs text-slate-800"><b>Última Indicação:</b> ${formatarDataBR(d.lastIndicationDate)}</p>
+                            <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Presente & Unidade Próxima</span>
+                            <p class="text-xs text-slate-900"><b>Presente:</b> ${d.present}</p>
+                            <p class="text-xs text-slate-900"><b>Unidade Próxima:</b> ${d.nearbyUnit || 'Não informada'}</p>
+                            <p class="text-xs text-slate-900"><b>Última Indicação:</b> ${formatarDataBR(d.lastIndicationDate)}</p>
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Observações</span>
-                            <p class="text-slate-700 text-xs leading-relaxed">${d.notes || 'Nenhuma observação.'}</p>
+                            <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Observações</span>
+                            <p class="text-slate-900 text-xs leading-relaxed">${d.notes || 'Nenhuma observação.'}</p>
                         </div>
                     </div>
                 `;
