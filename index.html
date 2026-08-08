@@ -43,15 +43,16 @@
                     </span>
                     <input type="text" id="search" oninput="app.renderList()" placeholder="Buscar por CRM, nome, clínica ou especialidade..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
-                <!-- Filtros condicionais: aparecem apenas se houver busca ativa ou clínica selecionada -->
+                <!-- Filtros condicionais -->
                 <div id="filter-container" class="hidden items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
                     <button onclick="app.setFilter('all')" id="filter-all" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap">Todos</button>
-                    <button onclick="app.setFilter('yes')" id="filter-yes" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Já Indica</button>
-                    <button onclick="app.setFilter('no')" id="filter-no" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Não Indica</button>
+                    <button onclick="app.setFilter('sim')" id="filter-yes" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Sim</button>
+                    <button onclick="app.setFilter('nao')" id="filter-no" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Não</button>
+                    <button onclick="app.setFilter('deixou')" id="filter-deixou" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Deixou de indicar</button>
                 </div>
             </div>
 
-            <!-- Navegação Breadcrumb / Voltar para Clínicas -->
+            <!-- Navegação Breadcrumb -->
             <div id="clinica-breadcrumb" class="hidden items-center justify-between bg-amber-50 border border-amber-200 px-4 py-2.5 rounded-xl">
                 <div class="flex items-center gap-2">
                     <button onclick="app.voltarParaClinicas()" class="bg-white text-amber-800 hover:bg-amber-100 p-1.5 rounded-lg border border-amber-200 text-xs font-bold transition flex items-center gap-1">
@@ -62,7 +63,6 @@
                 <span id="breadcrumb-contador" class="text-xs bg-amber-200 text-amber-900 font-semibold px-2 py-0.5 rounded-md">0 médicos</span>
             </div>
 
-            <!-- Lista de Cards (Clínicas ou Médicos) -->
             <div id="doctor-list" class="space-y-3 pb-6"></div>
         </section>
 
@@ -116,7 +116,6 @@
                 <form id="formNovoMedico" onsubmit="app.saveDoctor(event)" class="space-y-4 text-sm">
                     <input type="hidden" id="doctorEditId">
                     
-                    <!-- Gênero e Nome -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Gênero / Tratamento *</label>
                         <div class="flex items-center gap-4 bg-slate-50 p-2.5 border border-slate-200 rounded-xl">
@@ -135,13 +134,11 @@
                         <div id="name-error" class="text-xs text-rose-600 mt-1 font-medium hidden"></div>
                     </div>
 
-                    <!-- CRM -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">CRM (Identificador único) *</label>
                         <input type="text" id="crm" required placeholder="Ex: 54321-MG" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
                     </div>
 
-                    <!-- Especialização -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Especialização *</label>
                         <select id="specialization" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
@@ -150,19 +147,36 @@
                         </select>
                     </div>
 
-                    <!-- Subespecialização (Multi-seleção com tags) -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Subespecializações (Selecione as tags)</label>
-                        <div id="subspec-tags" class="flex flex-wrap gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                            <!-- Injetado dinamicamente via JS -->
-                        </div>
+                        <div id="subspec-tags" class="flex flex-wrap gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl"></div>
                     </div>
 
-                    <!-- Aniversário & Visita -->
+                    <!-- Aniversário & Visita (Aniversário sem ano: Dia e Mês) -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Data de Aniversário</label>
-                            <input type="date" id="dob" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Aniversário (Dia e Mês)</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <select id="dobDay" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition text-xs font-medium">
+                                    <option value="">Dia</option>
+                                    <!-- Preenchido via JS (1 a 31) -->
+                                </select>
+                                <select id="dobMonth" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition text-xs font-medium">
+                                    <option value="">Mês</option>
+                                    <option value="01">Janeiro</option>
+                                    <option value="02">Fevereiro</option>
+                                    <option value="03">Março</option>
+                                    <option value="04">Abril</option>
+                                    <option value="05">Maio</option>
+                                    <option value="06">Junho</option>
+                                    <option value="07">Julho</option>
+                                    <option value="08">Agosto</option>
+                                    <option value="09">Setembro</option>
+                                    <option value="10">Outubro</option>
+                                    <option value="11">Novembro</option>
+                                    <option value="12">Dezembro</option>
+                                </select>
+                            </div>
                         </div>
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Data da Visita</label>
@@ -170,7 +184,7 @@
                         </div>
                     </div>
 
-                    <!-- SISTEMA DE DIAS DE ATENDIMENTO DINÂMICO -->
+                    <!-- Sistema de Horários -->
                     <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl space-y-3">
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Dias e Horários de Atendimento</label>
@@ -178,17 +192,12 @@
                                 <i class="fa-solid fa-plus"></i> Adicionar Horário
                             </button>
                         </div>
-                        <div id="horariosContainer" class="space-y-2">
-                            <!-- Linhas de horários adicionadas dinamicamente -->
-                        </div>
+                        <div id="horariosContainer" class="space-y-2"></div>
                     </div>
 
-                    <!-- SELEÇÃO DE CLÍNICA (Vinda da Aba de Clínicas) -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Clínica Vinculada *</label>
-                        <select id="selectHospital" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
-                            <!-- Injetado dinamicamente -->
-                        </select>
+                        <select id="selectHospital" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"></select>
                         <p class="text-[11px] text-slate-500 mt-1">Caso a clínica não apareça, cadastre-a primeiro na aba inferior "Clínicas".</p>
                     </div>
 
@@ -214,16 +223,19 @@
                         </div>
                     </div>
 
-                    <!-- Status e Checkboxes -->
+                    <!-- Já Indica a Ótica com 3 opções: Sim, Não, Deixou de indicar -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Já Indica a Ótica?</label>
-                            <div class="flex items-center gap-4 bg-slate-50 p-2.5 border border-slate-200 rounded-xl">
-                                <label class="flex items-center gap-2 cursor-pointer font-medium">
+                            <div class="flex items-center gap-3 bg-slate-50 p-2.5 border border-slate-200 rounded-xl flex-wrap">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs">
                                     <input type="radio" name="indicates" value="sim" class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Sim
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer font-medium">
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs">
                                     <input type="radio" name="indicates" value="nao" checked class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Não
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs">
+                                    <input type="radio" name="indicates" value="deixou" class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Deixou de indicar
                                 </label>
                             </div>
                         </div>
@@ -276,13 +288,11 @@
                         </div>
                     </div>
 
-                    <!-- Observação -->
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Observações / Informações Extras</label>
                         <textarea id="notes" rows="3" placeholder="Ex: Gosta de vinhos tintos secos, secretaria Maria ajuda muito..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"></textarea>
                     </div>
 
-                    <!-- Botão Salvar / Cancelar Edição -->
                     <div class="flex gap-2 pt-1">
                         <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
                             <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Médico Completo
@@ -307,12 +317,8 @@
                     </div>
                 </div>
 
-                <!-- Lista Rolável de Relatórios -->
-                <div id="reports-list-container" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1 no-scrollbar">
-                    <!-- Injetado dinamicamente via JS -->
-                </div>
+                <div id="reports-list-container" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1 no-scrollbar"></div>
 
-                <!-- Botão Adicionar Novo Relatório -->
                 <button onclick="app.abrirFormRelatorio()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3.5 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-plus-circle"></i> Adicionar Novo Relatório
                 </button>
@@ -350,9 +356,7 @@
 
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Médico Correspondente *</label>
-                    <select id="reportDoctorId" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
-                        <!-- Injetado dinamicamente -->
-                    </select>
+                    <select id="reportDoctorId" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"></select>
                 </div>
 
                 <div>
@@ -454,10 +458,22 @@
                 this.reports = [];
                 this.currentFilter = 'all';
                 this.clinicaSelecionada = null; 
+                this.initDobDays();
                 this.loadData();
                 this.initSubspecTags();
                 this.adicionarHorarioLinha();
                 this.renderList();
+            }
+
+            initDobDays() {
+                const daySelect = document.getElementById('dobDay');
+                if(!daySelect) return;
+                let html = '<option value="">Dia</option>';
+                for(let i = 1; i <= 31; i++) {
+                    const diaStr = i < 10 ? '0' + i : '' + i;
+                    html += `<option value="${diaStr}">${i}</option>`;
+                }
+                daySelect.innerHTML = html;
             }
 
             loadData() {
@@ -473,7 +489,7 @@
                         this.saveClinicsStorage();
                     }
 
-                    const savedDocs = localStorage.getItem('otica_medicos_v3');
+                    const savedDocs = localStorage.getItem('otica_medicos_v4');
                     if (savedDocs) {
                         this.doctors = JSON.parse(savedDocs);
                     } else {
@@ -484,7 +500,8 @@
                                 name: 'Dr. Roberto Silveira',
                                 specialization: 'Oftalmo Geral',
                                 subspecialties: ['Retina', 'Catarata'],
-                                dob: '1975-04-12',
+                                dobDay: '12',
+                                dobMonth: '04',
                                 visitDate: '2026-06-15',
                                 schedules: [{ dia: 'SEG', periodo: 'Manhã (08:00 - 12:00)' }],
                                 hospital: 'Hospital Mater Dei',
@@ -529,7 +546,7 @@
 
             saveStorage() {
                 try {
-                    localStorage.setItem('otica_medicos_v3', JSON.stringify(this.doctors));
+                    localStorage.setItem('otica_medicos_v4', JSON.stringify(this.doctors));
                 } catch(e) {
                     this.showAlert("Erro", "Não foi possível salvar os médicos no navegador.");
                 }
@@ -553,6 +570,7 @@
 
             initSubspecTags() {
                 const container = document.getElementById('subspec-tags');
+                if(!container) return;
                 let html = '';
                 SUBESPECIALIDADES_LISTA.forEach((sub) => {
                     html += `
@@ -696,6 +714,7 @@
 
             adicionarHorarioLinha(diaPre = 'SEG', periodoPre = 'Manhã (08:00 - 12:00)') {
                 const container = document.getElementById('horariosContainer');
+                if(!container) return;
                 const linhaId = 'horario_' + Date.now() + Math.floor(Math.random()*1000);
                 
                 const div = document.createElement('div');
@@ -761,7 +780,6 @@
                     bAdd.className = "flex flex-col items-center justify-center flex-1 py-1 text-amber-600 transition";
                     bAdd.querySelector('span').className = "text-[11px] font-semibold";
                     
-                    // Sempre limpa o formulário de cadastro e reseta o ID de edição ao entrar na aba "Novo Médico"
                     document.getElementById('formNovoMedico').reset();
                     document.getElementById('doctorEditId').value = '';
                     document.getElementById('form-doctor-title').innerHTML = '<i class="fa-solid fa-user-doctor text-amber-600"></i> Cadastrar Novo Médico';
@@ -780,8 +798,9 @@
 
             setFilter(f) {
                 this.currentFilter = f;
-                ['all', 'yes', 'no'].forEach(id => {
+                ['all', 'sim', 'nao', 'deixou'].forEach(id => {
                     const btn = document.getElementById(`filter-${id}`);
+                    if(!btn) return;
                     if(id === f) {
                         btn.className = "px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap";
                     } else {
@@ -809,7 +828,6 @@
                 const filterContainer = document.getElementById('filter-container');
                 if(!container) return;
 
-                // Controla a visibilidade dos filtros de Indicação: só aparecem se há busca ou clínica selecionada
                 if (q.length > 0 || this.clinicaSelecionada) {
                     filterContainer.classList.remove('hidden');
                     filterContainer.classList.add('flex');
@@ -821,8 +839,9 @@
                 if (q.length > 0) {
                     breadcrumb.classList.add('hidden');
                     let filtered = this.doctors.filter(d => {
-                        if(this.currentFilter === 'yes' && d.indicates !== 'sim') return false;
-                        if(this.currentFilter === 'no' && d.indicates !== 'nao') return false;
+                        if(this.currentFilter === 'sim' && d.indicates !== 'sim') return false;
+                        if(this.currentFilter === 'nao' && d.indicates !== 'nao') return false;
+                        if(this.currentFilter === 'deixou' && d.indicates !== 'deixou') return false;
                         
                         const matchName = d.name.toLowerCase().includes(q);
                         const matchCrm = d.crm.toLowerCase().includes(q);
@@ -841,8 +860,9 @@
 
                     let filtered = this.doctors.filter(d => {
                         if (d.hospital.trim().toLowerCase() !== this.clinicaSelecionada.trim().toLowerCase()) return false;
-                        if(this.currentFilter === 'yes' && d.indicates !== 'sim') return false;
-                        if(this.currentFilter === 'no' && d.indicates !== 'nao') return false;
+                        if(this.currentFilter === 'sim' && d.indicates !== 'sim') return false;
+                        if(this.currentFilter === 'nao' && d.indicates !== 'nao') return false;
+                        if(this.currentFilter === 'deixou' && d.indicates !== 'deixou') return false;
                         return true;
                     });
 
@@ -872,8 +892,9 @@
                 this.clinics.forEach(c => {
                     const medicosClinica = this.doctors.filter(d => {
                         if (d.hospital.trim().toLowerCase() !== c.name.trim().toLowerCase()) return false;
-                        if(this.currentFilter === 'yes' && d.indicates !== 'sim') return false;
-                        if(this.currentFilter === 'no' && d.indicates !== 'nao') return false;
+                        if(this.currentFilter === 'sim' && d.indicates !== 'sim') return false;
+                        if(this.currentFilter === 'nao' && d.indicates !== 'nao') return false;
+                        if(this.currentFilter === 'deixou' && d.indicates !== 'deixou') return false;
                         return true;
                     });
 
@@ -918,10 +939,16 @@
 
                 let html = '';
                 filtered.forEach(d => {
-                    const badge = d.indicates === 'sim'
-                        ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-check mr-1"></i> Já indica</span>'
-                        : '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200"><i class="fa-solid fa-xmark mr-1"></i> Não indica</span>';
+                    let badge = '';
+                    if (d.indicates === 'sim') {
+                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-check mr-1"></i> Sim</span>';
+                    } else if (d.indicates === 'deixou') {
+                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200"><i class="fa-solid fa-triangle-exclamation mr-1"></i> Deixou de indicar</span>';
+                    } else {
+                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200"><i class="fa-solid fa-xmark mr-1"></i> Não</span>';
+                    }
 
+                    // Status com verde para Concluído e vermelho para Visitar
                     let statusColorClass = "bg-slate-100 text-slate-700 border-slate-200";
                     if (d.status === 'Concluído') {
                         statusColorClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
@@ -978,17 +1005,31 @@
                     cb.checked = d.subspecialties && d.subspecialties.includes(cb.value);
                 });
 
-                document.getElementById('dob').value = d.dob || '';
+                // Se houver dob antigo armazenado em formato completo (YYYY-MM-DD), extrai dia e mês
+                if(d.dob && d.dob.includes('-')) {
+                    const parts = d.dob.split('-');
+                    if(parts.length === 3) {
+                        document.getElementById('dobYear') ? null : null; // compatibilidade
+                        document.getElementById('dobDay').value = parts[2];
+                        document.getElementById('dobMonth').value = parts[1];
+                    }
+                } else {
+                    document.getElementById('dobDay').value = d.dobDay || '';
+                    document.getElementById('dobMonth').value = d.dobMonth || '';
+                }
+
                 document.getElementById('visitDate').value = d.visitDate || '';
 
                 const horariosContainer = document.getElementById('horariosContainer');
-                horariosContainer.innerHTML = '';
-                if(d.schedules && d.schedules.length > 0) {
-                    d.schedules.forEach(s => {
-                        this.adicionarHorarioLinha(s.dia, s.periodo);
-                    });
-                } else {
-                    this.adicionarHorarioLinha();
+                if(horariosContainer) {
+                    horariosContainer.innerHTML = '';
+                    if(d.schedules && d.schedules.length > 0) {
+                        d.schedules.forEach(s => {
+                            this.adicionarHorarioLinha(s.dia, s.periodo);
+                        });
+                    } else {
+                        this.adicionarHorarioLinha();
+                    }
                 }
 
                 this.preencherSelectClinicas(d.hospital);
@@ -999,6 +1040,8 @@
 
                 if(d.indicates === 'sim') {
                     document.querySelector('input[name="indicates"][value="sim"]').checked = true;
+                } else if(d.indicates === 'deixou') {
+                    document.querySelector('input[name="indicates"][value="deixou"]').checked = true;
                 } else {
                     document.querySelector('input[name="indicates"][value="nao"]').checked = true;
                 }
@@ -1034,7 +1077,8 @@
                     subspecialties.push(cb.value);
                 });
 
-                const dob = document.getElementById('dob').value;
+                const dobDay = document.getElementById('dobDay').value;
+                const dobMonth = document.getElementById('dobMonth').value;
                 const visitDate = document.getElementById('visitDate').value;
                 
                 const schedules = [];
@@ -1072,7 +1116,8 @@
                             name,
                             specialization,
                             subspecialties,
-                            dob,
+                            dobDay,
+                            dobMonth,
                             visitDate,
                             schedules,
                             hospital,
@@ -1102,7 +1147,8 @@
                         name,
                         specialization,
                         subspecialties,
-                        dob,
+                        dobDay,
+                        dobMonth,
                         visitDate,
                         schedules,
                         hospital,
@@ -1293,6 +1339,31 @@
                     return dataStr;
                 };
 
+                const formatarAniversario = (doc) => {
+                    if (doc.dobDay && doc.dobMonth) {
+                        const meses = { '01':'Janeiro', '02':'Fevereiro', '03':'Março', '04':'Abril', '05':'Maio', '06':'Junho', '07':'Julho', '08':'Agosto', '09':'Setembro', '10':'Outubro', '11':'Novembro', '12':'Dezembro' };
+                        return `${doc.dobDay} de ${meses[doc.dobMonth] || doc.dobMonth}`;
+                    }
+                    if (doc.dob) {
+                        const p = doc.dob.split('-');
+                        if(p.length === 3) {
+                            const meses = { '01':'Janeiro', '02':'Fevereiro', '03':'Março', '04':'Abril', '05':'Maio', '06':'Junho', '07':'Julho', '08':'Agosto', '09':'Setembro', '10':'Outubro', '11':'Novembro', '12':'Dezembro' };
+                            return `${p[2]} de ${meses[p[1]] || p[1]}`;
+                        }
+                    }
+                    return 'Não informado';
+                };
+
+                let indicaTexto = 'Não';
+                let indicaCor = 'text-rose-600';
+                if(d.indicates === 'sim') {
+                    indicaTexto = 'Sim, já indica';
+                    indicaCor = 'text-emerald-600';
+                } else if(d.indicates === 'deixou') {
+                    indicaTexto = 'Deixou de indicar';
+                    indicaCor = 'text-amber-600';
+                }
+
                 let statusBadgeClass = "text-slate-800 font-semibold";
                 if(d.status === 'Concluído') statusBadgeClass = "text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block";
                 if(d.status === 'Visitar') statusBadgeClass = "text-rose-700 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200 inline-block";
@@ -1306,7 +1377,7 @@
                             </div>
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Status Indicação</span>
-                                <span class="font-bold ${d.indicates==='sim'?'text-emerald-600':'text-rose-600'}">${d.indicates==='sim'?'Sim, já indica':'Não indica'}</span>
+                                <span class="font-bold ${indicaCor}">${indicaTexto}</span>
                             </div>
                         </div>
 
@@ -1318,8 +1389,8 @@
 
                         <div class="grid grid-cols-2 gap-3">
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Data de Aniversário</span>
-                                <span class="text-slate-800 font-medium"><i class="fa-solid fa-cake-candles text-amber-500 mr-1"></i> ${formatarDataBR(d.dob)}</span>
+                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Aniversário</span>
+                                <span class="text-slate-800 font-medium"><i class="fa-solid fa-cake-candles text-amber-500 mr-1"></i> ${formatarAniversario(d)}</span>
                             </div>
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Data da Visita</span>
@@ -1366,10 +1437,12 @@
                             </div>
                         </div>
 
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <!-- Presente & Unidade Próxima atualizado conforme solicitado -->
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
                             <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Presente & Unidade Próxima</span>
-                            <p class="text-xs text-slate-800"><b>Presente:</b> ${d.present} | <b>Unidade Próxima:</b> ${d.nearbyUnit || 'Not informada'}</p>
-                            <p class="text-xs text-slate-800 mt-1"><b>Última Indicação:</b> ${formatarDataBR(d.lastIndicationDate)}</p>
+                            <p class="text-xs text-slate-800"><b>Presente:</b> ${d.present}</p>
+                            <p class="text-xs text-slate-800"><b>Unidade Próxima:</b> ${d.nearbyUnit || 'Não informada'}</p>
+                            <p class="text-xs text-slate-800"><b>Última Indicação:</b> ${formatarDataBR(d.lastIndicationDate)}</p>
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
