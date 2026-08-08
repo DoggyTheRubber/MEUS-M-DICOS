@@ -17,9 +17,9 @@
 <body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
 
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
-        <div class="flex items-center space-x-2">
-            <div class="bg-amber-500 text-slate-900 p-2 rounded-xl font-bold flex items-center justify-center shadow">
-                <i class="fa-solid fa-eye text-lg"></i>
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700 shadow shrink-0">
+                <img src="la pipita.png" alt="La Pipita Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-eye text-amber-500 text-lg\'></i>';">
             </div>
             <div>
                 <h1 class="font-bold text-base tracking-tight">Ótica La Patrícia</h1>
@@ -43,7 +43,8 @@
                     </span>
                     <input type="text" id="search" oninput="app.renderList()" placeholder="Buscar por CRM, nome, clínica ou especialidade..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
-                <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                <!-- Filtros condicionais: aparecem apenas se houver busca ativa ou clínica selecionada -->
+                <div id="filter-container" class="hidden items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
                     <button onclick="app.setFilter('all')" id="filter-all" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap">Todos</button>
                     <button onclick="app.setFilter('yes')" id="filter-yes" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Já Indica</button>
                     <button onclick="app.setFilter('no')" id="filter-no" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Não Indica</button>
@@ -102,17 +103,18 @@
             </div>
         </section>
 
-        <!-- ==================== TELA 2: NOVO MÉDICO ==================== -->
+        <!-- ==================== TELA 2: NOVO / EDITAR MÉDICO ==================== -->
         <section id="view-add" class="hidden space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-                    <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                    <h2 id="form-doctor-title" class="font-bold text-slate-900 text-lg flex items-center gap-2">
                         <i class="fa-solid fa-user-doctor text-amber-600"></i> Cadastrar Novo Médico
                     </h2>
                     <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Campos organizados</span>
                 </div>
 
                 <form id="formNovoMedico" onsubmit="app.saveDoctor(event)" class="space-y-4 text-sm">
+                    <input type="hidden" id="doctorEditId">
                     
                     <!-- Gênero e Nome -->
                     <div>
@@ -129,7 +131,7 @@
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nome Completo *</label>
-                        <input type="text" id="name" required placeholder="Ex: Carlos Eduardo Silva" oninput="app.validateName()" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                        <input type="text" id="name" required placeholder="Ex: Carlos Eduardo Silva" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
                         <div id="name-error" class="text-xs text-rose-600 mt-1 font-medium hidden"></div>
                     </div>
 
@@ -280,10 +282,15 @@
                         <textarea id="notes" rows="3" placeholder="Ex: Gosta de vinhos tintos secos, secretaria Maria ajuda muito..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"></textarea>
                     </div>
 
-                    <!-- Botão Salvar -->
-                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Médico Completo
-                    </button>
+                    <!-- Botão Salvar / Cancelar Edição -->
+                    <div class="flex gap-2 pt-1">
+                        <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Médico Completo
+                        </button>
+                        <button type="button" id="btnCancelarEdicaoMedico" onclick="app.cancelarEdicaoMedico()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-3 rounded-xl transition text-xs">
+                            Cancelar
+                        </button>
+                    </div>
                 </form>
             </div>
         </section>
@@ -381,9 +388,14 @@
             </div>
             <div class="p-5 overflow-y-auto space-y-4 text-sm" id="modalConteudo"></div>
             <div class="bg-slate-50 border-t border-slate-100 p-4 flex items-center justify-between">
-                <button id="modalBtnExcluir" onclick="" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
-                    <i class="fa-solid fa-trash"></i> Excluir Médico
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="modalBtnEditar" onclick="" class="text-xs bg-amber-50 text-amber-700 hover:bg-amber-100 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-pen"></i> Editar Médico
+                    </button>
+                    <button id="modalBtnExcluir" onclick="" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-trash"></i> Excluir
+                    </button>
+                </div>
                 <button onclick="app.fecharModal()" class="bg-slate-900 text-white text-xs px-4 py-2 rounded-xl font-semibold hover:bg-slate-800 transition">
                     Fechar
                 </button>
@@ -445,12 +457,11 @@
                 this.loadData();
                 this.initSubspecTags();
                 this.adicionarHorarioLinha();
-                this.renderList(); // Renderiza imediatamente ao iniciar
+                this.renderList();
             }
 
             loadData() {
                 try {
-                    // Carrega Clínicas
                     const savedClinics = localStorage.getItem('otica_clinicas_v1');
                     if (savedClinics) {
                         this.clinics = JSON.parse(savedClinics);
@@ -462,7 +473,6 @@
                         this.saveClinicsStorage();
                     }
 
-                    // Carrega Médicos
                     const savedDocs = localStorage.getItem('otica_medicos_v3');
                     if (savedDocs) {
                         this.doctors = JSON.parse(savedDocs);
@@ -486,6 +496,7 @@
                                 present: 'Vinho',
                                 responsible: 'Kelen Mesquita Reis',
                                 status: 'Concluído',
+                                reportStatus: 'Concluido',
                                 lastIndicationDate: '2026-06-20',
                                 nearbyUnit: 'Loja Centro',
                                 notes: 'Prefere vinhos tintos encorpados.'
@@ -583,14 +594,12 @@
                 }
 
                 if(idEdit) {
-                    // Editar clínica existente
                     const cli = this.clinics.find(c => c.id === idEdit);
                     if(cli) {
                         const antigoNome = cli.name;
                         cli.name = nome;
                         cli.address = endereco;
                         
-                        // Atualiza nome da clínica nos médicos vinculados
                         this.doctors.forEach(d => {
                             if(d.hospital === antigoNome) {
                                 d.hospital = nome;
@@ -601,7 +610,6 @@
                     document.getElementById('clinicaEditId').value = '';
                     document.getElementById('btnCancelarEdicaoClinica').classList.add('hidden');
                 } else {
-                    // Criar nova clínica
                     const nova = {
                         id: 'cli_' + Date.now(),
                         name: nome,
@@ -635,7 +643,6 @@
                 const cli = this.clinics.find(c => c.id === id);
                 if(!cli) return;
 
-                // Verifica se há médicos nesta clínica
                 const medicosVinculados = this.doctors.filter(d => d.hospital === cli.name);
                 if(medicosVinculados.length > 0) {
                     this.showAlert("Aviso", `Não é possível excluir esta clínica pois existem ${medicosVinculados.length} médico(s) vinculados a ela.`);
@@ -729,13 +736,11 @@
                 const bAdd = document.getElementById('nav-btn-add');
                 const bReports = document.getElementById('nav-btn-reports');
 
-                // Esconde todas
                 vList.classList.add('hidden');
                 vClinics.classList.add('hidden');
                 vAdd.classList.add('hidden');
                 vReports.classList.add('hidden');
 
-                // Reseta nav buttons
                 [bList, bClinics, bAdd, bReports].forEach(b => {
                     b.className = "flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600 transition";
                     b.querySelector('span').className = "text-[11px] font-medium";
@@ -755,8 +760,15 @@
                     vAdd.classList.remove('hidden');
                     bAdd.className = "flex flex-col items-center justify-center flex-1 py-1 text-amber-600 transition";
                     bAdd.querySelector('span').className = "text-[11px] font-semibold";
+                    
+                    // Sempre limpa o formulário de cadastro e reseta o ID de edição ao entrar na aba "Novo Médico"
                     document.getElementById('formNovoMedico').reset();
-                    document.getElementById('name-error').classList.add('hidden');
+                    document.getElementById('doctorEditId').value = '';
+                    document.getElementById('form-doctor-title').innerHTML = '<i class="fa-solid fa-user-doctor text-amber-600"></i> Cadastrar Novo Médico';
+                    document.getElementById('btnCancelarEdicaoMedico').classList.add('hidden');
+                    document.getElementById('horariosContainer').innerHTML = '';
+                    this.adicionarHorarioLinha();
+                    
                     this.preencherSelectClinicas();
                 } else if (tela === 'reports') {
                     vReports.classList.remove('hidden');
@@ -794,9 +806,18 @@
                 const q = document.getElementById('search').value.toLowerCase().trim();
                 const container = document.getElementById('doctor-list');
                 const breadcrumb = document.getElementById('clinica-breadcrumb');
+                const filterContainer = document.getElementById('filter-container');
                 if(!container) return;
 
-                // Se houver busca de texto ativa, ignoramos o agrupamento por clínicas e buscamos em todos os médicos
+                // Controla a visibilidade dos filtros de Indicação: só aparecem se há busca ou clínica selecionada
+                if (q.length > 0 || this.clinicaSelecionada) {
+                    filterContainer.classList.remove('hidden');
+                    filterContainer.classList.add('flex');
+                } else {
+                    filterContainer.classList.add('hidden');
+                    filterContainer.classList.remove('flex');
+                }
+
                 if (q.length > 0) {
                     breadcrumb.classList.add('hidden');
                     let filtered = this.doctors.filter(d => {
@@ -814,7 +835,6 @@
                     return;
                 }
 
-                // Se o usuário clicou em uma clínica específica, mostramos os médicos dela
                 if (this.clinicaSelecionada) {
                     breadcrumb.classList.remove('hidden');
                     document.getElementById('breadcrumb-titulo').textContent = this.clinicaSelecionada;
@@ -831,7 +851,6 @@
                     return;
                 }
 
-                // Caso padrão: exibir a listagem de todas as Clínicas cadastradas na aba de Clínicas
                 breadcrumb.classList.add('hidden');
 
                 if(this.clinics.length === 0) {
@@ -851,7 +870,6 @@
                 let html = '<div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Clínicas Disponíveis (' + this.clinics.length + ')</div>';
 
                 this.clinics.forEach(c => {
-                    // Médicos nesta clínica filtrados pela aba de indicação
                     const medicosClinica = this.doctors.filter(d => {
                         if (d.hospital.trim().toLowerCase() !== c.name.trim().toLowerCase()) return false;
                         if(this.currentFilter === 'yes' && d.indicates !== 'sim') return false;
@@ -860,7 +878,6 @@
                     });
 
                     const totalMedicosNaClinica = this.doctors.filter(d => d.hospital.trim().toLowerCase() === c.name.trim().toLowerCase()).length;
-                    const indicamCount = medicosClinica.filter(d => d.indicates === 'sim').length;
 
                     html += `
                         <div onclick="app.selecionarClinica('${c.name.replace(/'/g, "\\'")}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md hover:border-amber-300 transition cursor-pointer flex items-center justify-between group">
@@ -905,12 +922,20 @@
                         ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-check mr-1"></i> Já indica</span>'
                         : '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200"><i class="fa-solid fa-xmark mr-1"></i> Não indica</span>';
 
+                    let statusColorClass = "bg-slate-100 text-slate-700 border-slate-200";
+                    if (d.status === 'Concluído') {
+                        statusColorClass = "bg-emerald-50 text-emerald-700 border-emerald-200";
+                    } else if (d.status === 'Visitar') {
+                        statusColorClass = "bg-rose-50 text-rose-700 border-rose-200";
+                    }
+
                     html += `
                         <div onclick="app.abrirDetalhes('${d.id}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs hover:shadow-md hover:border-amber-300 transition cursor-pointer flex items-center justify-between group">
                             <div class="space-y-1 pr-2">
-                                <div class="flex items-center gap-2">
+                                <div class="flex items-center gap-2 flex-wrap">
                                     <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition">${d.name}</h4>
                                     ${badge}
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold border ${statusColorClass}">Status: ${d.status}</span>
                                 </div>
                                 <p class="text-xs text-slate-500 flex items-center gap-1.5">
                                     <span class="font-semibold text-amber-700">CRM: ${d.crm}</span> | <i class="fa-solid fa-hospital text-slate-400"></i> ${d.hospital} (${d.room || 'Sala não inf.'})
@@ -926,8 +951,78 @@
                 container.innerHTML = html;
             }
 
+            prepararEdicaoMedico(id) {
+                const d = this.doctors.find(item => item.id === id);
+                if(!d) return;
+
+                this.fecharModal();
+                this.mudarTela('add');
+
+                document.getElementById('doctorEditId').value = d.id;
+                document.getElementById('form-doctor-title').innerHTML = '<i class="fa-solid fa-user-pen text-amber-600"></i> Editar Médico: ' + d.name;
+                document.getElementById('btnCancelarEdicaoMedico').classList.remove('hidden');
+
+                let limpoNome = d.name;
+                if(d.name.startsWith('Dr.')) {
+                    document.querySelector('input[name="gender"][value="Dr."]').checked = true;
+                    limpoNome = d.name.replace('Dr. ', '');
+                } else if(d.name.startsWith('Dra.')) {
+                    document.querySelector('input[name="gender"][value="Dra."]').checked = true;
+                    limpoNome = d.name.replace('Dra. ', '');
+                }
+                document.getElementById('name').value = limpoNome;
+                document.getElementById('crm').value = d.crm;
+                document.getElementById('specialization').value = d.specialization || 'Oftalmo Geral';
+
+                document.querySelectorAll('input[name="subspecialty"]').forEach(cb => {
+                    cb.checked = d.subspecialties && d.subspecialties.includes(cb.value);
+                });
+
+                document.getElementById('dob').value = d.dob || '';
+                document.getElementById('visitDate').value = d.visitDate || '';
+
+                const horariosContainer = document.getElementById('horariosContainer');
+                horariosContainer.innerHTML = '';
+                if(d.schedules && d.schedules.length > 0) {
+                    d.schedules.forEach(s => {
+                        this.adicionarHorarioLinha(s.dia, s.periodo);
+                    });
+                } else {
+                    this.adicionarHorarioLinha();
+                }
+
+                this.preencherSelectClinicas(d.hospital);
+                document.getElementById('room').value = d.room || '';
+                document.getElementById('phone').value = d.phone || '';
+                document.getElementById('cellphone').value = d.cellphone || '';
+                document.getElementById('secretary').value = d.secretary || '';
+
+                if(d.indicates === 'sim') {
+                    document.querySelector('input[name="indicates"][value="sim"]').checked = true;
+                } else {
+                    document.querySelector('input[name="indicates"][value="nao"]').checked = true;
+                }
+
+                document.getElementById('present').value = d.present || 'Bombom';
+                document.getElementById('responsible').value = d.responsible || 'Kelen Mesquita Reis';
+                document.getElementById('status').value = d.status || 'Visitar';
+                document.getElementById('reportStatus').value = d.reportStatus || 'Não iniciada';
+                document.getElementById('lastIndicationDate').value = d.lastIndicationDate || '';
+                document.getElementById('nearbyUnit').value = d.nearbyUnit || '';
+                document.getElementById('notes').value = d.notes || '';
+            }
+
+            cancelarEdicaoMedico() {
+                document.getElementById('doctorEditId').value = '';
+                document.getElementById('formNovoMedico').reset();
+                document.getElementById('form-doctor-title').innerHTML = '<i class="fa-solid fa-user-doctor text-amber-600"></i> Cadastrar Novo Médico';
+                document.getElementById('btnCancelarEdicaoMedico').classList.add('hidden');
+                this.mudarTela('list');
+            }
+
             saveDoctor(e) {
                 e.preventDefault();
+                const editId = document.getElementById('doctorEditId').value;
                 const gender = document.querySelector('input[name="gender"]:checked').value;
                 const rawName = document.getElementById('name').value.trim();
                 const name = rawName.toLowerCase().startsWith('dr') ? rawName : `${gender} ${rawName}`;
@@ -942,7 +1037,6 @@
                 const dob = document.getElementById('dob').value;
                 const visitDate = document.getElementById('visitDate').value;
                 
-                // Pega horários
                 const schedules = [];
                 document.querySelectorAll('#horariosContainer > div').forEach(div => {
                     const dia = div.querySelector('.horario-dia').value;
@@ -969,34 +1063,68 @@
                 const nearbyUnit = document.getElementById('nearbyUnit').value.trim();
                 const notes = document.getElementById('notes').value.trim();
 
-                const novoMedico = {
-                    id: 'doc_' + Date.now(),
-                    crm,
-                    name,
-                    specialization,
-                    subspecialties,
-                    dob,
-                    visitDate,
-                    schedules,
-                    hospital,
-                    room,
-                    phone,
-                    cellphone,
-                    secretary,
-                    indicates,
-                    present,
-                    responsible,
-                    status,
-                    reportStatus,
-                    lastIndicationDate,
-                    nearbyUnit,
-                    notes
-                };
+                if(editId) {
+                    const index = this.doctors.findIndex(item => item.id === editId);
+                    if(index !== -1) {
+                        this.doctors[index] = {
+                            id: editId,
+                            crm,
+                            name,
+                            specialization,
+                            subspecialties,
+                            dob,
+                            visitDate,
+                            schedules,
+                            hospital,
+                            room,
+                            phone,
+                            cellphone,
+                            secretary,
+                            indicates,
+                            present,
+                            responsible,
+                            status,
+                            reportStatus,
+                            lastIndicationDate,
+                            nearbyUnit,
+                            notes
+                        };
+                    }
+                    document.getElementById('doctorEditId').value = '';
+                    document.getElementById('btnCancelarEdicaoMedico').classList.add('hidden');
+                    this.saveStorage();
+                    this.mudarTela('list');
+                    this.showAlert("Sucesso", "Médico atualizado com sucesso!", "sucesso");
+                } else {
+                    const novoMedico = {
+                        id: 'doc_' + Date.now(),
+                        crm,
+                        name,
+                        specialization,
+                        subspecialties,
+                        dob,
+                        visitDate,
+                        schedules,
+                        hospital,
+                        room,
+                        phone,
+                        cellphone,
+                        secretary,
+                        indicates,
+                        present,
+                        responsible,
+                        status,
+                        reportStatus,
+                        lastIndicationDate,
+                        nearbyUnit,
+                        notes
+                    };
 
-                this.doctors.unshift(novoMedico);
-                this.saveStorage();
-                this.mudarTela('list');
-                this.showAlert("Sucesso", "Médico cadastrado com sucesso!", "sucesso");
+                    this.doctors.unshift(novoMedico);
+                    this.saveStorage();
+                    this.mudarTela('list');
+                    this.showAlert("Sucesso", "Médico cadastrado com sucesso!", "sucesso");
+                }
             }
 
             preencherSelectMedicos(selectedId = '') {
@@ -1155,9 +1283,19 @@
                 let horariosHtml = d.schedules?.length ? d.schedules.map(s => `<li class="text-xs text-slate-700">• <b>${s.dia}:</b> ${s.periodo}</li>`).join('') : 'Nenhum horário cadastrado';
                 let subsHtml = d.subspecialties?.length ? d.subspecialties.join(', ') : 'Nenhuma';
                 
-                // Busca o endereço da clínica cadastrada
                 const cliObj = this.clinics.find(c => c.name.trim().toLowerCase() === d.hospital.trim().toLowerCase());
                 const enderecoClinica = cliObj ? cliObj.address : 'Endereço não especificado na aba Clínicas';
+
+                const formatarDataBR = (dataStr) => {
+                    if (!dataStr) return 'Não informada';
+                    const p = dataStr.split('-');
+                    if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
+                    return dataStr;
+                };
+
+                let statusBadgeClass = "text-slate-800 font-semibold";
+                if(d.status === 'Concluído') statusBadgeClass = "text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block";
+                if(d.status === 'Visitar') statusBadgeClass = "text-rose-700 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200 inline-block";
 
                 const conteudo = `
                     <div class="space-y-3">
@@ -1176,6 +1314,17 @@
                             <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Especialização & Subespecializações</span>
                             <span class="text-slate-800 font-medium">${d.specialization}</span>
                             <p class="text-xs text-slate-600 mt-1"><b>Subs:</b> ${subsHtml}</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Data de Aniversário</span>
+                                <span class="text-slate-800 font-medium"><i class="fa-solid fa-cake-candles text-amber-500 mr-1"></i> ${formatarDataBR(d.dob)}</span>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Data da Visita</span>
+                                <span class="text-slate-800 font-medium"><i class="fa-solid fa-calendar-check text-amber-500 mr-1"></i> ${formatarDataBR(d.visitDate)}</span>
+                            </div>
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -1209,7 +1358,7 @@
                         <div class="grid grid-cols-2 gap-3">
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Situação / Status</span>
-                                <span class="text-slate-800 font-semibold">${d.status}</span>
+                                <span class="${statusBadgeClass}">${d.status}</span>
                             </div>
                             <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                                 <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Relatório</span>
@@ -1219,8 +1368,8 @@
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
                             <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Presente & Unidade Próxima</span>
-                            <p class="text-xs text-slate-800"><b>Presente:</b> ${d.present} | <b>Unidade Próxima:</b> ${d.nearbyUnit || 'Não informada'}</p>
-                            <p class="text-xs text-slate-800 mt-1"><b>Última Indicação:</b> ${d.lastIndicationDate || 'Não registrada'}</p>
+                            <p class="text-xs text-slate-800"><b>Presente:</b> ${d.present} | <b>Unidade Próxima:</b> ${d.nearbyUnit || 'Not informada'}</p>
+                            <p class="text-xs text-slate-800 mt-1"><b>Última Indicação:</b> ${formatarDataBR(d.lastIndicationDate)}</p>
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
@@ -1231,6 +1380,7 @@
                 `;
 
                 document.getElementById('modalConteudo').innerHTML = conteudo;
+                document.getElementById('modalBtnEditar').setAttribute('onclick', `app.prepararEdicaoMedico('${d.id}')`);
                 document.getElementById('modalBtnExcluir').setAttribute('onclick', `app.excluirMedico('${d.id}')`);
                 document.getElementById('modalDetalhes').classList.remove('hidden');
             }
