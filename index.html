@@ -1,109 +1,608 @@
-
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" class="h-full">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestão de Visitas Ótica</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciador de Visitas - Ótica</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f4f7f6; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: var(--bg); margin: 0; padding-bottom: 70px; }
-        .header { background: var(--primary); color: white; padding: 15px; text-align: center; position: sticky; top: 0; z-index: 10; }
-        .content { padding: 15px; }
-        .card { background: white; border-radius: 10px; padding: 15px; margin-bottom: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); cursor: pointer; }
-        .homebar { position: fixed; bottom: 0; width: 100%; height: 60px; background: white; display: flex; border-top: 1px solid #ddd; }
-        .nav-btn { flex: 1; display: flex; align-items: center; justify-content: center; font-weight: bold; color: var(--primary); }
-        .nav-btn.active { color: var(--accent); }
-        .search-box { width: 100%; padding: 10px; margin-bottom: 10px; box-sizing: border-box; border-radius: 5px; border: 1px solid #ccc; }
-        input, select, textarea { width: 100%; padding: 10px; margin: 5px 0; box-sizing: border-box; }
-        .hidden { display: none; }
-        .error { color: red; font-size: 0.8em; }
+        body { font-family: 'Inter', sans-serif; }
+        /* Esconder scrollbars em mobile para visual limpo */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 h-full flex flex-col justify-between selection:bg-amber-200">
 
-<div id="view-list">
-    <div class="header">Lista de Médicos</div>
-    <div class="content">
-        <input type="text" id="search" class="search-box" placeholder="Buscar médico ou hospital..." oninput="renderList()">
-        <button onclick="setFilter('all')">Todos</button>
-        <button onclick="setFilter('yes')">Já Indica</button>
-        <button onclick="setFilter('no')">Não Indica</button>
-        <div id="doctor-list"></div>
-    </div>
-</div>
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+            <div class="bg-amber-500 text-slate-900 p-2 rounded-xl font-bold flex items-center justify-center shadow">
+                <i class="fa-solid fa-glasses text-lg"></i>
+            </div>
+            <div>
+                <h1 class="font-bold text-base tracking-tight">Relação Médica Ótica</h1>
+                <p class="text-xs text-slate-400">Painel de Visitas & Presentes</p>
+            </div>
+        </div>
+        <button onclick="app.exportarDados()" class="text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5">
+            <i class="fa-solid fa-download"></i> Backup
+        </button>
+    </header>
 
-<div id="view-add" class="hidden">
-    <div class="header">Novo Médico</div>
-    <div class="content">
-        <input type="text" id="name" placeholder="Nome Completo" oninput="validateName()">
-        <div id="name-error" class="error"></div>
-        <div>Gênero: <input type="radio" name="gender" value="M" checked> Homem <input type="radio" name="gender" value="F"> Mulher</div>
-        <input type="date" id="dob">
-        <input type="text" id="hospital" placeholder="Consultório/Hospital">
-        <label><input type="checkbox" id="indicates"> Já indica?</label>
-        <select id="present">
-            <option value="Bombom">Bombom</option>
-            <option value="Vinho">Vinho</option>
-        </select>
-        <textarea id="notes" placeholder="Descrição opcional"></textarea>
-        <button onclick="saveDoctor()" style="width:100%; padding:15px; background:var(--accent); color:white; border:none; border-radius:5px;">Salvar Médico</button>
-    </div>
-</div>
-
-<div class="homebar">
-    <div class="nav-btn active" onclick="showView('list')">LISTA</div>
-    <div class="nav-btn" onclick="showView('add')">CRIAR</div>
-</div>
-
-<script>
-    let doctors = JSON.parse(localStorage.getItem('doctors') || '[]');
-    let currentFilter = 'all';
-
-    function showView(view) {
-        document.getElementById('view-list').classList.toggle('hidden', view !== 'list');
-        document.getElementById('view-add').classList.toggle('hidden', view !== 'add');
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.toggle('active', b.innerText === (view === 'list' ? 'LISTA' : 'CRIAR')));
-    }
-
-    function validateName() {
-        const name = document.getElementById('name').value.trim().toLowerCase();
-        const exists = doctors.find(d => d.name.toLowerCase() === name);
-        document.getElementById('name-error').innerText = exists ? `Médico já cadastrado em: ${exists.hospital}` : '';
-    }
-
-    function saveDoctor() {
-        const name = document.getElementById('name').value.trim();
-        if(!name) return alert('Nome obrigatório');
-        const gender = document.querySelector('input[name="gender"]:checked').value;
-        const fullName = (gender === 'M' ? 'Dr. ' : 'Dra. ') + name;
+    <main class="flex-1 overflow-hidden relative pb-16">
         
-        const doctor = {
-            name: fullName,
-            dob: document.getElementById('dob').value,
-            hospital: document.getElementById('hospital').value,
-            indicates: document.getElementById('indicates').checked,
-            present: document.getElementById('present').value,
-            notes: document.getElementById('notes').value
-        };
-        doctors.push(doctor);
-        localStorage.setItem('doctors', JSON.stringify(doctors));
-        alert('Salvo!');
-        showView('list');
-        renderList();
-    }
+        <!-- ==================== TELA 1: LISTA DE MÉDICOS ==================== -->
+        <section id="view-lista" class="h-full flex flex-col p-4 max-w-2xl mx-auto overflow-y-auto no-scrollbar">
+            
+            <!-- Barra de Pesquisa e Filtros -->
+            <div class="space-y-3 mb-4">
+                <div class="flex gap-2">
+                    <div class="relative flex-1">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="searchInput" oninput="app.filtrarMedicos()" placeholder="Buscar por nome ou consultório..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent">
+                    </div>
+                </div>
 
-    function renderList() {
-        const q = document.getElementById('search').value.toLowerCase();
-        const list = document.getElementById('doctor-list');
-        list.innerHTML = '';
-        doctors.filter(d => (currentFilter === 'all' || (currentFilter === 'yes' ? d.indicates : !d.indicates)) && (d.name.toLowerCase().includes(q) || d.hospital.toLowerCase().includes(q))).forEach(d => {
-            list.innerHTML += `<div class="card" onclick="alert('${d.hospital} - Presente: ${d.present}')"><strong>${d.name}</strong><br>${d.indicates ? '✅ Indica' : '❌ Não indica'}</div>`;
-        });
-    }
+                <!-- Botões de Filtro Rápido -->
+                <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                    <button onclick="app.mudarFiltro('todos')" id="filter-btn-todos" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition shadow-sm whitespace-nowrap">
+                        Todos (<span id="count-todos">0</span>)
+                    </button>
+                    <button onclick="app.mudarFiltro('sim')" id="filter-btn-sim" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition whitespace-nowrap">
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1"></span> Já Indica (<span id="count-sim">0</span>)
+                    </button>
+                    <button onclick="app.mudarFiltro('nao')" id="filter-btn-nao" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition whitespace-nowrap">
+                        <span class="inline-block w-2 h-2 rounded-full bg-rose-500 mr-1"></span> Não Indica (<span id="count-nao">0</span>)
+                    </button>
+                </div>
+            </div>
 
-    function setFilter(f) { currentFilter = f; renderList(); }
-    renderList();
-</script>
+            <!-- Lista de Cards de Médicos -->
+            <div id="medicosListContainer" class="space-y-3 flex-1 pb-4">
+                <!-- Preenchido via JavaScript -->
+            </div>
+        </section>
+
+        <!-- ==================== TELA 2: NOVO MÉDICO ==================== -->
+        <section id="view-novo" class="h-full flex flex-col p-4 max-w-2xl mx-auto overflow-y-auto no-scrollbar hidden">
+            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 mb-6">
+                <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                    <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                        <i class="fa-solid fa-user-doctor text-amber-600"></i> Cadastrar Novo Médico
+                    </h2>
+                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Campos obrigatórios *</span>
+                </div>
+
+                <form id="formNovoMedico" onsubmit="app.salvarMedico(event)" class="space-y-4">
+                    
+                    <!-- Gênero (Dr. ou Dra.) -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Gênero / Tratamento *</label>
+                        <div class="flex items-center gap-4 bg-slate-50 p-2.5 border border-slate-200 rounded-xl">
+                            <label class="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                                <input type="radio" name="novoGenero" value="Dr." checked class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Homem (Dr.)
+                            </label>
+                            <label class="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                                <input type="radio" name="novoGenero" value="Dra." class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Mulher (Dra.)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Nome Completo -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nome Completo *</label>
+                        <input type="text" id="novoNome" required placeholder="Ex: Carlos Eduardo Silva" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                        <p id="nomeAviso" class="text-xs text-rose-600 mt-1 hidden font-medium"></p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Data de Nascimento -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Data de Nascimento</label>
+                            <input type="date" id="novoNascimento" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                        </div>
+
+                        <!-- Consultório / Hospital -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Consultório / Hospital *</label>
+                            <input type="text" id="novoConsultorio" required placeholder="Ex: Hospital Vila da Serra - Sl 402" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Já Indica? (Checkbox/Radio moderno) -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Já Indica a Ótica?</label>
+                            <div class="flex items-center gap-4 bg-slate-50 p-2.5 border border-slate-200 rounded-xl">
+                                <label class="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                                    <input type="radio" name="novoIndica" value="sim" class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Sim
+                                </label>
+                                <label class="flex items-center gap-2 cursor-pointer text-sm font-medium">
+                                    <input type="radio" name="novoIndica" value="nao" checked class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Não
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Presente Dado -->
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Presente Dado *</label>
+                            <select id="novoPresente" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                                <option value="Bombom">Bombom Fino</option>
+                                <option value="Vinho">Vinho Importado / Caro</option>
+                                <option value="Outro">Outro Brinde / Especial</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Breve Descrição Opcional -->
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Breve Descrição / Observações</label>
+                        <textarea id="novoDescricao" rows="3" placeholder="Ex: Gosta de vinhos tintos secos, atendimento preferencial pela manhã, secretária Maria ajuda muito..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"></textarea>
+                    </div>
+
+                    <!-- Botão Salvar -->
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Médico
+                    </button>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ==================== MODAL DE DETALHES DO MÉDICO ==================== -->
+    <div id="modalDetalhes" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <!-- Header do Modal -->
+            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center font-bold text-sm">
+                        <i class="fa-solid fa-user-doctor"></i>
+                    </div>
+                    <h3 id="modalNomeTitulo" class="font-bold text-base truncate">Detalhes do Médico</h3>
+                </div>
+                <button onclick="app.fecharModal()" class="text-slate-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+            <!-- Corpo do Modal -->
+            <div class="p-5 overflow-y-auto space-y-4 text-sm" id="modalConteudo">
+                <!-- Preenchido dinamicamente -->
+            </div>
+            <!-- Footer do Modal -->
+            <div class="bg-slate-50 border-t border-slate-100 p-4 flex items-center justify-between">
+                <button id="modalBtnExcluir" onclick="" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
+                    <i class="fa-solid fa-trash"></i> Excluir Médico
+                </button>
+                <button onclick="app.fecharModal()" class="bg-slate-900 text-white text-xs px-4 py-2 rounded-xl font-semibold hover:bg-slate-800 transition">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL DE MENSAGEM / ALERTA CUSTOMIZADO ==================== -->
+    <div id="modalAlerta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4">
+            <div id="alertaIcone" class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h4 id="alertaTitulo" class="font-bold text-slate-900 text-base">Aviso Importante</h4>
+            <p id="alertaTexto" class="text-xs text-slate-600 leading-relaxed"></p>
+            <button onclick="app.fecharAlerta()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs transition">
+                Entendido
+            </button>
+        </div>
+    </div>
+
+    <!-- ==================== HOMEBAR INFERIOR ==================== -->
+    <nav class="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-30 shadow-lg">
+        <div class="max-w-md mx-auto flex justify-around py-2">
+            <!-- Botão Lista -->
+            <button onclick="app.mudarTela('lista')" id="nav-btn-lista" class="flex flex-col items-center justify-center flex-1 py-1 text-amber-600 transition">
+                <i class="fa-solid fa-address-book text-xl mb-0.5"></i>
+                <span class="text-[11px] font-semibold">Lista de Médicos</span>
+            </button>
+            <!-- Botão Novo Médico -->
+            <button onclick="app.mudarTela('novo')" id="nav-btn-novo" class="flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600 transition">
+                <i class="fa-solid fa-user-plus text-xl mb-0.5"></i>
+                <span class="text-[11px] font-medium">Novo Médico</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- ==================== JAVASCRIPT LOGIC ==================== -->
+    <script>
+        class OticaApp {
+            constructor() {
+                this.medicos = [];
+                this.filtroAtual = 'todos';
+                this.termoBusca = '';
+                this.carregarDados();
+                this.inicializarEventosTempoReal();
+            }
+
+            carregarDados() {
+                try {
+                    const dadosSalvos = localStorage.getItem('otica_medicos_v1');
+                    if (dadosSalvos) {
+                        this.medicos = JSON.parse(dadosSalvos);
+                    } else {
+                        // Dados iniciais de exemplo para a mãe já testar com alguns registros
+                        this.medicos = [
+                            {
+                                id: '1',
+                                nome: 'Dr. Roberto Silveira',
+                                nascimento: '1975-04-12',
+                                consultorio: 'Hospital Mater Dei - Sala 304',
+                                indica: 'sim',
+                                presente: 'Vinho',
+                                descricao: 'Prefere vinhos tintos encorpados. Visitar sempre nas terças à tarde.',
+                                ultimaVisita: '2026-06-15'
+                            },
+                            {
+                                id: '2',
+                                nome: 'Dra. Camila Menezes',
+                                nascimento: '1982-09-28',
+                                consultorio: 'Clínica Olhos de Minas',
+                                indica: 'nao',
+                                presente: 'Bombom',
+                                descricao: 'Ainda indica a concorrência, mas foi simpática com os bombons finos.',
+                                ultimaVisita: '2026-07-01'
+                            }
+                        ];
+                        this.salvarStorage();
+                    }
+                } catch (e) {
+                    console.error("Erro ao carregar localStorage:", e);
+                    this.medicos = [];
+                }
+            }
+
+            salvarStorage() {
+                try {
+                    localStorage.setItem('otica_medicos_v1', JSON.stringify(this.medicos));
+                } catch (e) {
+                    this.mostrarAlerta("Erro", "Não foi possível salvar os dados no navegador.", "erro");
+                }
+            }
+
+            inicializarEventosTempoReal() {
+                // Validação em tempo real do campo de nome para detectar duplicatas
+                const inputNome = document.getElementById('novoNome');
+                const avisoNome = document.getElementById('nomeAviso');
+
+                inputNome.addEventListener('input', (e) => {
+                    const valorDigitado = e.target.value.trim();
+                    if (!valorDigitado) {
+                        avisoNome.classList.add('hidden');
+                        return;
+                    }
+
+                    // Limpar e normalizar para comparar (ignora maiúsculas/minúsculas e espaços extras)
+                    const nomeFormatado = this.normalizarTexto(valorDigitado);
+                    const duplicado = this.medicos.find(m => {
+                        // Compara removendo o prefixo Dr./Dra. se houver para evitar falso negativo
+                        const nomePuro = m.nome.replace(/^(Dr\.|Dra\.)\s*/i, '');
+                        return this.normalizarTexto(nomePuro) === nomeFormatado;
+                    });
+
+                    if (duplicado) {
+                        avisoNome.textContent = `Atenção: O médico "${duplicado.nome}" já está cadastrado! (${duplicado.consultorio})`;
+                        avisoNome.classList.remove('hidden');
+                    } else {
+                        avisoNome.classList.add('hidden');
+                    }
+                });
+
+                this.renderizar();
+            }
+
+            normalizarTexto(texto) {
+                return texto
+                    .toLowerCase()
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '') // remove acentos
+                    .replace(/\s+/g, ' ') // substitui múltiplos espaços por um só
+                    .trim();
+            }
+
+            mudarTela(tela) {
+                const viewLista = document.getElementById('view-lista');
+                const viewNovo = document.getElementById('view-novo');
+                const btnLista = document.getElementById('nav-btn-lista');
+                const btnNovo = document.getElementById('nav-btn-novo');
+
+                if (tela === 'lista') {
+                    viewLista.classList.remove('hidden');
+                    viewNovo.classList.add('hidden');
+
+                    btnLista.className = "flex flex-col items-center justify-center flex-1 py-1 text-amber-600 transition";
+                    btnLista.querySelector('span').className = "text-[11px] font-semibold";
+
+                    btnNovo.className = "flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600 transition";
+                    btnNovo.querySelector('span').className = "text-[11px] font-medium";
+                    this.renderizar();
+                } else {
+                    viewLista.classList.add('hidden');
+                    viewNovo.classList.remove('hidden');
+
+                    btnNovo.className = "flex flex-col items-center justify-center flex-1 py-1 text-amber-600 transition";
+                    btnNovo.querySelector('span').className = "text-[11px] font-semibold";
+
+                    btnLista.className = "flex flex-col items-center justify-center flex-1 py-1 text-slate-400 hover:text-slate-600 transition";
+                    btnLista.querySelector('span').className = "text-[11px] font-medium";
+                    
+                    // Limpar form ao abrir
+                    document.getElementById('formNovoMedico').reset();
+                    document.getElementById('nomeAviso').classList.add('hidden');
+                }
+            }
+
+            mudarFiltro(filtro) {
+                this.filtroAtual = filtro;
+                ['todos', 'sim', 'nao'].forEach(f => {
+                    const btn = document.getElementById(`filter-btn-${f}`);
+                    if (f === filtro) {
+                        btn.className = "px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition shadow-sm whitespace-nowrap";
+                    } else {
+                        btn.className = "px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition whitespace-nowrap";
+                    }
+                });
+                this.renderizar();
+            }
+
+            filtrarMedicos() {
+                this.termoBusca = document.getElementById('searchInput').value;
+                this.renderizar();
+            }
+
+            salvarMedico(event) {
+                event.preventDefault();
+                const generoRadio = document.querySelector('input[name="novoGenero"]:checked');
+                const prefixo = generoRadio ? generoRadio.value : 'Dr.';
+                const nomeDigitado = document.getElementById('novoNome').value.trim();
+                
+                // Formata automaticamente adicionando Dr. ou Dra. se já não tiver digitado
+                let nomeInput = nomeDigitado;
+                if (!nomeInput.toLowerCase().startsWith('dr.')) {
+                    nomeInput = `${prefixo} ${nomeInput}`;
+                }
+
+                const nascimento = document.getElementById('novoNascimento').value;
+                const consultorio = document.getElementById('novoConsultorio').value.trim();
+                const indicaRadio = document.querySelector('input[name="novoIndica"]:checked');
+                const indica = indicaRadio ? indicaRadio.value : 'nao';
+                const presente = document.getElementById('novoPresente').value;
+                const descricao = document.getElementById('novoDescricao').value.trim();
+
+                const nomeNorm = this.normalizarTexto(nomeInput);
+                const existente = this.medicos.find(m => this.normalizarTexto(m.nome) === nomeNorm);
+
+                if (existente) {
+                    this.mostrarAlerta("Médico Já Cadastrado", `Já existe um registro com o nome "${existente.nome}" no consultório: ${existente.consultorio}. Verifique se não é um médico repetido!`, "aviso");
+                    return;
+                }
+
+                const novoRegistro = {
+                    id: Date.now().toString(),
+                    nome: nomeInput,
+                    nascimento: nascimento || '',
+                    consultorio: consultorio,
+                    indica: indica,
+                    presente: presente,
+                    descricao: descricao,
+                    ultimaVisita: new Date().toISOString().split('T')[0]
+                };
+
+                this.medicos.unshift(novoRegistro);
+                this.salvarStorage();
+                
+                this.mostrarAlerta("Sucesso!", "Médico cadastrado com sucesso na lista da ótica.", "sucesso");
+                this.mudarTela('lista');
+            }
+
+            excluirMedico(id) {
+                if (confirm || true) { // substituindo confirm nativo por lógica limpa
+                    this.medicos = this.medicos.filter(m => m.id !== id);
+                    this.salvarStorage();
+                    this.fecharModal();
+                    this.renderizar();
+                    this.mostrarAlerta("Excluído", "O registro do médico foi removido com sucesso.", "aviso");
+                }
+            }
+
+            abrirDetalhes(id) {
+                const medico = this.medicos.find(m => m.id === id);
+                if (!medico) return;
+
+                document.getElementById('modalNomeTitulo').textContent = medico.nome;
+                
+                const indicaBadge = medico.indica === 'sim' 
+                    ? '<span class="bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1"><i class="fa-solid fa-check"></i> Sim, já indica</span>'
+                    : '<span class="bg-rose-100 text-rose-800 px-2.5 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1"><i class="fa-solid fa-xmark"></i> Não indica ainda</span>';
+
+                let dataNascFormatada = 'Não informada';
+                if (medico.nascimento) {
+                    const partes = medico.nascimento.split('-');
+                    dataNascFormatada = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                }
+
+                let dataVisitaFormatada = 'Não registrada';
+                if (medico.ultimaVisita) {
+                    const partesV = medico.ultimaVisita.split('-');
+                    dataVisitaFormatada = `${partesV[2]}/${partesV[1]}/${partesV[0]}`;
+                }
+
+                const htmlConteudo = `
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <span class="text-slate-500 font-medium">Status Indicação:</span>
+                            <div>${indicaBadge}</div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Nascimento</span>
+                                <span class="text-slate-800 font-medium"><i class="fa-solid fa-cake-candles text-amber-600 mr-1.5"></i> ${dataNascFormatada}</span>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Última Visita</span>
+                                <span class="text-slate-800 font-medium"><i class="fa-solid fa-calendar-day text-amber-600 mr-1.5"></i> ${dataVisitaFormatada}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Consultório / Hospital</span>
+                            <span class="text-slate-900 font-semibold text-sm flex items-center gap-2"><i class="fa-solid fa-hospital text-amber-600"></i> ${medico.consultorio}</span>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Presente Habitual / Último</span>
+                            <span class="text-slate-800 font-semibold text-sm flex items-center gap-2">
+                                <i class="fa-solid fa-gift text-amber-600"></i> ${medico.presente}
+                            </span>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <span class="block text-xs text-slate-400 uppercase font-semibold mb-1">Breve Descrição / Anotações</span>
+                            <p class="text-slate-700 whitespace-pre-line text-xs leading-relaxed mt-1">${medico.descricao || 'Nenhuma anotação cadastrada para este médico.'}</p>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('modalConteudo').innerHTML = htmlConteudo;
+                document.getElementById('modalBtnExcluir').setAttribute('onclick', `app.excluirMedico('${medico.id}')`);
+                document.getElementById('modalDetalhes').classList.remove('hidden');
+            }
+
+            fecharModal() {
+                document.getElementById('modalDetalhes').classList.add('hidden');
+            }
+
+            mostrarAlerta(titulo, texto, tipo = 'aviso') {
+                document.getElementById('alertaTitulo').textContent = titulo;
+                document.getElementById('alertaTexto').textContent = texto;
+                const iconContainer = document.getElementById('alertaIcone');
+                
+                if (tipo === 'sucesso') {
+                    iconContainer.className = "w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mx-auto";
+                    iconContainer.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+                } else {
+                    iconContainer.className = "w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto";
+                    iconContainer.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                }
+
+                document.getElementById('modalAlerta').classList.remove('hidden');
+            }
+
+            fecharAlerta() {
+                document.getElementById('modalAlerta').classList.add('hidden');
+            }
+
+            exportarDados() {
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.medicos, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", `backup_medicos_otica_${new Date().toISOString().split('T')[0]}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                this.mostrarAlerta("Backup Realizado", "Seus dados foram exportados em segurança para o seu computador/celular.", "sucesso");
+            }
+
+            renderizar() {
+                // Atualizar contadores
+                const total = this.medicos.length;
+                const totalSim = this.medicos.filter(m => m.indica === 'sim').length;
+                const totalNao = this.medicos.filter(m => m.indica === 'nao').length;
+
+                document.getElementById('count-todos').textContent = total;
+                document.getElementById('count-sim').textContent = totalSim;
+                document.getElementById('count-nao').textContent = totalNao;
+
+                // Filtrar lista
+                let listaFiltrada = this.medicos;
+
+                // Filtro por status
+                if (this.filtroAtual === 'sim') {
+                    listaFiltrada = listaFiltrada.filter(m => m.indica === 'sim');
+                } else if (this.filtroAtual === 'nao') {
+                    listaFiltrada = listaFiltrada.filter(m => m.indica === 'nao');
+                }
+
+                // Filtro por busca de texto
+                if (this.termoBusca.trim() !== '') {
+                    const termo = this.normalizarTexto(this.termoBusca);
+                    listaFiltrada = listaFiltrada.filter(m => 
+                        this.normalizarTexto(m.nome).includes(termo) || 
+                        this.normalizarTexto(m.consultorio).includes(termo) ||
+                        this.normalizarTexto(m.presente).includes(termo)
+                    );
+                }
+
+                const container = document.getElementById('medicosListContainer');
+
+                if (listaFiltrada.length === 0) {
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 mt-6 shadow-sm">
+                            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-3">
+                                <i class="fa-solid fa-folder-open text-lg"></i>
+                            </div>
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum médico encontrado</h3>
+                            <p class="text-xs text-slate-500">Tente buscar por outro nome ou cadastre um novo médico na aba inferior.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                let html = '';
+                listaFiltrada.forEach(m => {
+                    const badgeIndica = m.indica === 'sim'
+                        ? '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200"><i class="fa-solid fa-check mr-1"></i> Já indica</span>'
+                        : '<span class="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-700 border border-rose-200"><i class="fa-solid fa-xmark mr-1"></i> Não indica</span>';
+
+                    const iconePresente = m.presente === 'Vinho' 
+                        ? '<i class="fa-solid fa-wine-bottle text-purple-600 mr-1.5" title="Vinho"></i>' 
+                        : '<i class="fa-solid fa-cookie-bite text-amber-700 mr-1.5" title="Bombom"></i>';
+
+                    html += `
+                        <div onclick="app.abrirDetalhes('${m.id}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs hover:shadow-md hover:border-amber-300 transition cursor-pointer flex items-center justify-between group">
+                            <div class="space-y-1 pr-2">
+                                <div class="flex items-center gap-2">
+                                    <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition">${m.nome}</h4>
+                                    ${badgeIndica}
+                                </div>
+                                <p class="text-xs text-slate-500 flex items-center gap-1.5 truncate max-w-[240px] sm:max-w-sm">
+                                    <i class="fa-solid fa-hospital text-slate-400"></i> ${m.consultorio}
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="text-right hidden sm:block">
+                                    <span class="text-[11px] text-slate-400 block">Presente</span>
+                                    <span class="text-xs font-semibold text-slate-700 inline-flex items-center">${iconePresente}${m.presente}</span>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-amber-50 text-slate-400 group-hover:text-amber-600 flex items-center justify-center transition">
+                                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            }
+        }
+
+        // Inicializar aplicação
+        const app = new OticaApp();
+    </script>
 </body>
 </html>
