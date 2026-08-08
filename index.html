@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Gestão de Visitas Ótica</title>
+    <title>Optica La Patrícia - Gestão de Atendimentos</title>
+    <!-- Favicon personalizado -->
+    <link rel="icon" type="image/png" href="la pipita.png">
     <!-- Tailwind CSS CDN for gorgeous UI -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome for clean icons -->
@@ -22,8 +24,8 @@
                 <img src="la pipita.png" alt="La Pipita Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-eye text-amber-500 text-lg\'></i>';">
             </div>
             <div>
-                <h1 class="font-bold text-base tracking-tight">Ótica La Patrícia</h1>
-                <p class="text-xs text-slate-400">Painel Completo de Visitas</p>
+                <h1 class="font-bold text-base tracking-tight">Optica La Patrícia</h1>
+                <p class="text-xs text-slate-400">Gestão de Atendimentos</p>
             </div>
         </div>
         <div class="text-xs text-slate-400 font-medium bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
@@ -46,8 +48,8 @@
                 <!-- Filtros condicionais -->
                 <div id="filter-container" class="hidden items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
                     <button onclick="app.setFilter('all')" id="filter-all" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap">Todos</button>
-                    <button onclick="app.setFilter('sim')" id="filter-yes" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Sim</button>
-                    <button onclick="app.setFilter('nao')" id="filter-no" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Não</button>
+                    <button onclick="app.setFilter('sim')" id="filter-yes" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Indica</button>
+                    <button onclick="app.setFilter('nao')" id="filter-no" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Não Indica</button>
                     <button onclick="app.setFilter('deixou')" id="filter-deixou" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Deixou de indicar</button>
                 </div>
             </div>
@@ -152,14 +154,13 @@
                         <div id="subspec-tags" class="flex flex-wrap gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl"></div>
                     </div>
 
-                    <!-- Aniversário & Visita (Aniversário sem ano: Dia e Mês) -->
+                    <!-- Aniversário & Visita -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Aniversário (Dia e Mês)</label>
                             <div class="grid grid-cols-2 gap-2">
                                 <select id="dobDay" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition text-xs font-medium">
                                     <option value="">Dia</option>
-                                    <!-- Preenchido via JS (1 a 31) -->
                                 </select>
                                 <select id="dobMonth" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition text-xs font-medium">
                                     <option value="">Mês</option>
@@ -223,7 +224,7 @@
                         </div>
                     </div>
 
-                    <!-- Já Indica a Ótica com 3 opções: Sim, Não, Deixou de indicar -->
+                    <!-- Já Indica a Ótica com 3 opções -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Já Indica a Ótica?</label>
@@ -308,7 +309,7 @@
 
         <!-- ==================== TELA 3: RELATÓRIOS ==================== -->
         <section id="view-reports" class="hidden space-y-4">
-            <div class="space-y-4">
+            <div class="space-y-3">
                 <div class="flex items-center justify-between">
                     <div>
                         <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
@@ -318,7 +319,21 @@
                     </div>
                 </div>
 
-                <div id="reports-list-container" class="space-y-3 max-h-[60vh] overflow-y-auto pr-1 no-scrollbar"></div>
+                <!-- Barra de Pesquisa e Tags de Relatórios -->
+                <div class="space-y-3">
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </span>
+                        <input type="text" id="reportSearch" oninput="app.renderReportsList()" placeholder="Buscar relatórios por título, conteúdo ou médico..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    </div>
+                    <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                        <button onclick="app.setReportFilter('concluidos')" id="report-filter-concluidos" class="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap">Concluídos</button>
+                        <button onclick="app.setReportFilter('pendentes')" id="report-filter-pendentes" class="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Pendentes (<span id="count-pendentes">0</span>)</button>
+                    </div>
+                </div>
+
+                <div id="reports-list-container" class="space-y-3 max-h-[55vh] overflow-y-auto pr-1 no-scrollbar"></div>
 
                 <button onclick="app.abrirFormRelatorio()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3.5 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-plus-circle"></i> Adicionar Novo Relatório
@@ -347,7 +362,7 @@
                 
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Título do Relatório *</label>
-                    <input type="text" id="reportTitle" required placeholder="Ex: Visita de Apresentação e Entrega de Brinde" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                    <input type="text" id="reportTitle" required placeholder="" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
                 </div>
 
                 <div>
@@ -458,6 +473,7 @@
                 this.clinics = [];
                 this.reports = [];
                 this.currentFilter = 'all';
+                this.reportFilter = 'concluidos'; // 'concluidos' ou 'pendentes'
                 this.clinicaSelecionada = null; 
                 this.initDobDays();
                 this.loadData();
@@ -530,7 +546,7 @@
                         this.reports = [
                             {
                                 id: 'rep_1',
-                                title: 'Visita de Boas-vindas',
+                                title: 'Relatório #0001',
                                 date: '2026-06-15',
                                 doctorId: '1',
                                 content: 'Visita realizada com sucesso. O Dr. Roberto recebeu o vinho importado.'
@@ -597,6 +613,23 @@
                 this.clinics.forEach(c => {
                     const sel = (c.name === selectedName) ? 'selected' : '';
                     html += `<option value="${c.name}" ${sel}>${c.name} - ${c.address}</option>`;
+                });
+                select.innerHTML = html;
+            }
+
+            preencherSelectMedicos(selectedId = '') {
+                const select = document.getElementById('reportDoctorId');
+                if(!select) return;
+
+                if(this.doctors.length === 0) {
+                    select.innerHTML = '<option value="">Nenhum médico cadastrado</option>';
+                    return;
+                }
+
+                let html = '<option value="">Selecione o Médico...</option>';
+                this.doctors.forEach(d => {
+                    const sel = (d.id === selectedId) ? 'selected' : '';
+                    html += `<option value="${d.id}" ${sel}>${d.name} (${d.hospital})</option>`;
                 });
                 select.innerHTML = html;
             }
@@ -800,7 +833,8 @@
             setFilter(f) {
                 this.currentFilter = f;
                 ['all', 'sim', 'nao', 'deixou'].forEach(id => {
-                    const btn = document.getElementById(`filter-${id}`);
+                    const btnId = id === 'sim' ? 'yes' : (id === 'nao' ? 'no' : id);
+                    const btn = document.getElementById(`filter-${btnId}`);
                     if(!btn) return;
                     if(id === f) {
                         btn.className = "px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap";
@@ -942,14 +976,13 @@
                 filtered.forEach(d => {
                     let badge = '';
                     if (d.indicates === 'sim') {
-                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200"><i class="fa-solid fa-check mr-1 text-emerald-700"></i> Sim</span>';
+                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200"><i class="fa-solid fa-check mr-1 text-emerald-700"></i> Indica</span>';
                     } else if (d.indicates === 'deixou') {
                         badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-900 border border-amber-200"><i class="fa-solid fa-triangle-exclamation mr-1 text-amber-700"></i> Deixou de indicar</span>';
                     } else {
-                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-900 border border-rose-200"><i class="fa-solid fa-xmark mr-1 text-rose-700"></i> Não</span>';
+                        badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-900 border border-rose-200"><i class="fa-solid fa-xmark mr-1 text-rose-700"></i> Não Indica</span>';
                     }
 
-                    // Status com tom legível e escuro para Concluído/Visitar
                     let statusColorClass = "bg-slate-100 text-slate-900 border-slate-200";
                     if (d.status === 'Concluído') {
                         statusColorClass = "bg-emerald-50 text-emerald-900 border-emerald-200";
@@ -1088,11 +1121,6 @@
                 });
 
                 const hospital = document.getElementById('selectHospital').value;
-                if(!hospital) {
-                    this.showAlert("Atenção", "Por favor, selecione uma clínica cadastrada.");
-                    return;
-                }
-
                 const room = document.getElementById('room').value.trim();
                 const phone = document.getElementById('phone').value.trim();
                 const cellphone = document.getElementById('cellphone').value.trim();
@@ -1106,13 +1134,18 @@
                 const nearbyUnit = document.getElementById('nearbyUnit').value.trim();
                 const notes = document.getElementById('notes').value.trim();
 
+                if(!hospital) {
+                    this.showAlert("Atenção", "Por favor, selecione ou cadastre uma clínica para o médico.");
+                    return;
+                }
+
                 if(editId) {
                     const index = this.doctors.findIndex(item => item.id === editId);
                     if(index !== -1) {
                         this.doctors[index] = {
                             id: editId,
-                            crm,
                             name,
+                            crm,
                             specialization,
                             subspecialties,
                             dobDay,
@@ -1135,15 +1168,13 @@
                         };
                     }
                     document.getElementById('doctorEditId').value = '';
+                    document.getElementById('form-doctor-title').innerHTML = '<i class="fa-solid fa-user-doctor text-amber-600"></i> Cadastrar Novo Médico';
                     document.getElementById('btnCancelarEdicaoMedico').classList.add('hidden');
-                    this.saveStorage();
-                    this.mudarTela('list');
-                    this.showAlert("Sucesso", "Médico atualizado com sucesso!", "sucesso");
                 } else {
                     const novoMedico = {
                         id: 'doc_' + Date.now(),
-                        crm,
                         name,
+                        crm,
                         specialization,
                         subspecialties,
                         dobDay,
@@ -1164,37 +1195,50 @@
                         nearbyUnit,
                         notes
                     };
-
                     this.doctors.unshift(novoMedico);
-                    this.saveStorage();
-                    this.mudarTela('list');
-                    this.showAlert("Sucesso", "Médico cadastrado com sucesso!", "sucesso");
                 }
+
+                this.saveStorage();
+                document.getElementById('formNovoMedico').reset();
+                document.getElementById('horariosContainer').innerHTML = '';
+                this.adicionarHorarioLinha();
+                this.mudarTela('list');
+                this.showAlert("Sucesso", "Médico salvo com sucesso!", "sucesso");
             }
 
-            preencherSelectMedicos(selectedId = '') {
-                const select = document.getElementById('reportDoctorId');
-                if(!select) return;
-
-                if(this.doctors.length === 0) {
-                    select.innerHTML = '<option value="">Nenhum médico cadastrado</option>';
-                    return;
-                }
-
-                let html = '<option value="">Selecione o Médico correspondente...</option>';
-                this.doctors.forEach(d => {
-                    const sel = (d.id === selectedId) ? 'selected' : '';
-                    html += `<option value="${d.id}" ${sel}>${d.name} (${d.hospital})</option>`;
+            setReportFilter(f) {
+                this.reportFilter = f;
+                ['concluidos', 'pendentes'].forEach(id => {
+                    const btn = document.getElementById(`report-filter-${id}`);
+                    if(!btn) return;
+                    if(id === f) {
+                        btn.className = "px-3.5 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap";
+                    } else {
+                        btn.className = "px-3.5 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap";
+                    }
                 });
-                select.innerHTML = html;
+                this.renderReportsList();
             }
 
-            abrirFormRelatorio(reportId = null) {
+            gerarProximoTituloRelatorio() {
+                let maxNum = 0;
+                this.reports.forEach(r => {
+                    const match = r.title.match(/Relatório\s*#(\d{4})/i);
+                    if (match) {
+                        const num = parseInt(match[1], 10);
+                        if (num > maxNum) maxNum = num;
+                    }
+                });
+                const proximoNum = maxNum + 1;
+                return `Relatório #${String(proximoNum).padStart(4, '0')}`;
+            }
+
+            abrirFormRelatorio(reportId = null, preselectDoctorId = null) {
                 const modal = document.getElementById('modalRelatorio');
                 const titulo = document.getElementById('modalRelatorioTitulo');
                 const btnExcluir = document.getElementById('btnExcluirRelatorio');
 
-                this.preencherSelectMedicos();
+                this.preencherSelectMedicos(preselectDoctorId || '');
 
                 if(reportId) {
                     const rep = this.reports.find(r => r.id === reportId);
@@ -1213,6 +1257,10 @@
                     document.getElementById('formRelatorio').reset();
                     document.getElementById('reportId').value = '';
                     
+                    const proximoTitulo = this.gerarProximoTituloRelatorio();
+                    document.getElementById('reportTitle').value = proximoTitulo;
+                    document.getElementById('reportTitle').placeholder = proximoTitulo;
+                    
                     const hoje = new Date().toISOString().split('T')[0];
                     document.getElementById('reportDate').value = hoje;
 
@@ -1229,7 +1277,10 @@
             salvarRelatorio(e) {
                 e.preventDefault();
                 const id = document.getElementById('reportId').value;
-                const title = document.getElementById('reportTitle').value.trim();
+                let title = document.getElementById('reportTitle').value.trim();
+                if(!title) {
+                    title = document.getElementById('reportTitle').placeholder || this.gerarProximoTituloRelatorio();
+                }
                 const date = document.getElementById('reportDate').value;
                 const doctorId = document.getElementById('reportDoctorId').value;
                 const content = document.getElementById('reportContent').value.trim();
@@ -1271,23 +1322,90 @@
 
             renderReportsList() {
                 const container = document.getElementById('reports-list-container');
+                const searchInput = document.getElementById('reportSearch');
+                const countPendentesSpan = document.getElementById('count-pendentes');
                 if(!container) return;
 
-                if(this.reports.length === 0) {
+                // Calcular médicos pendentes (sem nenhum relatório vinculado)
+                const medicosComRelatorioIds = new Set(this.reports.map(r => r.doctorId));
+                const medicosPendentes = this.doctors.filter(d => !medicosComRelatorioIds.has(d.id));
+                if(countPendentesSpan) countPendentesSpan.textContent = medicosPendentes.length;
+
+                const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+                if (this.reportFilter === 'pendentes') {
+                    let filtrados = medicosPendentes;
+                    if(q) {
+                        filtrados = medicosPendentes.filter(d => 
+                            d.name.toLowerCase().includes(q) || 
+                            d.crm.toLowerCase().includes(q) || 
+                            d.hospital.toLowerCase().includes(q)
+                        );
+                    }
+
+                    if(filtrados.length === 0) {
+                        container.innerHTML = `
+                            <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 shadow-sm">
+                                <div class="w-12 h-12 bg-emerald-50 rounded-full flex items-center justify-center mx-auto text-emerald-600 mb-3">
+                                    <i class="fa-solid fa-circle-check text-lg"></i>
+                                </div>
+                                <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum médico pendente</h3>
+                                <p class="text-xs text-slate-500">Todos os médicos cadastrados já possuem relatório vinculado!</p>
+                            </div>
+                        `;
+                        return;
+                    }
+
+                    let html = '<div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1 mb-1">Médicos sem relatório (Clique para criar)</div>';
+                    filtrados.forEach(d => {
+                        html += `
+                            <div onclick="app.abrirFormRelatorio(null, '${d.id}')" class="bg-white p-4 rounded-2xl border border-amber-200 shadow-2xs hover:shadow-md hover:border-amber-400 transition cursor-pointer flex items-center justify-between group bg-amber-50/30">
+                                <div class="space-y-1 pr-2">
+                                    <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition flex items-center gap-1.5">
+                                        <i class="fa-solid fa-user-doctor text-amber-600"></i> ${d.name}
+                                    </h4>
+                                    <p class="text-xs text-slate-600">CRM: <b>${d.crm}</b> | Clínica: <b>${d.hospital}</b></p>
+                                    <span class="inline-block text-[10px] font-semibold bg-amber-100 text-amber-800 px-2 py-0.5 rounded">Pendente de Relatório</span>
+                                </div>
+                                <div class="w-8 h-8 rounded-full bg-amber-100 group-hover:bg-amber-600 text-amber-800 group-hover:text-white flex items-center justify-center transition">
+                                    <i class="fa-solid fa-plus text-xs"></i>
+                                </div>
+                            </div>
+                        `;
+                    });
+                    container.innerHTML = html;
+                    return;
+                }
+
+                // Filtro Concluídos (Relatórios existentes)
+                let filtradosReps = this.reports;
+                if(q) {
+                    filtradosReps = this.reports.filter(r => {
+                        const doc = this.doctors.find(d => d.id === r.doctorId);
+                        const docName = doc ? doc.name.toLowerCase() : '';
+                        const docHosp = doc ? doc.hospital.toLowerCase() : '';
+                        return r.title.toLowerCase().includes(q) || 
+                               r.content.toLowerCase().includes(q) || 
+                               docName.includes(q) || 
+                               docHosp.includes(q);
+                    });
+                }
+
+                if(filtradosReps.length === 0) {
                     container.innerHTML = `
                         <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 shadow-sm">
                             <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-3">
                                 <i class="fa-solid fa-file-circle-exclamation text-lg"></i>
                             </div>
-                            <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum relatório cadastrado</h3>
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum relatório encontrado</h3>
                             <p class="text-xs text-slate-500">Clique no botão abaixo para adicionar sua primeira anotação de visita.</p>
                         </div>
                     `;
                     return;
                 }
 
-                let html = '';
-                this.reports.forEach(r => {
+                let html = '<div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider px-1 mb-1">Relatórios Concluídos</div>';
+                filtradosReps.forEach(r => {
                     const doc = this.doctors.find(d => d.id === r.doctorId);
                     const docName = doc ? doc.name : 'Médico não encontrado';
                     const docHosp = doc ? doc.hospital : '';
@@ -1353,10 +1471,10 @@
                     return 'Não informado';
                 };
 
-                let indicaTexto = 'Não';
+                let indicaTexto = 'Não Indica';
                 let indicaCor = 'text-rose-900 font-bold';
                 if(d.indicates === 'sim') {
-                    indicaTexto = 'Sim, já indica';
+                    indicaTexto = 'Indica';
                     indicaCor = 'text-emerald-900 font-bold';
                 } else if(d.indicates === 'deixou') {
                     indicaTexto = 'Deixou de indicar';
@@ -1436,7 +1554,6 @@
                             </div>
                         </div>
 
-                        <!-- Presente & Unidade Próxima atualizado conforme solicitado -->
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
                             <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Presente & Unidade Próxima</span>
                             <p class="text-xs text-slate-900"><b>Presente:</b> ${d.present}</p>
