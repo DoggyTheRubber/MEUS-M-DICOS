@@ -18,17 +18,15 @@
 
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-3">
-            <!-- BOTÃO DE VOLTAR ADICIONADO AQUI -->
             <a href="index.html" class="text-slate-400 hover:text-white mr-1">
                 <i class="fa-solid fa-arrow-left text-base"></i>
             </a>
             
             <div>
-                <h1 class="font-bold text-base tracking-tight">Aniversários da Semana</h1>
+                <h1 class="font-bold text-base tracking-tight">Aniversários do Mês</h1>
                 <p class="text-xs text-slate-400">Ótica La Patricia</p>
             </div>
         </div>
-        <!-- ENGRENAGEM NO TOPO DIREITO -->
         <a href="settings.html" class="text-slate-400 hover:text-white transition">
             <i class="fa-solid fa-gear text-xl"></i>
         </a>
@@ -42,8 +40,8 @@
                 <i class="fa-solid fa-cake-candles text-lg"></i>
             </div>
             <div class="space-y-1">
-                <h3 class="font-bold text-slate-900 text-sm">Próximos Aniversários (7 Dias)</h3>
-                <p class="text-xs text-slate-600 leading-relaxed">Listando médicos que fazem aniversário do dia de hoje até os próximos 7 dias. O sistema notificará automaticamente caso haja algum aniversário amanhã!</p>
+                <h3 id="mes-atual-titulo" class="font-bold text-slate-900 text-sm">Aniversariantes do Mês</h3>
+                <p class="text-xs text-slate-600 leading-relaxed">Listando todos os médicos que fazem aniversário neste mês, ordenados em ordem alfabética.</p>
             </div>
         </div>
 
@@ -80,14 +78,6 @@
             constructor() {
                 this.doctors = [];
                 this.loadData();
-                
-                // Inicia o loop APENAS UMA VEZ ao abrir
-                if (localStorage.getItem('notif_ativa') === 'true') {
-                    const intervalo = parseInt(localStorage.getItem('notif_intervalo') || '3600000');
-                    setInterval(() => {
-                        this.loadData(); // Recarrega do banco e processa
-                    }, intervalo);
-                }
             }
 
             async loadData() {
@@ -100,100 +90,72 @@
                 } catch(e) { console.error(e); }
             }
 
-            async solicitarPermissaoNotificacao() {
-                if (!("Notification" in window)) {
-                    alert("Este navegador não suporta notificações de desktop/dispositivo.");
-                    return;
-                }
-                let permission = await Notification.requestPermission();
-                if (permission === "granted") {
-                    alert("Permissão concedida! Você receberá alertas dos aniversários.");
-                } else {
-                    alert("Permissão negada para notificações.");
-                }
-            }
-
-            dispararNotificacaoNativa(titulo, corpo) {
-                if (Notification.permission === "granted") {
-                    new Notification(titulo, {
-                        body: corpo,
-                        icon: "la pipita.png"
-                    });
-                }
-            }
-
             processarAniversarios() {
                 const container = document.getElementById('birthday-list');
                 if(!container) return;
 
                 const hoje = new Date();
-                hoje.setHours(0, 0, 0, 0);
+                const mesAtual = hoje.getMonth(); // 0 a 11
+                const diaHoje = hoje.getDate();
+                const anoAtual = hoje.getFullYear();
 
-                let aniversariantesDaSemana = [];
-                let temAniversarioAmanha = false;
-                let medicoAmanhaNome = "";
+                const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+                
+                const tituloCard = document.getElementById('mes-atual-titulo');
+                if(tituloCard) {
+                    tituloCard.textContent = `Aniversariantes de ${nomesMeses[mesAtual]}`;
+                }
+
+                let aniversariantesDoMes = [];
 
                 this.doctors.forEach(d => {
                     if (!d.birthdate) return;
 
-                    // Trata datas no formato YYYY-MM-DD evitando problemas de fuso horário (UTC vs Local)
                     const partes = d.birthdate.split('-');
                     if (partes.length !== 3) return;
-                    const anoNasc = parseInt(partes[0], 10);
                     const mesAniversario = parseInt(partes[1], 10) - 1;
                     const diaAniversario = parseInt(partes[2], 10);
 
-                    // Testa para os próximos 7 dias (incluindo hoje)
-                    for (let i = 0; i < 7; i++) {
-                        let dataTeste = new Date(hoje);
-                        dataTeste.setDate(hoje.getDate() + i);
-
-                        if (dataTeste.getDate() === diaAniversario && dataTeste.getMonth() === mesAniversario) {
-                            let statusDia = i === 0 ? "🎂 Hoje!" : (i === 1 ? "🎉 Amanhã!" : `Em ${i} dias`);
-                            
-                            aniversariantesDaSemana.push({
-                                doctor: d,
-                                diasRestantes: i,
-                                rotuloDia: statusDia,
-                                dataFormatada: `${String(diaAniversario).padStart(2, '0')}/${String(mesAniversario + 1).padStart(2, '0')}`
-                            });
-
-                            if (i === 1) {
-                                temAniversarioAmanha = true;
-                                medicoAmanhaNome = d.name;
-                            }
-                            break;
+                    // Verifica se o mês do aniversário é o mês atual
+                    if (mesAniversario === mesAtual) {
+                        let statusDia = "";
+                        if (diaAniversario === diaHoje) {
+                            statusDia = "🎂 Hoje!";
+                        } else if (diaAniversario === diaHoje + 1) {
+                            statusDia = "🎉 Amanhã!";
+                        } else if (diaAniversario > diaHoje) {
+                            statusDia = `Dia ${diaAniversario}`;
+                        } else {
+                            statusDia = `Passou (${diaAniversario}/${String(mesAniversario + 1).padStart(2, '0')})`;
                         }
+
+                        aniversariantesDoMes.push({
+                            doctor: d,
+                            dia: diaAniversario,
+                            rotuloDia: statusDia,
+                            dataFormatada: `${String(diaAniversario).padStart(2, '0')}/${String(mesAniversario + 1).padStart(2, '0')}`
+                        });
                     }
                 });
 
-                if (temAniversarioAmanha && Notification.permission === "granted") {
-                    if (!sessionStorage.getItem(`notificado_${medicoAmanhaNome}`)) {
-                        this.dispararNotificacaoNativa(
-                            "Lembrete de Aniversário 🎈",
-                            `Olá! Amanhã é aniversário do Dr(a). ${medicoAmanhaNome}!`
-                        );
-                        sessionStorage.setItem(`notificado_${medicoAmanhaNome}`, "true");
-                    }
-                }
-
-                if (aniversariantesDaSemana.length === 0) {
+                if (aniversariantesDoMes.length === 0) {
                     container.innerHTML = `
                         <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 mt-2 shadow-sm">
-                            <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum aniversário nos próximos 7 dias</h3>
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum aniversário em ${nomesMeses[mesAtual]}</h3>
                             <p class="text-xs text-slate-500">Certifique-se de preencher a data de nascimento dos médicos no cadastro.</p>
                         </div>
                     `;
                     return;
                 }
 
-                aniversariantesDaSemana.sort((a, b) => a.diasRestantes - b.diasRestantes);
+                // Ordenação alfabética por nome do médico
+                aniversariantesDoMes.sort((a, b) => a.doctor.name.localeCompare(b.doctor.name, 'pt-BR', { sensitivity: 'accent' }));
 
-                let html = '<div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Aniversariantes da Semana</div>';
+                let html = `<div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Médicos Aniversariantes (${aniversariantesDoMes.length})</div>`;
                 
-                aniversariantesDaSemana.forEach(item => {
+                aniversariantesDoMes.forEach(item => {
                     const d = item.doctor;
-                    let badgeClass = item.diasRestantes === 0 ? "bg-emerald-50 text-emerald-900 border-emerald-200" : (item.diasRestantes === 1 ? "bg-amber-50 text-amber-900 border-amber-200" : "bg-slate-100 text-slate-700 border-slate-200");
+                    let badgeClass = item.dia === diaHoje ? "bg-emerald-50 text-emerald-900 border-emerald-200" : "bg-slate-100 text-slate-700 border-slate-200";
 
                     html += `
                         <div onclick="app.abrirDetalhes('${d.id}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs hover:border-amber-300 transition cursor-pointer flex items-center justify-between group">

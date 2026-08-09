@@ -26,61 +26,72 @@
                 <p class="text-xs text-slate-400">Ótica La Patrícia</p>
             </div>
         </div>
-        <!-- ENGRENAGEM NO TOPO DIREITO -->
-        <a href="settings.html" class="text-slate-400 hover:text-white transition">
-            <i class="fa-solid fa-gear text-xl"></i>
-        </a>
+        <div class="flex items-center gap-2">
+            <a href="add.html" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Novo
+            </a>
+            <a href="settings.html" class="text-slate-400 hover:text-white transition p-1">
+                <i class="fa-solid fa-gear text-xl"></i>
+            </a>
+        </div>
     </header>
 
     <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-4">
         
-        <div class="space-y-3">
+        <!-- Barra de Busca e Filtros -->
+        <div class="space-y-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
             <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
-                <input type="text" id="search" oninput="app.renderList()" placeholder="Buscar por CRM, nome, clínica ou especialidade..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <input type="text" id="search" oninput="app.renderList()" placeholder="Buscar por CRM, nome, clínica ou especialidade..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
-            <div id="filter-container" class="hidden items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-                <button onclick="app.setFilter('all')" id="filter-all" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap">Todos</button>
-                <button onclick="app.setFilter('sim')" id="filter-yes" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Indica</button>
-                <button onclick="app.setFilter('nao')" id="filter-no" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Não Indica</button>
-                <button onclick="app.setFilter('deixou')" id="filter-deixou" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Deixou de indicar</button>
+            <div id="filter-container" class="hidden items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar pt-1">
+                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Filtros:</span>
+                <button onclick="app.setFilter('all')" id="filter-all" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white transition whitespace-nowrap">Todos</button>
+                <button onclick="app.setFilter('sim')" id="filter-yes" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 transition whitespace-nowrap">Indica</button>
+                <button onclick="app.setFilter('nao')" id="filter-no" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 transition whitespace-nowrap">Não Indica</button>
+                <button onclick="app.setFilter('deixou')" id="filter-deixou" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 transition whitespace-nowrap">Deixou de Indicar</button>
             </div>
         </div>
 
-        <div id="clinica-breadcrumb" class="hidden items-center justify-between bg-amber-50 border border-amber-200 px-4 py-2.5 rounded-xl">
+        <!-- Breadcrumb / Navegação por Clínica -->
+        <div id="clinica-breadcrumb" class="hidden items-center justify-between bg-amber-50 border border-amber-200 px-4 py-3 rounded-2xl shadow-2xs">
             <div class="flex items-center gap-2">
-                <button onclick="app.voltarParaClinicas()" class="bg-white text-amber-800 hover:bg-amber-100 p-1.5 rounded-lg border border-amber-200 text-xs font-bold transition flex items-center gap-1">
-                    <i class="fa-solid fa-arrow-left"></i> Voltar às Clínicas
+                <button onclick="app.voltarParaClinicas()" class="bg-white text-amber-900 hover:bg-amber-100 px-2.5 py-1.5 rounded-xl border border-amber-300 text-xs font-bold transition flex items-center gap-1 shadow-2xs">
+                    <i class="fa-solid fa-arrow-left"></i> Clínicas
                 </button>
-                <span id="breadcrumb-titulo" class="font-bold text-slate-900 text-xs truncate max-w-[200px]">Clínica</span>
+                <span id="breadcrumb-titulo" class="font-bold text-slate-900 text-xs truncate max-w-[180px]">Clínica</span>
             </div>
-            <span id="breadcrumb-contador" class="text-xs bg-amber-200 text-amber-900 font-semibold px-2 py-0.5 rounded-md">0 médicos</span>
+            <span id="breadcrumb-contador" class="text-xs bg-amber-200/80 text-amber-900 font-bold px-2.5 py-1 rounded-lg">0 médicos</span>
         </div>
 
+        <!-- Container de Listagem Principal -->
         <div id="doctor-list" class="space-y-3 pb-6"></div>
     </main>
 
-    <!-- Modal Detalhes com TODOS os campos -->
+    <!-- Modal de Detalhes -->
     <div id="modalDetalhes" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
-                <h3 id="modalNomeTitulo" class="font-bold text-base">Detalhes do Médico</h3>
+                <div>
+                    <span class="text-[10px] bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded uppercase tracking-wider">Ficha Completa</span>
+                    <h3 id="modalNomeTitulo" class="font-bold text-base mt-0.5">Detalhes do Médico</h3>
+                </div>
                 <button onclick="app.fecharModal()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
-            <div class="p-5 overflow-y-auto space-y-3 text-sm" id="modalConteudo"></div>
+            <div class="p-5 overflow-y-auto space-y-3.5 text-sm" id="modalConteudo"></div>
             <div class="bg-slate-50 border-t border-slate-100 p-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <button id="modalBtnEditar" class="text-xs bg-amber-50 text-amber-700 font-semibold px-3 py-2 rounded-xl"><i class="fa-solid fa-pen"></i> Editar</button>
-                    <button id="modalBtnExcluir" class="text-xs bg-rose-50 text-rose-600 font-semibold px-3 py-2 rounded-xl"><i class="fa-solid fa-trash"></i> Excluir</button>
+                    <button id="modalBtnEditar" class="text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-2xs"><i class="fa-solid fa-pen"></i> Editar</button>
+                    <button id="modalBtnExcluir" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5"><i class="fa-solid fa-trash"></i> Excluir</button>
                 </div>
-                <button onclick="app.fecharModal()" class="bg-slate-900 text-white text-xs px-4 py-2 rounded-xl font-semibold">Fechar</button>
+                <button onclick="app.fecharModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-4 py-2 rounded-xl font-semibold transition">Fechar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Alerta -->
+    <!-- Modal de Alerta -->
     <div id="modalAlerta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4">
             <h4 id="alertaTitulo" class="font-bold text-slate-900 text-base">Aviso</h4>
@@ -105,6 +116,14 @@
                 this.loadData();
             }
 
+            // Função auxiliar para limpar "Dr.", "Dra." e espaços extras para ordenação alfabética correta pelo nome real
+            getCleanNameForSort(name) {
+                if (!name) return '';
+                return name
+                    .replace(/^(dr\.?|dra\.?)\s+/i, '')
+                    .trim();
+            }
+
             async loadData() {
                 try {
                     if (supabaseClient) {
@@ -112,8 +131,16 @@
                             supabaseClient.from('clinics').select('*'),
                             supabaseClient.from('doctors').select('*')
                         ]);
-                        if (!resClinicas.error && resClinicas.data) this.clinics = resClinicas.data;
-                        if (!resMedicos.error && resMedicos.data) this.doctors = resMedicos.data;
+                        if (!resClinicas.error && resClinicas.data) {
+                            this.clinics = resClinicas.data.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'accent' }));
+                        }
+                        if (!resMedicos.error && resMedicos.data) {
+                            this.doctors = resMedicos.data.sort((a, b) => {
+                                const nomeA = this.getCleanNameForSort(a.name);
+                                const nomeB = this.getCleanNameForSort(b.name);
+                                return nomeA.localeCompare(nomeB, 'pt-BR', { sensitivity: 'accent' });
+                            });
+                        }
                     }
                     this.renderList();
                 } catch(e) { console.error(e); }
@@ -125,7 +152,9 @@
                     const btnId = id === 'sim' ? 'yes' : (id === 'nao' ? 'no' : id);
                     const btn = document.getElementById(`filter-${btnId}`);
                     if(!btn) return;
-                    btn.className = (id === f) ? "px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap" : "px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap";
+                    btn.className = (id === f) 
+                        ? "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white transition whitespace-nowrap shadow-2xs" 
+                        : "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap";
                 });
                 this.renderList();
             }
@@ -137,40 +166,62 @@
 
             voltarParaClinicas() {
                 this.clinicaSelecionada = null;
-                document.getElementById('search').value = '';
+                const searchEl = document.getElementById('search');
+                if(searchEl) searchEl.value = '';
                 this.renderList();
             }
 
             renderList() {
-                const q = document.getElementById('search').value.toLowerCase().trim();
+                const searchEl = document.getElementById('search');
+                const q = searchEl ? searchEl.value.toLowerCase().trim() : '';
                 const container = document.getElementById('doctor-list');
                 const breadcrumb = document.getElementById('clinica-breadcrumb');
                 const filterContainer = document.getElementById('filter-container');
                 if(!container) return;
 
                 if (q.length > 0 || this.clinicaSelecionada) {
-                    filterContainer.classList.remove('hidden');
-                    filterContainer.classList.add('flex');
+                    if(filterContainer) {
+                        filterContainer.classList.remove('hidden');
+                        filterContainer.classList.add('flex');
+                    }
                 } else {
-                    filterContainer.classList.add('hidden');
-                    filterContainer.classList.remove('flex');
+                    if(filterContainer) {
+                        filterContainer.classList.add('hidden');
+                        filterContainer.classList.remove('flex');
+                    }
                 }
 
                 if (q.length > 0) {
-                    breadcrumb.classList.add('hidden');
+                    if(breadcrumb) breadcrumb.classList.add('hidden');
                     let filtered = this.doctors.filter(d => {
                         if(this.currentFilter === 'sim' && d.indicates !== 'sim') return false;
                         if(this.currentFilter === 'nao' && d.indicates !== 'nao') return false;
                         if(this.currentFilter === 'deixou' && d.indicates !== 'deixou') return false;
-                        return d.name.toLowerCase().includes(q) || d.crm.toLowerCase().includes(q) || (d.hospital && d.hospital.toLowerCase().includes(q)) || (d.specialization && d.specialization.toLowerCase().includes(q));
+                        
+                        const nomeDoc = d.name ? d.name.toLowerCase() : '';
+                        const crmDoc = d.crm ? d.crm.toLowerCase() : '';
+                        const hospDoc = d.hospital ? d.hospital.toLowerCase() : '';
+                        const specDoc = d.specialization ? d.specialization.toLowerCase() : '';
+                        const subspecDoc = d.subspecialties ? d.subspecialties.toLowerCase() : '';
+
+                        return nomeDoc.includes(q) || crmDoc.includes(q) || hospDoc.includes(q) || specDoc.includes(q) || subspecDoc.includes(q);
                     });
-                    this.renderizarCardsMedicos(filtered, container, `Resultados para "${q}"`);
+                    
+                    filtered.sort((a, b) => {
+                        const nomeA = this.getCleanNameForSort(a.name);
+                        const nomeB = this.getCleanNameForSort(b.name);
+                        return nomeA.localeCompare(nomeB, 'pt-BR', { sensitivity: 'accent' });
+                    });
+
+                    this.renderizarCardsMedicos(filtered, container, `Nenhum resultado encontrado para "${q}"`);
                     return;
                 }
 
                 if (this.clinicaSelecionada) {
-                    breadcrumb.classList.remove('hidden');
-                    document.getElementById('breadcrumb-titulo').textContent = this.clinicaSelecionada;
+                    if(breadcrumb) breadcrumb.classList.remove('hidden');
+                    const titleEl = document.getElementById('breadcrumb-titulo');
+                    if(titleEl) titleEl.textContent = this.clinicaSelecionada;
+                    
                     let filtered = this.doctors.filter(d => {
                         if (!d.hospital || d.hospital.trim().toLowerCase() !== this.clinicaSelecionada.trim().toLowerCase()) return false;
                         if(this.currentFilter === 'sim' && d.indicates !== 'sim') return false;
@@ -178,35 +229,54 @@
                         if(this.currentFilter === 'deixou' && d.indicates !== 'deixou') return false;
                         return true;
                     });
-                    document.getElementById('breadcrumb-contador').textContent = `${filtered.length} médico(s)`;
-                    this.renderizarCardsMedicos(filtered, container, `Médicos na clínica ${this.clinicaSelecionada}`);
+                    
+                    filtered.sort((a, b) => {
+                        const nomeA = this.getCleanNameForSort(a.name);
+                        const nomeB = this.getCleanNameForSort(b.name);
+                        return nomeA.localeCompare(nomeB, 'pt-BR', { sensitivity: 'accent' });
+                    });
+
+                    const countEl = document.getElementById('breadcrumb-contador');
+                    if(countEl) countEl.textContent = `${filtered.length} médico(s)`;
+                    this.renderizarCardsMedicos(filtered, container, `Nenhum médico cadastrado nesta clínica.`);
                     return;
                 }
 
-                breadcrumb.classList.add('hidden');
+                if(breadcrumb) breadcrumb.classList.add('hidden');
 
                 if(this.clinics.length === 0) {
                     container.innerHTML = `
-                        <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 mt-6 shadow-sm">
-                            <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhuma clínica cadastrada</h3>
-                            <p class="text-xs text-slate-500 mb-3">Cadastre clínicas na aba "Clínicas".</p>
-                            <a href="clinics.html" class="inline-block bg-amber-600 text-white font-semibold px-4 py-2 rounded-xl text-xs">Ir para Clínicas</a>
+                        <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 mt-6 shadow-sm space-y-2">
+                            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto text-lg"><i class="fa-solid fa-hospital"></i></div>
+                            <h3 class="font-bold text-slate-800 text-sm">Nenhuma clínica cadastrada</h3>
+                            <p class="text-xs text-slate-500">Cadastre clínicas para organizar seus médicos com facilidade.</p>
+                            <a href="clinics.html" class="inline-block bg-amber-600 hover:bg-amber-700 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-sm mt-1">Ir para Clínicas</a>
                         </div>
                     `;
                     return;
                 }
 
-                let html = '<div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Clínicas Disponíveis</div>';
+                let html = '<div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 flex items-center justify-between"><span>Selecione uma Clínica</span><span class="text-[11px] font-normal text-slate-500">Total: ' + this.clinics.length + '</span></div>';
+                
                 this.clinics.forEach(c => {
                     const totalMedicos = this.doctors.filter(d => d.hospital && d.hospital.trim().toLowerCase() === c.name.trim().toLowerCase()).length;
                     html += `
-                        <div onclick="app.selecionarClinica('${c.name.replace(/'/g, "\\'")}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs hover:border-amber-300 transition cursor-pointer flex items-center justify-between group">
-                            <div class="space-y-1 pr-2">
-                                <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600"><i class="fa-solid fa-hospital text-amber-600"></i> ${c.name}</h4>
-                                <p class="text-xs text-slate-500">${c.address}</p>
-                                <p class="text-[11px] text-slate-400"><span class="font-semibold text-slate-700">${totalMedicos}</span> médico(s) cadastrado(s)</p>
+                        <div onclick="app.selecionarClinica('${c.name.replace(/'/g, "\\'")}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs hover:border-amber-400 hover:shadow-md transition cursor-pointer flex items-center justify-between group">
+                            <div class="flex items-center gap-3.5 pr-2">
+                                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-base shrink-0 group-hover:bg-amber-600 group-hover:text-white transition shadow-2xs">
+                                    <i class="fa-solid fa-hospital"></i>
+                                </div>
+                                <div class="space-y-0.5">
+                                    <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition">${c.name}</h4>
+                                    <p class="text-xs text-slate-500 line-clamp-1">${c.address || 'Endereço não informado'}</p>
+                                    <div class="flex items-center gap-1.5 pt-0.5">
+                                        <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
+                                            <i class="fa-solid fa-user-doctor text-amber-600"></i> ${totalMedicos} médico(s)
+                                        </span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-amber-50 text-slate-400 group-hover:text-amber-600 flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></div>
+                            <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-amber-100 text-slate-400 group-hover:text-amber-700 flex items-center justify-center transition shrink-0"><i class="fa-solid fa-chevron-right text-xs"></i></div>
                         </div>
                     `;
                 });
@@ -215,24 +285,50 @@
 
             renderizarCardsMedicos(filtered, container, msgVazia) {
                 if(filtered.length === 0) {
-                    container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border border-slate-200 mt-6 shadow-sm"><h3 class="font-bold text-slate-800 text-sm mb-1">${msgVazia}</h3></div>`;
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 mt-4 shadow-sm space-y-2">
+                            <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto text-lg"><i class="fa-solid fa-user-slash"></i></div>
+                            <h3 class="font-bold text-slate-800 text-sm">${msgVazia}</h3>
+                            <p class="text-xs text-slate-500">Tente ajustar os filtros ou os termos da busca.</p>
+                        </div>
+                    `;
                     return;
                 }
 
                 let html = '';
                 filtered.forEach(d => {
-                    let badge = d.indicates === 'sim' ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200">Indica</span>' : (d.indicates === 'deixou' ? '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-900 border border-amber-200">Deixou de indicar</span>' : '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-900 border border-rose-200">Não Indica</span>');
+                    let badge = '';
+                    if (d.indicates === 'sim') {
+                        badge = '<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Indica</span>';
+                    } else if (d.indicates === 'deixou') {
+                        badge = '<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> Deixou de Indicar</span>';
+                    } else {
+                        badge = '<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200 flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> Não Indica</span>';
+                    }
+
+                    const nomeExibir = (d.name && d.name !== ' ') ? d.name : 'Médico sem nome';
+                    const crmExibir = (d.crm && d.crm !== ' ') ? d.crm : 'CRM N/A';
+                    const telExibir = (d.cellphone && d.cellphone !== ' ') ? d.cellphone : ((d.phone && d.phone !== ' ') ? d.phone : 'Sem telefone');
+                    
+                    const specExibir = (d.specialization && d.specialization !== ' ') ? d.specialization : 'Geral';
+                    const subspecExibir = (d.subspecialties && d.subspecialties !== ' ') ? ` • ${d.subspecialties}` : '';
 
                     html += `
-                        <div onclick="app.abrirDetalhes('${d.id}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs hover:border-amber-300 transition cursor-pointer flex items-center justify-between group">
-                            <div class="space-y-1 pr-2">
-                                <div class="flex items-center gap-2 flex-wrap">
-                                    <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600">${d.name}</h4>
-                                    ${badge}
-                               </div>
-                                <p class="text-xs text-slate-600"><span class="font-semibold text-slate-900">CRM: ${d.crm}</span> | ${d.hospital || 'Sem clínica'} ${d.specialization ? '• ' + d.specialization : ''}</p>
+                        <div onclick="app.abrirDetalhes('${d.id}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs hover:border-amber-400 hover:shadow-md transition cursor-pointer flex items-center justify-between group">
+                            <div class="space-y-1.5 pr-2 flex-1">
+                                <div class="flex items-center justify-between gap-2">
+                                    <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition truncate">${nomeExibir}</h4>
+                                    <div class="shrink-0">${badge}</div>
+                                </div>
+                                <div class="flex items-center gap-3 text-xs text-slate-500 flex-wrap">
+                                    <span class="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded"><i class="fa-solid fa-id-card text-slate-400"></i> ${crmExibir}</span>
+                                    <span class="truncate"><i class="fa-solid fa-phone text-slate-400"></i> ${telExibir}</span>
+                                </div>
+                                <div class="flex items-center gap-3 text-[11px] text-slate-400 pt-0.5">
+                                    <span><i class="fa-solid fa-stethoscope text-amber-600/70"></i> ${specExibir}${subspecExibir}</span>
+                                </div>
                             </div>
-                            <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-amber-50 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></div>
+                            <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-amber-100 text-slate-400 group-hover:text-amber-700 flex items-center justify-center transition shrink-0 ml-2"><i class="fa-solid fa-chevron-right text-xs"></i></div>
                         </div>
                     `;
                 });
@@ -244,55 +340,71 @@
                 if(!d) return;
 
                 let statusIndicaTexto = 'Não Informado';
-                if(d.indicates === 'sim') statusIndicaTexto = 'Sim (Indica)';
-                else if(d.indicates === 'nao') statusIndicaTexto = 'Não (Não Indica)';
-                else if(d.indicates === 'deixou') statusIndicaTexto = 'Deixou de Indicar';
+                let indicaCor = 'bg-slate-100 text-slate-800 border-slate-200';
+                if(d.indicates === 'sim') { statusIndicaTexto = 'Indica'; indicaCor = 'bg-emerald-50 text-emerald-800 border-emerald-200'; }
+                else if(d.indicates === 'nao') { statusIndicaTexto = 'Não Indica'; indicaCor = 'bg-rose-50 text-rose-800 border-rose-200'; }
+                else if(d.indicates === 'deixou') { statusIndicaTexto = 'Deixou de Indicar'; indicaCor = 'bg-amber-50 text-amber-800 border-amber-200'; }
 
                 let aniverFormatado = 'Não informado';
-                if(d.birthdate) {
+                if(d.birthdate && d.birthdate !== ' ') {
                     const partes = d.birthdate.split('-');
                     if(partes.length === 3) {
-                        aniverFormatado = `${partes[2]}/${partes[1]}`;
+                        aniverFormatado = `${partes[2]}/${partes[1]}/${partes[0]}`;
                     }
                 }
 
-                document.getElementById('modalNomeTitulo').textContent = d.name;
+                const val = (v) => (v && v !== ' ') ? v : 'Não informado';
+
+                document.getElementById('modalNomeTitulo').textContent = val(d.name);
                 document.getElementById('modalConteudo').innerHTML = `
-                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">CRM</span><span class="font-medium text-slate-800">${d.crm || 'N/A'}</span></div>
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Especialização</span><span class="font-medium text-slate-800">${d.specialization || 'N/A'}</span></div>
+                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">CRM</span><span class="font-bold text-slate-800 text-xs">${val(d.crm)}</span></div>
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Especialização</span><span class="font-bold text-slate-800 text-xs">${val(d.specialization)}</span></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Clínica Vinculada</span><span class="font-medium text-slate-800">${d.hospital || 'N/A'}</span></div>
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Sala / Consultório</span><span class="font-medium text-slate-800">${d.room || 'N/A'}</span></div>
+
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Subespecializações</span>
+                        <span class="font-medium text-slate-800 text-xs">${val(d.subspecialties)}</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Telefone Fixo</span><span class="font-medium text-slate-800">${d.phone || 'Não informado'}</span></div>
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Celular / WhatsApp</span><span class="font-medium text-slate-800">${d.cellphone || 'Não informado'}</span></div>
+
+                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Clínica Vinculada</span><span class="font-medium text-slate-800 text-xs">${val(d.hospital)}</span></div>
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sala / Consultório</span><span class="font-medium text-slate-800 text-xs">${val(d.room)}</span></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Secretária(s)</span><span class="font-medium text-slate-800">${d.secretary || 'Não informado'}</span></div>
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Aniversário</span><span class="font-medium text-slate-800">${aniverFormatado}</span></div>
+
+                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Telefone Comercial</span><span class="font-medium text-slate-800 text-xs">${val(d.phone)}</span></div>
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Celular / WhatsApp</span><span class="font-medium text-slate-800 text-xs">${val(d.cellphone)}</span></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Data da Visita</span><span class="font-medium text-slate-800">${d.visitDate || 'Não informada'}</span></div>
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Última Indicação</span><span class="font-medium text-slate-800">${d.lastIndicationDate || 'Não informada'}</span></div>
+
+                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Telefone Pessoa (personalPhone)</span><span class="font-medium text-slate-800 text-xs">${val(d.personalPhone)}</span></div>
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Secretária(s)</span><span class="font-medium text-slate-800 text-xs">${val(d.secretary)}</span></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Status Indicação</span><span class="font-medium text-slate-800">${statusIndicaTexto}</span></div>
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Presente Habitual</span><span class="font-medium text-slate-800">${d.present || 'Não informado'}</span></div>
+
+                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Aniversário</span><span class="font-medium text-slate-800 text-xs">${aniverFormatado}</span></div>
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Presente Habitual</span><span class="font-medium text-slate-800 text-xs">${val(d.present)}</span></div>
                     </div>
-                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Responsável</span><span class="font-medium text-slate-800">${d.responsible || 'Não informado'}</span></div>
-                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Status Atendimento</span><span class="font-medium text-slate-800">${d.status || 'Não informado'}</span></div>
+
+                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Data da Visita</span><span class="font-medium text-slate-800 text-xs">${val(d.visitDate)}</span></div>
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Última Indicação</span><span class="font-medium text-slate-800 text-xs">${val(d.lastIndicationDate)}</span></div>
                     </div>
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <span class="text-[11px] font-semibold text-slate-400 uppercase block">Unidade Próxima</span>
-                        <span class="font-medium text-slate-800">${d.nearbyUnit || 'Not informada'}</span>
+
+                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Responsável</span><span class="font-medium text-slate-800 text-xs">${val(d.responsible)}</span></div>
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Status Atendimento</span><span class="font-medium text-slate-800 text-xs">${val(d.status)}</span></div>
                     </div>
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                        <span class="text-[11px] font-semibold text-slate-400 uppercase block">Observações</span>
-                        <p class="font-medium text-slate-800 whitespace-pre-wrap mt-0.5">${d.notes || 'Nenhuma observação registrada.'}</p>
+
+                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Status Indicação</span><span class="inline-block mt-0.5 px-2 py-0.5 rounded text-xs font-bold border ${indicaCor}">${statusIndicaTexto}</span></div>
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Unidade Próxima</span><span class="font-medium text-slate-800 text-xs">${val(d.nearbyUnit)}</span></div>
+                    </div>
+
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Observações</span>
+                        <p class="font-medium text-slate-800 text-xs whitespace-pre-wrap leading-relaxed">${(d.notes && d.notes !== ' ') ? d.notes : 'Nenhuma observação registrada.'}</p>
                     </div>
                 `;
                 document.getElementById('modalBtnEditar').setAttribute('onclick', `window.location.href='add.html?id=${d.id}'`);
@@ -303,10 +415,12 @@
             fecharModal() { document.getElementById('modalDetalhes').classList.add('hidden'); }
 
             async excluirMedico(id) {
-                this.doctors = this.doctors.filter(d => String(d.id) !== String(id));
-                if (supabaseClient) await supabaseClient.from('doctors').delete().eq('id', id);
-                this.fecharModal();
-                this.renderList();
+                if(confirm("Tem certeza que deseja excluir este médico?")) {
+                    this.doctors = this.doctors.filter(d => String(d.id) !== String(id));
+                    if (supabaseClient) await supabaseClient.from('doctors').delete().eq('id', id);
+                    this.fecharModal();
+                    this.renderList();
+                }
             }
 
             fecharAlerta() { document.getElementById('modalAlerta').classList.add('hidden'); }

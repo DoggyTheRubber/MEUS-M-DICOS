@@ -19,7 +19,6 @@
                 <p class="text-xs text-slate-400">Ótica La Patrícia</p>
             </div>
         </div>
-        <!-- ENGRENAGEM NO TOPO DIREITO -->
         <a href="settings.html" class="text-slate-400 hover:text-white transition">
             <i class="fa-solid fa-gear text-xl"></i>
         </a>
@@ -31,14 +30,14 @@
                 <h2 id="form-doctor-title" class="font-bold text-slate-900 text-lg flex items-center gap-2">
                     <i class="fa-solid fa-user-doctor text-amber-600"></i> Informações do Médico
                 </h2>
-                <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Campos completos</span>
+                <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Campos Opcionais</span>
             </div>
 
             <form id="formNovoMedico" onsubmit="addApp.saveDoctor(event)" class="space-y-4 text-sm">
                 <input type="hidden" id="doctorEditId">
                 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Gênero / Tratamento *</label>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Gênero / Tratamento</label>
                     <div class="flex items-center gap-4 bg-slate-50 p-2.5 border border-slate-200 rounded-xl">
                         <label class="flex items-center gap-2 cursor-pointer font-medium">
                             <input type="radio" name="gender" value="Dr." checked class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Homem (Dr.)
@@ -50,18 +49,19 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nome Completo *</label>
-                    <input type="text" id="name" required placeholder="Ex: Carlos Eduardo Silva" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nome Completo</label>
+                    <input type="text" id="name" placeholder="Ex: Carlos Eduardo Silva" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">CRM (Identificador único) *</label>
-                    <input type="text" id="crm" required placeholder="Ex: 54321-MG" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">CRM (Identificador único)</label>
+                    <input type="text" id="crm" placeholder="Ex: 54321-MG" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Especialização *</label>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Especialização</label>
                     <select id="specialization" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="">Selecione...</option>
                         <option value="Oftalmo Geral">Oftalmo Geral</option>
                         <option value="Oftalmo Pediatria">Oftalmo Pediatria</option>
                     </select>
@@ -102,8 +102,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Clínica Vinculada *</label>
-                    <select id="selectHospital" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl"></select>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Clínica Vinculada</label>
+                    <select id="selectHospital" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl"></select>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -117,10 +117,15 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Celular Pessoal</label>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">WhatsApp do Médico</label>
                         <input type="text" id="cellphone" placeholder="Ex: (31) 99887-7665" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                    <div>
+                        <!-- CORRIGIDO: de pessoalPhone para personalPhone -->
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Telefone Pessoal</label>
+                        <input type="text" id="personalPhone" placeholder="Ex: (31) 98888-1111" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Secretária(s)</label>
@@ -132,14 +137,15 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Já Indica a Ótica?</label>
                         <div class="flex items-center gap-3 bg-slate-50 p-2.5 border border-slate-200 rounded-xl flex-wrap">
-                            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="sim" class="text-amber-600"> Sim</label>
-                            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="nao" checked class="text-amber-600"> Não</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="sim" class="text-amber-600"> Indica</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="nao" class="text-amber-600"> Não Indica</label>
                             <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="deixou" class="text-amber-600"> Deixou de indicar</label>
                         </div>
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Presente Habitual</label>
                         <select id="present" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <option value="">Selecione...</option>
                             <option value="Caixa de Vinho">Caixa de Vinho</option>
                             <option value="Pão de mel">Pão de Mel</option>
                             <option value="Limpa Lentes">Limpa Lentes</option>
@@ -153,6 +159,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Responsável</label>
                         <select id="responsible" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <option value="">Selecione...</option>
                             <option value="Kelen Mesquita">Kelen Mesquita</option>
                             <option value="Vitório Quites">Vitório Quites</option>
                         </select>
@@ -160,6 +167,7 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Status Atendimento</label>
                         <select id="status" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <option value="">Selecione...</option>
                             <option value="Visitar">Visitar</option>
                             <option value="Concluído">Concluído</option>
                             <option value="Rota de visita">Rota de visita</option>
@@ -177,6 +185,7 @@
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Unidade Próxima</label>
                     <select id="nearbyUnit" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <option value="">Selecione...</option>
                         <option value="BRASIL 80 - SANTA EFIGÊNIA">BRASIL 80 - SANTA EFIGÊNIA</option>
                         <option value="BRASIL 685 - FUNCIONÁRIOS">BRASIL 685 - FUNCIONÁRIOS</option>
                         <option value="CONTORNO 4679 - SERRA">CONTORNO 4679 - SERRA</option>
@@ -200,7 +209,6 @@
         </div>
     </main>
 
-    <!-- Modal Alerta -->
     <div id="modalAlerta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4">
             <h4 id="alertaTitulo" class="font-bold text-slate-900 text-base">Aviso</h4>
@@ -218,9 +226,9 @@
 
         const SUBESPECIALIDADES_LISTA = [
             "Retina", "Uveite", "Glaucoma", "Catarata", 
-            "Estrabismo", "Córnea", "Neuro Oftamologia", 
+            "Estrabismo", "Córnea", "Neurooftalmologia", 
             "Plástica Ocular", "Urgência", "Refrativa",
-            "Vítreo", "Doenças Oculáres", "Visão Subnormal",
+            "Vítreo", "Doenças Oculares", "Visão Subnormal",
             "Baixa Visão", "Astigmatismo", "Miopia", "Hipermetropia",
             "Presbiopia", "Mácula", "Oncologia Ocular"
         ];
@@ -231,7 +239,6 @@
                 this.doctors = [];
                 this.initDobDays();
                 this.initSubspecTags();
-                this.adicionarHorarioLinha();
                 this.loadDataAndCheckEdit();
             }
 
@@ -253,7 +260,7 @@
                 SUBESPECIALIDADES_LISTA.forEach((sub) => {
                     html += `
                         <label class="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:border-amber-400 transition select-none">
-                            <input type="checkbox" name="subspecialty" value="${sub}" class="text-amber-600 h-3.5 w-3.5 rounded">
+                            <input type="checkbox" name="subspecialties" value="${sub}" class="text-amber-600 h-3.5 w-3.5 rounded">
                             <span class="font-medium text-slate-700">${sub}</span>
                         </label>
                     `;
@@ -296,7 +303,9 @@
                             supabaseClient.from('clinics').select('*'),
                             supabaseClient.from('doctors').select('*')
                         ]);
-                        if (!resClinicas.error && resClinicas.data) this.clinics = resClinicas.data;
+                        if (!resClinicas.error && resClinicas.data) {
+                            this.clinics = resClinicas.data.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'accent' }));
+                        }
                         if (!resMedicos.error && resMedicos.data) this.doctors = resMedicos.data;
                     }
                     this.preencherSelectClinicas();
@@ -313,11 +322,7 @@
             preencherSelectClinicas(selectedName = '') {
                 const select = document.getElementById('selectHospital');
                 if(!select) return;
-                if(this.clinics.length === 0) {
-                    select.innerHTML = '<option value="">Nenhuma clínica cadastrada (Cadastre na aba Clínicas)</option>';
-                    return;
-                }
-                let html = '<option value="">Selecione a Clínica...</option>';
+                let html = '<option value=" ">Selecione a Clínica...</option>';
                 this.clinics.forEach(c => {
                     const sel = (c.name === selectedName) ? 'selected' : '';
                     html += `<option value="${c.name}" ${sel}>${c.name} - ${c.address}</option>`;
@@ -330,35 +335,70 @@
                 document.getElementById('form-doctor-title').innerHTML = '<i class="fa-solid fa-user-pen text-amber-600"></i> Editar Informações';
                 document.getElementById('doctorEditId').value = d.id;
 
-                let limpoNome = d.name.replace('Dr. ', '').replace('Dra. ', '');
-                document.getElementById('name').value = limpoNome;
-                document.getElementById('crm').value = d.crm;
-                document.getElementById('specialization').value = d.specialization || 'Oftalmo Geral';
-                document.getElementById('room').value = d.room || '';
-                document.getElementById('phone').value = d.phone || '';
-                document.getElementById('cellphone').value = d.cellphone || '';
-                document.getElementById('secretary').value = d.secretary || '';
-                document.getElementById('notes').value = d.notes || '';
-                if(d.present) document.getElementById('present').value = d.present;
-                if(d.responsible) document.getElementById('responsible').value = d.responsible;
-                if(d.status) document.getElementById('status').value = d.status;
-                if(d.nearbyUnit) document.getElementById('nearbyUnit').value = d.nearbyUnit;
-                if(d.visitDate) document.getElementById('visitDate').value = d.visitDate;
-                if(d.lastIndicationDate) document.getElementById('lastIndicationDate').value = d.lastIndicationDate;
+                let limpoNome = d.name ? d.name.replace('Dr. ', '').replace('Dra. ', '') : '';
+                document.getElementById('name').value = limpoNome !== ' ' ? limpoNome : '';
+                document.getElementById('crm').value = (d.crm && d.crm !== ' ') ? d.crm : '';
+                document.getElementById('specialization').value = (d.specialization && d.specialization !== ' ') ? d.specialization : '';
+                document.getElementById('room').value = (d.room && d.room !== ' ') ? d.room : '';
+                document.getElementById('phone').value = (d.phone && d.phone !== ' ') ? d.phone : '';
+                document.getElementById('cellphone').value = (d.cellphone && d.cellphone !== ' ') ? d.cellphone : '';
+                document.getElementById('personalPhone').value = (d.personalPhone && d.personalPhone !== ' ') ? d.personalPhone : '';
+                document.getElementById('secretary').value = (d.secretary && d.secretary !== ' ') ? d.secretary : '';
+                document.getElementById('notes').value = (d.notes && d.notes !== ' ') ? d.notes : '';
+                if(d.present && d.present !== ' ') document.getElementById('present').value = d.present;
+                if(d.responsible && d.responsible !== ' ') document.getElementById('responsible').value = d.responsible;
+                if(d.status && d.status !== ' ') document.getElementById('status').value = d.status;
+                if(d.nearbyUnit && d.nearbyUnit !== ' ') document.getElementById('nearbyUnit').value = d.nearbyUnit;
 
-                if(d.birthdate) {
-                    const partes = d.birthdate.split('-');
+                if (d.visitDate && d.visitDate !== ' ' && d.visitDate.includes('/')) {
+                    const partes = d.visitDate.split('/');
                     if(partes.length === 3) {
-                        document.getElementById('dobMonth').value = partes[1];
-                        document.getElementById('dobDay').value = partes[2];
+                        document.getElementById('visitDate').value = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                    }
+                } else if (d.visitDate && d.visitDate !== ' ') {
+                    document.getElementById('visitDate').value = d.visitDate;
+                }
+
+                if (d.lastIndicationDate && d.lastIndicationDate !== ' ' && d.lastIndicationDate.includes('/')) {
+                    const partes = d.lastIndicationDate.split('/');
+                    if(partes.length === 3) {
+                        document.getElementById('lastIndicationDate').value = `${partes[2]}-${partes[1]}-${partes[0]}`;
+                    }
+                } else if (d.lastIndicationDate && d.lastIndicationDate !== ' ') {
+                    document.getElementById('lastIndicationDate').value = d.lastIndicationDate;
+                }
+
+                if (d.subspecialties && d.subspecialties !== ' ') {
+                    const listaSalva = d.subspecialties.split(',').map(s => s.trim());
+                    document.querySelectorAll('input[name="subspecialties"]').forEach(chk => {
+                        if (listaSalva.includes(chk.value)) {
+                            chk.checked = true;
+                        }
+                    });
+                }
+
+                if(d.birthdate && d.birthdate !== ' ') {
+                    if(d.birthdate.includes('/')) {
+                        const partes = d.birthdate.split('/');
+                        if(partes.length >= 2) {
+                            document.getElementById('dobDay').value = partes[0];
+                            document.getElementById('dobMonth').value = partes[1];
+                        }
+                    } else if(d.birthdate.includes('-')) {
+                        const partes = d.birthdate.split('-');
+                        if(partes.length === 3) {
+                            document.getElementById('dobMonth').value = partes[1];
+                            document.getElementById('dobDay').value = partes[2];
+                        }
                     }
                 }
 
-                if(d.name.startsWith('Dra.')) {
-                    document.querySelector('input[name="gender"][value="Dra."]').checked = true;
+                if(d.name && d.name.startsWith('Dra.')) {
+                    const radioDra = document.querySelector('input[name="gender"][value="Dra."]');
+                    if(radioDra) radioDra.checked = true;
                 }
 
-                if(d.indicates) {
+                if(d.indicates && d.indicates !== ' ') {
                     const radio = document.querySelector(`input[name="indicates"][value="${d.indicates}"]`);
                     if(radio) radio.checked = true;
                 }
@@ -369,52 +409,71 @@
             async saveDoctor(e) {
                 e.preventDefault();
                 const editId = document.getElementById('doctorEditId').value;
-                const gender = document.querySelector('input[name="gender"]:checked').value;
+                const genderElement = document.querySelector('input[name="gender"]:checked');
+                const gender = genderElement ? genderElement.value : 'Dr.';
+                
                 const rawName = document.getElementById('name').value.trim();
-                const name = rawName.toLowerCase().startsWith('dr') ? rawName : `${gender} ${rawName}`;
-                const crm = document.getElementById('crm').value.trim();
-                const specialization = document.getElementById('specialization').value;
-                const hospital = document.getElementById('selectHospital').value;
-                const room = document.getElementById('room').value.trim();
-                const phone = document.getElementById('phone').value.trim();
-                const cellphone = document.getElementById('cellphone').value.trim();
-                const secretary = document.getElementById('secretary').value.trim();
-                const notes = document.getElementById('notes').value.trim();
-                const indicates = document.querySelector('input[name="indicates"]:checked').value;
-                const present = document.getElementById('present').value;
-                const responsible = document.getElementById('responsible').value;
-                const status = document.getElementById('status').value;
-                const nearbyUnit = document.getElementById('nearbyUnit').value;
-                const visitDate = document.getElementById('visitDate').value;
-                const lastIndicationDate = document.getElementById('lastIndicationDate').value;
+                const name = rawName ? (rawName.toLowerCase().startsWith('dr') ? rawName : `${gender} ${rawName}`) : " ";
+                
+                const crm = document.getElementById('crm').value.trim() || " ";
+                const specialization = document.getElementById('specialization').value || " ";
+                
+                const subspecChecked = Array.from(document.querySelectorAll('input[name="subspecialties"]:checked'))
+                    .map(el => el.value);
+                const subspecialties = subspecChecked.length > 0 ? subspecChecked.join(', ') : " ";
+
+                const hospital = document.getElementById('selectHospital').value || " ";
+                const room = document.getElementById('room').value.trim() || " ";
+                const phone = document.getElementById('phone').value.trim() || " ";
+                const cellphone = document.getElementById('cellphone').value.trim() || " ";
+                const personalPhone = document.getElementById('personalPhone').value.trim() || " ";
+                const secretary = document.getElementById('secretary').value.trim() || " ";
+                const notes = document.getElementById('notes').value.trim() || " ";
+                
+                const indicatesEl = document.querySelector('input[name="indicates"]:checked');
+                const indicates = indicatesEl ? indicatesEl.value : " ";
+                
+                const present = document.getElementById('present').value || " ";
+                const responsible = document.getElementById('responsible').value || " ";
+                const status = document.getElementById('status').value || " ";
+                const nearbyUnit = document.getElementById('nearbyUnit').value || " ";
+                
+                const rawVisitDate = document.getElementById('visitDate').value;
+                let visitDate = " ";
+                if (rawVisitDate) {
+                    const p = rawVisitDate.split('-');
+                    if (p.length === 3) visitDate = `${p[2]}/${p[1]}/${p[0]}`;
+                }
+
+                const rawLastInd = document.getElementById('lastIndicationDate').value;
+                let lastIndicationDate = " ";
+                if (rawLastInd) {
+                    const p = rawLastInd.split('-');
+                    if (p.length === 3) lastIndicationDate = `${p[2]}/${p[1]}/${p[0]}`;
+                }
 
                 const dobDay = document.getElementById('dobDay').value;
                 const dobMonth = document.getElementById('dobMonth').value;
-                let birthdate = null;
+                let birthdate = " ";
                 if(dobDay && dobMonth) {
-                    birthdate = `2000-${dobMonth}-${dobDay}`;
+                    birthdate = `${dobDay}/${dobMonth}`;
                 }
 
-                if(!hospital) {
-                    this.showAlert("Atenção", "Selecione uma clínica.");
-                    return;
-                }
+                const finalId = editId ? (isNaN(editId) ? editId : Number(editId)) : Date.now();
 
                 const obj = {
-                    id: editId ? Number(editId) : Date.now(),
-                    name, crm, specialization, hospital, room, phone, cellphone, secretary, notes, indicates,
+                    id: finalId,
+                    name, crm, specialization, subspecialties, hospital, room, phone, cellphone, personalPhone, secretary, notes, indicates,
                     present, responsible, status, nearbyUnit, visitDate, lastIndicationDate, birthdate
                 };
 
-                if(editId) {
-                    const idx = this.doctors.findIndex(item => String(item.id) === String(editId));
-                    if(idx !== -1) this.doctors[idx] = obj;
-                } else {
-                    this.doctors.unshift(obj);
-                }
-
                 if (supabaseClient) {
-                    await supabaseClient.from('doctors').upsert(obj);
+                    const { error } = await supabaseClient.from('doctors').upsert(obj);
+                    if (error) {
+                        console.error('Erro ao salvar no Supabase:', error);
+                        this.showAlert('Erro', 'Não foi possível salvar as alterações no banco de dados.');
+                        return;
+                    }
                 }
 
                 window.location.href = 'index.html';

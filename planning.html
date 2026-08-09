@@ -19,7 +19,6 @@
                 <p class="text-xs text-slate-400">Ótica La Patrícia</p>
             </div>
         </div>
-        <!-- ENGRENAGEM NO TOPO DIREITO -->
         <a href="settings.html" class="text-slate-400 hover:text-white transition">
             <i class="fa-solid fa-gear text-xl"></i>
         </a>
@@ -69,6 +68,14 @@
                 this.loadData();
             }
 
+            getDataHojeFormatada() {
+                const agora = new Date();
+                const dia = String(agora.getDate()).padStart(2, '0');
+                const mes = String(agora.getMonth() + 1).padStart(2, '0');
+                const ano = agora.getFullYear();
+                return `${dia}/${mes}/${ano}`;
+            }
+
             async loadData() {
                 try {
                     if (supabaseClient) {
@@ -78,8 +85,27 @@
                             supabaseClient.from('reports').select('*')
                         ]);
                         if (!resDoc.error && resDoc.data) this.doctors = resDoc.data;
-                        if (!resPlan.error && resPlan.data) this.planning = resPlan.data.map(p => ({ ...p, doctorId: p.doctor_id !== undefined ? p.doctor_id : p.doctorId }));
                         if (!resRep.error && resRep.data) this.reports = resRep.data;
+                        
+                        if (!resPlan.error && resPlan.data) {
+                            const hojeStr = this.getDataHojeFormatada();
+                            let itensValidos = [];
+
+                            for (let item of resPlan.data) {
+                                const mappedItem = { 
+                                    ...item, 
+                                    doctor_id: item.doctor_id !== undefined ? item.doctor_id : item.doctorId 
+                                };
+
+                                const dataItem = mappedItem.dayGroup || "";
+                                if (mappedItem.checked && dataItem && dataItem !== hojeStr) {
+                                    await supabaseClient.from('planning').delete().eq('id', mappedItem.id);
+                                } else {
+                                    itensValidos.push(mappedItem);
+                                }
+                            }
+                            this.planning = itensValidos;
+                        }
                     }
                     this.preencherSelectPlanejamentoMedicos();
                     this.renderPlanningList();
@@ -106,11 +132,13 @@
                 const text = document.getElementById('planText').value.trim();
                 if(!doctorId || !text) return;
 
+                const hojeStr = this.getDataHojeFormatada();
+
                 const novoItem = {
                     id: Date.now(),
                     doctor_id: String(doctorId),
                     text: text,
-                    dayGroup: 'Hoje',
+                    dayGroup: hojeStr,
                     checked: false
                 };
 
@@ -133,11 +161,13 @@
                     if (error) console.error("Erro ao atualizar planejamento:", error);
                 }
 
+                const docIdFinal = item.doctor_id || item.doctorId;
+
                 const novoRelatorio = {
                     id: Date.now(),
                     title: `Relatório #${String(Date.now()).slice(-4)}`,
                     date: new Date().toISOString().split('T')[0],
-                    doctor_id: String(item.doctor_id),
+                    doctor_id: String(docIdFinal),
                     content: `Planejamento concluído: "${item.text}".`,
                     isPending: true
                 };
@@ -147,28 +177,6 @@
                     const { error } = await supabaseClient.from('reports').upsert([novoRelatorio]);
                     if (error) console.error("Erro ao gerar relatório automático:", error);
                 }
-                this.renderPlanningList();
-            }
-
-            async togglePlanningItem(id) {
-                const item = this.planning.find(p => String(p.id) === String(id));
-                if(!item || item.checked) return;
-
-                item.checked = true;
-                if (supabaseClient) await supabaseClient.from('planning').upsert(item);
-
-                const novoRelatorio = {
-                    id: Date.now(),
-                    title: `Relatório #${String(Date.now()).slice(-4)}`,
-                    date: new Date().toISOString().split('T')[0],
-                    doctor_id: String(item.doctorId),
-                    doctorId: item.doctorId,
-                    content: `Planejamento concluído: "${item.text}".`,
-                    isPending: true
-                };
-
-                this.reports.unshift(novoRelatorio);
-                if (supabaseClient) await supabaseClient.from('reports').upsert(novoRelatorio);
                 this.renderPlanningList();
             }
 
@@ -183,7 +191,8 @@
 
                 let html = '';
                 this.planning.forEach(item => {
-                    const doc = this.doctors.find(d => String(d.id) === String(item.doctorId));
+                    const docIdFinal = item.doctor_id || item.doctorId;
+                    const doc = this.doctors.find(d => String(d.id) === String(docIdFinal));
                     html += `
                         <div class="flex items-center justify-between p-3 rounded-xl border bg-white">
                             <div class="flex items-center gap-3">

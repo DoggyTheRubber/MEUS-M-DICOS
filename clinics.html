@@ -91,7 +91,10 @@
                             supabaseClient.from('clinics').select('*'),
                             supabaseClient.from('doctors').select('*')
                         ]);
-                        if (!resClinicas.error && resClinicas.data) this.clinics = resClinicas.data;
+                        if (!resClinicas.error && resClinicas.data) {
+                            // Ordena alfabeticamente ao carregar do banco
+                            this.clinics = resClinicas.data.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'accent' }));
+                        }
                         if (!resMedicos.error && resMedicos.data) this.doctors = resMedicos.data;
                     }
                     this.renderClinicsList();
@@ -122,6 +125,9 @@
                 } else {
                     this.clinics.push({ id: Date.now(), name: nome, address: endereco });
                 }
+
+                // Reordena alfabeticamente após adicionar ou editar
+                this.clinics.sort((a, b) => (a.name || '').localeCompare(b.name || '', 'pt-BR', { sensitivity: 'accent' }));
 
                 if (supabaseClient) {
                     for (let c of this.clinics) await supabaseClient.from('clinics').upsert(c);
