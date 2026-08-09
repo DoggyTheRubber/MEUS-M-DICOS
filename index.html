@@ -6,9 +6,9 @@
     <title>Optica La Patrícia - Gestão de Atendimentos</title>
     <!-- Favicon personalizado -->
     <link rel="icon" type="image/png" href="la pipita.png">
-    <!-- Tailwind CSS CDN for gorgeous UI -->
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for clean icons -->
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f4f7f6; margin: 0; padding-bottom: 80px; }
@@ -25,19 +25,17 @@
             </div>
             <div>
                 <h1 class="font-bold text-base tracking-tight">Optica La Patrícia</h1>
-                <p class="text-xs text-slate-400">Gestão de Atendimentos</p>
+                <p class="text-xs text-slate-400">Gestão de Atendimentos (JSON Sync)</p>
             </div>
         </div>
-        <div class="text-xs text-slate-400 font-medium bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
-            Salvamento Automático
+        <div class="text-xs text-emerald-400 font-medium bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 shadow-sm">
+            <i class="fa-solid fa-cloud-circle-check text-emerald-400"></i> Auto-JSON Ativo
         </div>
     </header>
 
     <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full">
         
-        <!-- ==================== TELA 1: LISTA DE MÉDICOS (CLÍNICAS) ==================== -->
         <section id="view-list" class="space-y-4">
-            <!-- Barra de Pesquisa e Filtros -->
             <div class="space-y-3">
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
@@ -45,7 +43,6 @@
                     </span>
                     <input type="text" id="search" oninput="app.renderList()" placeholder="Buscar por CRM, nome, clínica ou especialidade..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
-                <!-- Filtros condicionais -->
                 <div id="filter-container" class="hidden items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
                     <button onclick="app.setFilter('all')" id="filter-all" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap">Todos</button>
                     <button onclick="app.setFilter('sim')" id="filter-yes" class="px-3 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Indica</button>
@@ -54,7 +51,6 @@
                 </div>
             </div>
 
-            <!-- Navegação Breadcrumb -->
             <div id="clinica-breadcrumb" class="hidden items-center justify-between bg-amber-50 border border-amber-200 px-4 py-2.5 rounded-xl">
                 <div class="flex items-center gap-2">
                     <button onclick="app.voltarParaClinicas()" class="bg-white text-amber-800 hover:bg-amber-100 p-1.5 rounded-lg border border-amber-200 text-xs font-bold transition flex items-center gap-1">
@@ -68,14 +64,13 @@
             <div id="doctor-list" class="space-y-3 pb-6"></div>
         </section>
 
-        <!-- ==================== TELA DE GESTÃO DE CLÍNICAS ==================== -->
         <section id="view-clinics" class="hidden space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                     <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
                         <i class="fa-solid fa-hospital text-amber-600"></i> Gerenciar Clínicas
                     </h2>
-                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Obrigatório nome e endereço</span>
+                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Salva em clinica.json</span>
                 </div>
 
                 <form id="formClinica" onsubmit="app.salvarClinica(event)" class="space-y-3 text-sm">
@@ -90,7 +85,7 @@
                     </div>
                     <div class="flex gap-2 pt-1">
                         <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl transition shadow-sm text-xs flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Clínica
+                            <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Clínica (clinica.json)
                         </button>
                         <button type="button" id="btnCancelarEdicaoClinica" onclick="app.cancelarEdicaoClinica()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl transition text-xs">
                             Cancelar
@@ -105,14 +100,13 @@
             </div>
         </section>
 
-        <!-- ==================== TELA 2: NOVO / EDITAR MÉDICO ==================== -->
         <section id="view-add" class="hidden space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
                 <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
                     <h2 id="form-doctor-title" class="font-bold text-slate-900 text-lg flex items-center gap-2">
                         <i class="fa-solid fa-user-doctor text-amber-600"></i> Cadastrar Novo Médico
                     </h2>
-                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Campos organizados</span>
+                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Salva em medico.json</span>
                 </div>
 
                 <form id="formNovoMedico" onsubmit="app.saveDoctor(event)" class="space-y-4 text-sm">
@@ -133,7 +127,6 @@
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nome Completo *</label>
                         <input type="text" id="name" required placeholder="Ex: Carlos Eduardo Silva" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
-                        <div id="name-error" class="text-xs text-rose-600 mt-1 font-medium hidden"></div>
                     </div>
 
                     <div>
@@ -154,7 +147,6 @@
                         <div id="subspec-tags" class="flex flex-wrap gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl"></div>
                     </div>
 
-                    <!-- Aniversário & Visita -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Aniversário (Dia e Mês)</label>
@@ -185,7 +177,6 @@
                         </div>
                     </div>
 
-                    <!-- Sistema de Horários -->
                     <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl space-y-3">
                         <div class="flex items-center justify-between">
                             <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Dias e Horários de Atendimento</label>
@@ -224,7 +215,6 @@
                         </div>
                     </div>
 
-                    <!-- Já Indica a Ótica com 3 opções -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Já Indica a Ótica?</label>
@@ -275,15 +265,13 @@
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-1 gap-4">
-                        <div>
-                            <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Unidade Próxima</label>
-                            <select id="nearbyUnit" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
-                                <option value="BRASIL 80 - SANTA EFIGÊNIA">BRASIL 80 - SANTA EFIGÊNIA</option>
-                                <option value="BRASIL 685 - FUNCIONÁRIOS">BRASIL 685 - FUNCIONÁRIOS</option>
-                                <option value="CONTORNO 4679 - SERRA">CONTORNO 4679 - SERRA</option>
-                            </select>
-                        </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Unidade Próxima</label>
+                        <select id="nearbyUnit" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                            <option value="BRASIL 80 - SANTA EFIGÊNIA">BRASIL 80 - SANTA EFIGÊNIA</option>
+                            <option value="BRASIL 685 - FUNCIONÁRIOS">BRASIL 685 - FUNCIONÁRIOS</option>
+                            <option value="CONTORNO 4679 - SERRA">CONTORNO 4679 - Serra</option>
+                        </select>
                     </div>
 
                     <div>
@@ -303,17 +291,17 @@
             </div>
         </section>
 
-        <!-- ==================== TELA 3: PLANEJAMENTO ==================== -->
         <section id="view-planning" class="hidden space-y-4">
             <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
                 <div class="flex items-center justify-between pb-3 border-b border-slate-100">
                     <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
                         <i class="fa-solid fa-calendar-days text-amber-600"></i> Planejamento Diário
                     </h2>
-                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Lista dinâmica</span>
+                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Salva em planejamento.json</span>
                 </div>
 
                 <form id="formPlanejamento" onsubmit="app.adicionarPlanejamento(event)" class="space-y-3 text-sm">
+                    <input type="hidden" id="planEditId">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Selecione o Médico *</label>
                         <select id="planDoctorId" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"></select>
@@ -322,9 +310,14 @@
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Texto da Tarefa / Checkbox *</label>
                         <input type="text" id="planText" required placeholder="Ex: Entregar presente e confirmar indicações" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
                     </div>
-                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-sm text-xs flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento
-                    </button>
+                    <div class="flex gap-2">
+                        <button type="submit" id="btnSubmitPlanejamento" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-sm text-xs flex items-center justify-center gap-1.5">
+                            <i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento
+                        </button>
+                        <button type="button" id="btnCancelarEdicaoPlanejamento" onclick="app.cancelarEdicaoPlanejamento()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-3 rounded-xl transition text-xs">
+                            Cancelar
+                        </button>
+                    </div>
                 </form>
             </div>
 
@@ -334,7 +327,6 @@
             </div>
         </section>
 
-        <!-- ==================== TELA 4: RELATÓRIOS ==================== -->
         <section id="view-reports" class="hidden space-y-4">
             <div class="space-y-3">
                 <div class="flex items-center justify-between">
@@ -342,16 +334,14 @@
                         <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
                             <i class="fa-solid fa-file-lines text-amber-600"></i> Relatórios de Visitas
                         </h2>
-                        <p class="text-xs text-slate-500">Gerencie e anote todas as suas visitas detalhadas</p>
+                        <p class="text-xs text-slate-500">Salvos em relatorio.json e sincronizados no share.json</p>
                     </div>
                 </div>
 
-                <!-- Botão de Compartilhar Relatórios -->
                 <button onclick="app.abrirModalSelecaoCompartilhar()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm">
-                    <i class="fa-solid fa-share-nodes"></i> Compartilhar Relatórios Selecionados
+                    <i class="fa-solid fa-share-nodes"></i> Compartilhar Relatórios (Atualiza share.json)
                 </button>
 
-                <!-- Barra de Pesquisa e Tags de Relatórios -->
                 <div class="space-y-3">
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
@@ -374,7 +364,6 @@
         </section>
     </main>
 
-    <!-- ==================== MODAL DE CRIAR / EDITAR RELATÓRIO ==================== -->
     <div id="modalRelatorio" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
@@ -391,27 +380,22 @@
 
             <form id="formRelatorio" onsubmit="app.salvarRelatorio(event)" class="p-5 overflow-y-auto space-y-4 text-sm flex-1">
                 <input type="hidden" id="reportId">
-                
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Título do Relatório *</label>
-                    <input type="text" id="reportTitle" required placeholder="" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
+                    <input type="text" id="reportTitle" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
                 </div>
-
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Data (Automática do Dispositivo) *</label>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Data *</label>
                     <input type="date" id="reportDate" required class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl text-slate-600 focus:outline-none">
                 </div>
-
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Médico Correspondente *</label>
                     <select id="reportDoctorId" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"></select>
                 </div>
-
                 <div>
                     <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Relatório / Anotações da Visita *</label>
                     <textarea id="reportContent" rows="6" required placeholder="Escreva detalhadamente como foi a conversa..." class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition font-mono text-xs leading-relaxed"></textarea>
                 </div>
-
                 <div class="flex items-center justify-between pt-2">
                     <button type="button" id="btnExcluirRelatorio" onclick="" class="hidden text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold px-3 py-2.5 rounded-xl transition flex items-center gap-1.5">
                         <i class="fa-solid fa-trash"></i> Excluir Relatório
@@ -424,7 +408,6 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL DE DETALHES ==================== -->
     <div id="modalDetalhes" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
@@ -442,7 +425,7 @@
             <div class="bg-slate-50 border-t border-slate-100 p-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
                     <button id="modalBtnEditar" onclick="" class="text-xs bg-amber-50 text-amber-700 hover:bg-amber-100 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
-                        <i class="fa-solid fa-pen"></i> Editar Médico
+                        <i class="fa-solid fa-pen"></i> Editar
                     </button>
                     <button id="modalBtnExcluir" onclick="" class="text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5">
                         <i class="fa-solid fa-trash"></i> Excluir
@@ -455,7 +438,6 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL DE ALERTA ==================== -->
     <div id="modalAlerta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4">
             <div id="alertaIcone" class="w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto">
@@ -469,7 +451,6 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL DE SELEÇÃO PARA COMPARTILHAR ==================== -->
     <div id="modalSelecaoCompartilhar" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
@@ -477,7 +458,7 @@
                     <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-900 flex items-center justify-center font-bold text-sm">
                         <i class="fa-solid fa-square-check"></i>
                     </div>
-                    <h3 class="font-bold text-base">Selecionar Relatórios Completos</h3>
+                    <h3 class="font-bold text-base">Selecionar Relatórios para share.json</h3>
                 </div>
                 <button onclick="app.fecharModalSelecaoCompartilhar()" class="text-slate-400 hover:text-white p-2">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -485,7 +466,7 @@
             </div>
 
             <div class="p-5 overflow-y-auto space-y-3 text-sm flex-1">
-                <p class="text-xs text-slate-500">Selecione abaixo quais relatórios concluídos você deseja enviar para visualização:</p>
+                <p class="text-xs text-slate-500">Selecione quais relatórios concluídos farão parte da lista de últimos relatórios e do share.json:</p>
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
                     <button type="button" onclick="app.marcarTodosCompartilhar(true)" class="text-amber-600 font-semibold hover:underline">Selecionar Todos</button>
                     <button type="button" onclick="app.marcarTodosCompartilhar(false)" class="text-slate-500 hover:underline">Desmarcar Todos</button>
@@ -495,7 +476,7 @@
 
             <div class="bg-slate-50 border-t border-slate-100 p-4 flex gap-2">
                 <button onclick="app.enviarRelatoriosSelecionados()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-md text-xs flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i> Enviar e Abrir Share
+                    <i class="fa-solid fa-paper-plane"></i> Salvar no share.json e Abrir Share
                 </button>
                 <button onclick="app.fecharModalSelecaoCompartilhar()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-3 rounded-xl transition text-xs">
                     Cancelar
@@ -504,7 +485,6 @@
         </div>
     </div>
 
-    <!-- ==================== HOMEBAR INFERIOR ==================== -->
     <nav class="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-30 shadow-lg">
         <div class="max-w-md mx-auto flex justify-around py-2">
             <button onclick="app.mudarTela('list')" id="nav-btn-list" class="flex flex-col items-center justify-center flex-1 py-1 text-amber-600 transition">
@@ -530,7 +510,6 @@
         </div>
     </nav>
 
-    <!-- ==================== JAVASCRIPT ==================== -->
     <script>
         const SUBESPECIALIDADES_LISTA = [
             "Retina", "Uveite", "Glaucoma", "Catarata", 
@@ -567,36 +546,33 @@
 
             loadData() {
                 try {
-                    const savedClinics = localStorage.getItem('otica_clinicas_v1');
+                    // Sem templates padrão: inicia vazio caso não haja nada salvo
+                    const savedClinics = localStorage.getItem('otica_clinica_json');
                     if (savedClinics) {
                         this.clinics = JSON.parse(savedClinics);
                     } else {
                         this.clinics = [];
-                        this.saveClinicsStorage();
                     }
 
-                    const savedDocs = localStorage.getItem('otica_medicos_v5');
+                    const savedDocs = localStorage.getItem('otica_medico_json');
                     if (savedDocs) {
                         this.doctors = JSON.parse(savedDocs);
                     } else {
                         this.doctors = [];
-                        this.saveStorage();
                     }
 
-                    const savedReports = localStorage.getItem('otica_reports_v3');
+                    const savedReports = localStorage.getItem('otica_relatorio_json');
                     if (savedReports) {
                         this.reports = JSON.parse(savedReports);
                     } else {
                         this.reports = [];
-                        this.saveReportsStorage();
                     }
 
-                    const savedPlanning = localStorage.getItem('otica_planning_v1');
+                    const savedPlanning = localStorage.getItem('otica_planejamento_json');
                     if (savedPlanning) {
                         this.planning = JSON.parse(savedPlanning);
                     } else {
                         this.planning = [];
-                        this.savePlanningStorage();
                     }
                 } catch(e) {
                     this.doctors = [];
@@ -608,33 +584,41 @@
 
             saveStorage() {
                 try {
-                    localStorage.setItem('otica_medicos_v5', JSON.stringify(this.doctors));
+                    localStorage.setItem('otica_medico_json', JSON.stringify(this.doctors));
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar os médicos no navegador.");
+                    this.showAlert("Erro", "Não foi possível salvar medico.json");
                 }
             }
 
             saveClinicsStorage() {
                 try {
-                    localStorage.setItem('otica_clinicas_v1', JSON.stringify(this.clinics));
+                    localStorage.setItem('otica_clinica_json', JSON.stringify(this.clinics));
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar as clínicas no navegador.");
+                    this.showAlert("Erro", "Não foi possível salvar clinica.json");
                 }
             }
 
             saveReportsStorage() {
                 try {
-                    localStorage.setItem('otica_reports_v3', JSON.stringify(this.reports));
+                    localStorage.setItem('otica_relatorio_json', JSON.stringify(this.reports));
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar os relatórios no navegador.");
+                    this.showAlert("Erro", "Não foi possível salvar relatorio.json");
                 }
             }
 
             savePlanningStorage() {
                 try {
-                    localStorage.setItem('otica_planning_v1', JSON.stringify(this.planning));
+                    localStorage.setItem('otica_planejamento_json', JSON.stringify(this.planning));
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar o planejamento no navegador.");
+                    this.showAlert("Erro", "Não foi possível salvar planejamento.json");
+                }
+            }
+
+            saveShareStorage(shareData) {
+                try {
+                    localStorage.setItem('otica_share_json', JSON.stringify(shareData));
+                } catch(e) {
+                    this.showAlert("Erro", "Não foi possível salvar share.json");
                 }
             }
 
@@ -742,7 +726,7 @@
                 this.saveClinicsStorage();
                 document.getElementById('formClinica').reset();
                 this.renderClinicsList();
-                this.showAlert("Sucesso", "Clínica salva com sucesso!", "sucesso");
+                this.showAlert("Sucesso", "Clínica salva automaticamente em clinica.json!", "sucesso");
             }
 
             editarClinica(id) {
@@ -773,7 +757,7 @@
                 this.clinics = this.clinics.filter(c => c.id !== id);
                 this.saveClinicsStorage();
                 this.renderClinicsList();
-                this.showAlert("Removido", "Clínica excluída com sucesso.", "sucesso");
+                this.showAlert("Removido", "Clínica excluída e atualizada no clinica.json com sucesso.", "sucesso");
             }
 
             renderClinicsList() {
@@ -783,7 +767,7 @@
                 if(this.clinics.length === 0) {
                     container.innerHTML = `
                         <div class="bg-white rounded-2xl p-6 text-center border border-slate-200 shadow-sm">
-                            <p class="text-xs text-slate-500">Nenhuma clínica cadastrada ainda. Utilize o formulário acima.</p>
+                            <p class="text-xs text-slate-500">Nenhuma clínica cadastrada. Utilize o formulário acima para criar uma nova clínica (salva em clinica.json).</p>
                         </div>
                     `;
                     return;
@@ -892,7 +876,6 @@
                     document.getElementById('btnCancelarEdicaoMedico').classList.add('hidden');
                     document.getElementById('horariosContainer').innerHTML = '';
                     this.adicionarHorarioLinha();
-                    
                     this.preencherSelectClinicas();
                 } else if (tela === 'planning') {
                     vPlanning.classList.remove('hidden');
@@ -993,14 +976,14 @@
                                 <i class="fa-solid fa-hospital text-lg"></i>
                             </div>
                             <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhuma clínica cadastrada</h3>
-                            <p class="text-xs text-slate-500 mb-3">Cadastre clínicas na aba "Clínicas" no rodapé para visualizar o painel.</p>
+                            <p class="text-xs text-slate-500 mb-3">Cadastre clínicas na aba "Clínicas" para começar a adicionar médicos.</p>
                             <button onclick="app.mudarTela('clinics')" class="bg-amber-600 text-white font-semibold px-4 py-2 rounded-xl text-xs">Ir para Clínicas</button>
                         </div>
                     `;
                     return;
                 }
 
-                let html = '<div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Clínicas Disponíveis (' + this.clinics.length + ')</div>';
+                let html = '<div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Clínicas Cadastradas (' + this.clinics.length + ')</div>';
 
                 this.clinics.forEach(c => {
                     const totalMedicosNaClinica = this.doctors.filter(d => d.hospital.trim().toLowerCase() === c.name.trim().toLowerCase()).length;
@@ -1036,7 +1019,7 @@
                                 <i class="fa-solid fa-user-doctor text-lg"></i>
                             </div>
                             <h3 class="font-bold text-slate-800 text-sm mb-1">${mensagemVazia}</h3>
-                            <p class="text-xs text-slate-500">Tente alterar os filtros ou cadastrar um médico nesta clínica.</p>
+                            <p class="text-xs text-slate-500">Nenhum médico cadastrado nesta seleção.</p>
                         </div>
                     `;
                     return;
@@ -1082,6 +1065,117 @@
                 container.innerHTML = html;
             }
 
+            abrirDetalhes(id) {
+                const d = this.doctors.find(item => item.id === id);
+                if(!d) return;
+
+                document.getElementById('modalNomeTitulo').textContent = d.name;
+                
+                let horariosHtml = '';
+                if(d.schedules && d.schedules.length > 0) {
+                    horariosHtml = d.schedules.map(s => `<span class="inline-block bg-slate-100 text-slate-800 px-2 py-1 rounded text-xs mr-1 mb-1 font-medium">${s.dia}: ${s.periodo}</span>`).join('');
+                } else {
+                    horariosHtml = '<span class="text-xs text-slate-500">Não informado</span>';
+                }
+
+                let subHtml = d.subspecialties && d.subspecialties.length > 0 ? d.subspecialties.join(', ') : 'Nenhuma';
+                let dataAniversario = (d.dobDay && d.dobMonth) ? `${d.dobDay}/${d.dobMonth}` : 'Não informada';
+
+                let html = `
+                    <div class="space-y-3">
+                        <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block">CRM</span>
+                                <span class="font-bold text-slate-800 text-xs">${d.crm}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block">Especialidade</span>
+                                <span class="font-bold text-slate-800 text-xs">${d.specialization}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Subespecialidades</span>
+                            <p class="text-xs text-slate-700 font-medium">${subHtml}</p>
+                        </div>
+
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Clínica / Hospital & Sala</span>
+                            <p class="text-xs text-slate-800 font-semibold"><i class="fa-solid fa-hospital text-amber-600"></i> ${d.hospital} - ${d.room || 'Sem sala informada'}</p>
+                        </div>
+
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Dias e Horários de Atendimento</span>
+                            <div class="mt-1">${horariosHtml}</div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block">Tel. Comercial</span>
+                                <span class="text-xs text-slate-800 font-medium">${d.phone || 'Não informado'}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block">Celular Pessoal</span>
+                                <span class="text-xs text-slate-800 font-medium">${d.cellphone || 'Não informado'}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block">Secretária(s)</span>
+                                <span class="text-xs text-slate-800 font-medium">${d.secretary || 'Não informada'}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-slate-400 block">Aniversário</span>
+                                <span class="text-xs text-slate-800 font-medium">${dataAniversario}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-3 gap-2 bg-amber-50/60 p-3 rounded-xl border border-amber-200">
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-amber-800 block">Indica Ótica</span>
+                                <span class="text-xs text-amber-900 font-bold uppercase">${d.indicates}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-amber-800 block">Presente</span>
+                                <span class="text-xs text-amber-900 font-bold">${d.present}</span>
+                            </div>
+                            <div>
+                                <span class="text-[10px] uppercase font-bold text-amber-800 block">Status</span>
+                                <span class="text-xs text-amber-900 font-bold">${d.status}</span>
+                            </div>
+                        </div>
+
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Responsável & Unidade Próxima</span>
+                            <p class="text-xs text-slate-700">${d.responsible} • Unidade: ${d.nearbyUnit}</p>
+                        </div>
+
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-slate-400 block">Observações</span>
+                            <p class="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl border border-slate-200">${d.notes || 'Nenhuma observação registrada.'}</p>
+                        </div>
+                    </div>
+                `;
+
+                document.getElementById('modalConteudo').innerHTML = html;
+                document.getElementById('modalBtnEditar').setAttribute('onclick', `app.prepararEdicaoMedico('${d.id}')`);
+                document.getElementById('modalBtnExcluir').setAttribute('onclick', `app.excluirMedico('${d.id}')`);
+                document.getElementById('modalDetalhes').classList.remove('hidden');
+            }
+
+            fecharModal() {
+                document.getElementById('modalDetalhes').classList.add('hidden');
+            }
+
+            excluirMedico(id) {
+                this.doctors = this.doctors.filter(d => d.id !== id);
+                this.saveStorage();
+                this.fecharModal();
+                this.renderList();
+                this.showAlert("Removido", "Médico excluído com sucesso do medico.json.", "sucesso");
+            }
+
             prepararEdicaoMedico(id) {
                 const d = this.doctors.find(item => item.id === id);
                 if(!d) return;
@@ -1109,17 +1203,8 @@
                     cb.checked = d.subspecialties && d.subspecialties.includes(cb.value);
                 });
 
-                if(d.dob && d.dob.includes('-')) {
-                    const parts = d.dob.split('-');
-                    if(parts.length === 3) {
-                        document.getElementById('dobDay').value = parts[2];
-                        document.getElementById('dobMonth').value = parts[1];
-                    }
-                } else {
-                    document.getElementById('dobDay').value = d.dobDay || '';
-                    document.getElementById('dobMonth').value = d.dobMonth || '';
-                }
-
+                document.getElementById('dobDay').value = d.dobDay || '';
+                document.getElementById('dobMonth').value = d.dobMonth || '';
                 document.getElementById('visitDate').value = d.visitDate || '';
 
                 const horariosContainer = document.getElementById('horariosContainer');
@@ -1212,26 +1297,9 @@
                     if(index !== -1) {
                         this.doctors[index] = {
                             id: editId,
-                            name,
-                            crm,
-                            specialization,
-                            subspecialties,
-                            dobDay,
-                            dobMonth,
-                            visitDate,
-                            schedules,
-                            hospital,
-                            room,
-                            phone,
-                            cellphone,
-                            secretary,
-                            indicates,
-                            present,
-                            responsible,
-                            status,
-                            lastIndicationDate,
-                            nearbyUnit,
-                            notes
+                            name, crm, specialization, subspecialties, dobDay, dobMonth, visitDate,
+                            schedules, hospital, room, phone, cellphone, secretary, indicates,
+                            present, responsible, status, lastIndicationDate, nearbyUnit, notes
                         };
                     }
                     document.getElementById('doctorEditId').value = '';
@@ -1240,26 +1308,9 @@
                 } else {
                     const novoMedico = {
                         id: 'doc_' + Date.now(),
-                        name,
-                        crm,
-                        specialization,
-                        subspecialties,
-                        dobDay,
-                        dobMonth,
-                        visitDate,
-                        schedules,
-                        hospital,
-                        room,
-                        phone,
-                        cellphone,
-                        secretary,
-                        indicates,
-                        present,
-                        responsible,
-                        status,
-                        lastIndicationDate,
-                        nearbyUnit,
-                        notes
+                        name, crm, specialization, subspecialties, dobDay, dobMonth, visitDate,
+                        schedules, hospital, room, phone, cellphone, secretary, indicates,
+                        present, responsible, status, lastIndicationDate, nearbyUnit, notes
                     };
                     this.doctors.unshift(novoMedico);
                 }
@@ -1269,12 +1320,12 @@
                 document.getElementById('horariosContainer').innerHTML = '';
                 this.adicionarHorarioLinha();
                 this.mudarTela('list');
-                this.showAlert("Sucesso", "Médico salvo com sucesso!", "sucesso");
+                this.showAlert("Sucesso", "Médico salvo com sucesso no medico.json!", "sucesso");
             }
 
-            // ==================== PLANEJAMENTO ====================
             adicionarPlanejamento(e) {
                 e.preventDefault();
+                const editId = document.getElementById('planEditId').value;
                 const doctorId = document.getElementById('planDoctorId').value;
                 const text = document.getElementById('planText').value.trim();
 
@@ -1283,28 +1334,72 @@
                     return;
                 }
 
-                const hoje = new Date();
-                const diasSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-                const diaSemanaStr = diasSemana[hoje.getDay()];
-                const diaNum = String(hoje.getDate()).padStart(2, '0');
-                const mesNum = String(hoje.getMonth() + 1).padStart(2, '0');
-                const dataFormatada = `${diaSemanaStr} - ${diaNum}/${mesNum}`;
+                if (editId) {
+                    const item = this.planning.find(p => p.id === editId);
+                    if (item && !item.checked) {
+                        item.doctorId = doctorId;
+                        item.text = text;
+                        this.savePlanningStorage();
+                    }
+                    document.getElementById('planEditId').value = '';
+                    document.getElementById('btnSubmitPlanejamento').innerHTML = '<i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento';
+                    document.getElementById('btnCancelarEdicaoPlanejamento').classList.add('hidden');
+                } else {
+                    const hoje = new Date();
+                    const diasSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+                    const diaSemanaStr = diasSemana[hoje.getDay()];
+                    const diaNum = String(hoje.getDate()).padStart(2, '0');
+                    const mesNum = String(hoje.getMonth() + 1).padStart(2, '0');
+                    const dataFormatada = `${diaSemanaStr} - ${diaNum}/${mesNum}`;
 
-                const novoItem = {
-                    id: 'plan_' + Date.now(),
-                    doctorId,
-                    text,
-                    dayGroup: dataFormatada,
-                    checked: false,
-                    dateIso: hoje.toISOString().split('T')[0]
-                };
+                    const novoItem = {
+                        id: 'plan_' + Date.now(),
+                        doctorId,
+                        text,
+                        dayGroup: dataFormatada,
+                        checked: false
+                    };
 
-                this.planning.unshift(novoItem);
+                    this.planning.unshift(novoItem);
+                }
+
                 this.savePlanningStorage();
                 document.getElementById('formPlanejamento').reset();
                 this.preencherSelectPlanejamentoMedicos();
                 this.renderPlanningList();
-                this.showAlert("Sucesso", "Planejamento adicionado com sucesso!", "sucesso");
+                this.showAlert("Sucesso", "Planejamento salvo em planejamento.json!", "sucesso");
+            }
+
+            editarPlanejamento(id) {
+                const item = this.planning.find(p => p.id === id);
+                if (!item || item.checked) {
+                    this.showAlert("Aviso", "Itens marcados não podem ser editados.");
+                    return;
+                }
+                document.getElementById('planEditId').value = item.id;
+                document.getElementById('planDoctorId').value = item.doctorId;
+                document.getElementById('planText').value = item.text;
+                document.getElementById('btnSubmitPlanejamento').innerHTML = '<i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Alteração';
+                document.getElementById('btnCancelarEdicaoPlanejamento').classList.remove('hidden');
+            }
+
+            cancelarEdicaoPlanejamento() {
+                document.getElementById('planEditId').value = '';
+                document.getElementById('formPlanejamento').reset();
+                document.getElementById('btnSubmitPlanejamento').innerHTML = '<i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento';
+                document.getElementById('btnCancelarEdicaoPlanejamento').classList.add('hidden');
+            }
+
+            apagarPlanejamento(id) {
+                const item = this.planning.find(p => p.id === id);
+                if (!item || item.checked) {
+                    this.showAlert("Aviso", "Itens marcados não podem ser apagados.");
+                    return;
+                }
+                this.planning = this.planning.filter(p => p.id !== id);
+                this.savePlanningStorage();
+                this.renderPlanningList();
+                this.showAlert("Removido", "Item apagado com sucesso.", "sucesso");
             }
 
             togglePlanningItem(id) {
@@ -1325,7 +1420,7 @@
                     title: proximoTitulo,
                     date: hojeIso,
                     doctorId: item.doctorId,
-                    content: `Planejamento concluído: "${item.text}". (Preencha as anotações detalhadas da visita para finalizar)`,
+                    content: `Planejamento concluído: "${item.text}". (Preencha as anotações detalhadas da visita)`,
                     isPending: true
                 };
 
@@ -1333,7 +1428,7 @@
                 this.saveReportsStorage();
 
                 this.renderPlanningList();
-                this.showAlert("Pendente Gerado", `Tarefa marcada! Relatório pendente criado para ${docName}. Acesse a aba Relatórios -> Pendentes para preencher.`, "sucesso");
+                this.showAlert("Pendente Gerado", `Tarefa concluída! Relatório pendente criado para ${docName} em relatorio.json.`, "sucesso");
             }
 
             renderPlanningList() {
@@ -1346,8 +1441,8 @@
                             <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto text-amber-600 mb-3">
                                 <i class="fa-solid fa-calendar-days text-lg"></i>
                             </div>
-                            <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum planejamento hoje</h3>
-                            <p class="text-xs text-slate-500">Utilize o formulário acima para adicionar tarefas vinculadas a médicos.</p>
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum planejamento cadastrado</h3>
+                            <p class="text-xs text-slate-500">Utilize o formulário acima para adicionar tarefas vinculadas a médicos (planejamento.json).</p>
                         </div>
                     `;
                     return;
@@ -1378,6 +1473,22 @@
                         const bgStyle = item.checked ? 'bg-slate-50 border-emerald-200 text-slate-400' : 'bg-white border-slate-200 text-slate-800 hover:border-amber-300';
                         const checkText = item.checked ? '<span class="line-through">' + item.text + '</span>' : item.text;
 
+                        let botoesAcao = '';
+                        if (!item.checked) {
+                            botoesAcao = `
+                                <div class="flex items-center gap-1 shrink-0 ml-2">
+                                    <button onclick="app.editarPlanejamento('${item.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-1.5 rounded-lg transition text-xs" title="Editar">
+                                        <i class="fa-solid fa-pen"></i>
+                                    </button>
+                                    <button onclick="app.apagarPlanejamento('${item.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-1.5 rounded-lg transition text-xs" title="Apagar">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </div>
+                            `;
+                        } else {
+                            botoesAcao = '<span class="text-[10px] font-semibold bg-emerald-50 text-emerald-800 px-2 py-1 rounded border border-emerald-200 shrink-0 ml-2">Concluído</span>';
+                        }
+
                         html += `
                             <div class="flex items-center justify-between p-3 rounded-xl border ${bgStyle} transition shadow-2xs">
                                 <div class="flex items-center gap-3 pr-2 flex-1">
@@ -1387,7 +1498,7 @@
                                         <p class="text-xs ${item.checked ? 'text-slate-400 line-through' : 'text-slate-700'}">${checkText}</p>
                                     </div>
                                 </div>
-                                ${item.checked ? '<span class="text-[10px] font-semibold bg-emerald-50 text-emerald-800 px-2 py-1 rounded border border-emerald-200 shrink-0">Concluído</span>' : '<span class="text-[10px] font-semibold bg-amber-50 text-amber-800 px-2 py-1 rounded border border-amber-200 shrink-0">Pendente</span>'}
+                                ${botoesAcao}
                             </div>
                         `;
                     });
@@ -1454,7 +1565,6 @@
                     
                     const proximoTitulo = this.gerarProximoTituloRelatorio();
                     document.getElementById('reportTitle').value = proximoTitulo;
-                    document.getElementById('reportTitle').placeholder = proximoTitulo;
                     
                     const hoje = new Date().toISOString().split('T')[0];
                     document.getElementById('reportDate').value = hoje;
@@ -1474,7 +1584,7 @@
                 const id = document.getElementById('reportId').value;
                 let title = document.getElementById('reportTitle').value.trim();
                 if(!title) {
-                    title = document.getElementById('reportTitle').placeholder || this.gerarProximoTituloRelatorio();
+                    title = this.gerarProximoTituloRelatorio();
                 }
                 const date = document.getElementById('reportDate').value;
                 const doctorId = document.getElementById('reportDoctorId').value;
@@ -1512,7 +1622,7 @@
                 this.saveReportsStorage();
                 this.fecharModalRelatorio();
                 this.renderReportsList();
-                this.showAlert("Sucesso", "Relatório salvo e concluído com sucesso!", "sucesso");
+                this.showAlert("Sucesso", "Relatório salvo em relatorio.json com sucesso!", "sucesso");
             }
 
             excluirRelatorio(id) {
@@ -1520,7 +1630,7 @@
                 this.saveReportsStorage();
                 this.fecharModalRelatorio();
                 this.renderReportsList();
-                this.showAlert("Removido", "O relatório foi excluído com sucesso.", "sucesso");
+                this.showAlert("Removido", "Relatório excluído com sucesso.", "sucesso");
             }
 
             renderReportsList() {
@@ -1553,7 +1663,7 @@
                                     <i class="fa-solid fa-circle-check text-lg"></i>
                                 </div>
                                 <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum relatório pendente</h3>
-                                <p class="text-xs text-slate-500">Marque tarefas na aba Planejamento para gerar relatórios pendentes automaticamente!</p>
+                                <p class="text-xs text-slate-500">Marque tarefas no Planejamento para gerar relatórios pendentes automaticamente.</p>
                             </div>
                         `;
                         return;
@@ -1572,7 +1682,7 @@
                         }
 
                         html += `
-                            <div onclick="app.abrirFormRelatorio('${r.id}')" class="bg-white p-4 rounded-2xl border border-amber-200 shadow-2xs hover:shadow-md hover:border-amber-400 transition cursor-pointer flex items-center justify-between group bg-amber-50/30">
+                            <div onclick="app.abrirFormRelatorio('${r.id}')" class="bg-amber-50/30 p-4 rounded-2xl border border-amber-200 shadow-2xs hover:shadow-md hover:border-amber-400 transition cursor-pointer flex items-center justify-between group">
                                 <div class="space-y-1 pr-2 flex-1">
                                     <div class="flex items-center justify-between">
                                         <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition">${r.title}</h4>
@@ -1582,7 +1692,7 @@
                                         <i class="fa-solid fa-user-doctor"></i> ${docName} ${docHosp ? '(' + docHosp + ')' : ''}
                                     </p>
                                     <p class="text-xs text-slate-600 line-clamp-2 mt-1 bg-white p-2 rounded-xl border border-amber-100 font-mono">${r.content}</p>
-                                    <span class="inline-block text-[10px] font-semibold bg-amber-200 text-amber-900 px-2 py-0.5 rounded mt-1">Aguardando preenchimento do relatório</span>
+                                    <span class="inline-block text-[10px] font-semibold bg-amber-200 text-amber-900 px-2 py-0.5 rounded mt-1">Aguardando preenchimento</span>
                                 </div>
                                 <div class="w-8 h-8 rounded-full bg-amber-100 group-hover:bg-amber-600 text-amber-800 group-hover:text-white flex items-center justify-center transition ml-2">
                                     <i class="fa-solid fa-pen text-xs"></i>
@@ -1610,11 +1720,11 @@
                 if(filtradosReps.length === 0) {
                     container.innerHTML = `
                         <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 shadow-sm">
-                            <div class="w-12 h-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto text-slate-400 mb-3">
-                                <i class="fa-solid fa-file-circle-exclamation text-lg"></i>
+                            <div class="w-12 h-12 bg-amber-50 rounded-full flex items-center justify-center mx-auto text-amber-600 mb-3">
+                                <i class="fa-solid fa-file-lines text-lg"></i>
                             </div>
                             <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum relatório concluído</h3>
-                            <p class="text-xs text-slate-500">Adicione relatórios ou preencha os pendentes para concluí-los.</p>
+                            <p class="text-xs text-slate-500">Adicione relatórios utilizando o botão abaixo.</p>
                         </div>
                     `;
                     return;
@@ -1639,10 +1749,10 @@
                                     <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition">${r.title}</h4>
                                     <span class="text-[11px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md"><i class="fa-solid fa-calendar mr-1"></i> ${dataFmt}</span>
                                 </div>
-                                <p class="text-xs text-amber-700 font-semibold flex items-center gap-1">
-                                    <i class="fa-solid fa-user-doctor"></i> ${docName} ${docHosp ? '(' + docHosp + ')' : ''}
+                                <p class="text-xs text-slate-700 font-semibold flex items-center gap-1">
+                                    <i class="fa-solid fa-user-doctor text-amber-600"></i> ${docName} ${docHosp ? '(' + docHosp + ')' : ''}
                                 </p>
-                                <p class="text-xs text-slate-500 line-clamp-2 mt-1 bg-slate-50 p-2 rounded-xl border border-slate-100 font-mono">${r.content}</p>
+                                <p class="text-xs text-slate-600 line-clamp-2 mt-1 bg-slate-50 p-2 rounded-xl border border-slate-100 font-mono">${r.content}</p>
                             </div>
                             <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-amber-50 text-slate-400 group-hover:text-amber-600 flex items-center justify-center transition ml-2">
                                 <i class="fa-solid fa-pen text-xs"></i>
@@ -1654,12 +1764,11 @@
             }
 
             abrirModalSelecaoCompartilhar() {
-                const modal = document.getElementById('modalSelecaoCompartilhar');
-                const container = document.getElementById('lista-checkbox-compartilhar');
                 const concluidos = this.reports.filter(r => !r.isPending);
-
+                const listaContainer = document.getElementById('lista-checkbox-compartilhar');
+                
                 if(concluidos.length === 0) {
-                    this.showAlert("Atenção", "Não há relatórios concluídos para compartilhar.");
+                    this.showAlert("Atenção", "Não há relatórios concluídos para compartilhar no share.json.");
                     return;
                 }
 
@@ -1668,17 +1777,17 @@
                     const doc = this.doctors.find(d => d.id === r.doctorId);
                     const docName = doc ? doc.name : 'Médico';
                     html += `
-                        <label class="flex items-start gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-amber-400 transition">
-                            <input type="checkbox" value="${r.id}" class="check-compartilhar mt-0.5 w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer" checked>
-                            <div class="space-y-0.5 flex-1">
-                                <div class="font-bold text-slate-900 text-xs">${r.title} - <span class="text-amber-700">${docName}</span></div>
-                                <p class="text-[11px] text-slate-500 line-clamp-1">${r.content}</p>
+                        <label class="flex items-start gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200 cursor-pointer hover:border-emerald-300 transition">
+                            <input type="checkbox" name="shareCheckbox" value="${r.id}" checked class="mt-0.5 h-4 w-4 text-emerald-600 rounded focus:ring-emerald-500">
+                            <div class="text-xs space-y-0.5">
+                                <p class="font-bold text-slate-900">${r.title} — <span class="font-normal text-slate-600">${docName}</span></p>
+                                <p class="text-slate-500 line-clamp-1">${r.content}</p>
                             </div>
                         </label>
                     `;
                 });
-                container.innerHTML = html;
-                modal.classList.remove('hidden');
+                listaContainer.innerHTML = html;
+                document.getElementById('modalSelecaoCompartilhar').classList.remove('hidden');
             }
 
             fecharModalSelecaoCompartilhar() {
@@ -1686,202 +1795,64 @@
             }
 
             marcarTodosCompartilhar(marcar) {
-                document.querySelectorAll('.check-compartilhar').forEach(cb => cb.checked = marcar);
+                document.querySelectorAll('input[name="shareCheckbox"]').forEach(cb => {
+                    cb.checked = marcar;
+                });
             }
 
             enviarRelatoriosSelecionados() {
-                const checkboxes = document.querySelectorAll('.check-compartilhar:checked');
-                const idsSelecionados = Array.from(checkboxes).map(cb => cb.value);
+                const selecionadosIds = [];
+                document.querySelectorAll('input[name="shareCheckbox"]:checked').forEach(cb => {
+                    selecionadosIds.push(cb.value);
+                });
 
-                if(idsSelecionados.length === 0) {
-                    this.showAlert("Atenção", "Selecione pelo menos um relatório para enviar.");
+                if(selecionadosIds.length === 0) {
+                    this.showAlert("Atenção", "Selecione pelo menos um relatório para enviar ao share.json.");
                     return;
                 }
 
-                const relatoriosParaEnviar = this.reports.filter(r => idsSelecionados.includes(r.id)).map(r => {
-                    const doc = this.doctors.find(d => d.id === r.doctorId);
+                const relatoriosParaShare = selecionadosIds.map(id => {
+                    const r = this.reports.find(item => item.id === id);
+                    const doc = r ? this.doctors.find(d => d.id === r.doctorId) : null;
                     return {
-                        ...r,
-                        doctorName: doc ? doc.name : 'Médico',
-                        hospitalName: doc ? doc.hospital : ''
+                        id: r.id,
+                        title: r.title,
+                        date: r.date,
+                        doctorName: doc ? doc.name : 'Desconhecido',
+                        doctorCrm: doc ? doc.crm : '',
+                        hospital: doc ? doc.hospital : '',
+                        content: r.content
                     };
                 });
 
-                localStorage.setItem('otica_shared_reports', JSON.stringify(relatoriosParaEnviar));
+                const sharePayload = {
+                    updatedAt: new Date().toISOString(),
+                    totalShared: relatoriosParaShare.length,
+                    reports: relatoriosParaShare
+                };
+
+                this.saveShareStorage(sharePayload);
                 this.fecharModalSelecaoCompartilhar();
-                window.open('share.html', '_blank');
-            }
+                this.showAlert("Sucesso", "share.json atualizado com sucesso com os relatórios selecionados!", "sucesso");
 
-            abrirDetalhes(id) {
-                const d = this.doctors.find(item => item.id === id);
-                if(!d) return;
-
-                document.getElementById('modalNomeTitulo').textContent = d.name;
-
-                let horariosHtml = d.schedules?.length ? d.schedules.map(s => `<li class="text-xs text-slate-700">• <b>${s.dia}:</b> ${s.periodo}</li>`).join('') : 'Nenhum horário cadastrado';
-                let subsHtml = d.subspecialties?.length ? d.subspecialties.join(', ') : 'Nenhuma';
-                
-                const cliObj = this.clinics.find(c => c.name.trim().toLowerCase() === d.hospital.trim().toLowerCase());
-                const enderecoClinica = cliObj ? cliObj.address : 'Endereço não especificado na aba Clínicas';
-
-                const formatarDataBR = (dataStr) => {
-                    if (!dataStr) return 'Não informada';
-                    const p = dataStr.split('-');
-                    if (p.length === 3) return `${p[2]}/${p[1]}/${p[0]}`;
-                    return dataStr;
-                };
-
-                const formatarAniversario = (doc) => {
-                    if (doc.dobDay && doc.dobMonth) {
-                        const meses = { '01':'Janeiro', '02':'Fevereiro', '03':'Março', '04':'Abril', '05':'Maio', '06':'Junho', '07':'Julho', '08':'Agosto', '09':'Setembro', '10':'Outubro', '11':'Novembro', '12':'Dezembro' };
-                        return `${doc.dobDay} de ${meses[doc.dobMonth] || doc.dobMonth}`;
-                    }
-                    if (doc.dob) {
-                        const p = doc.dob.split('-');
-                        if(p.length === 3) {
-                            const meses = { '01':'Janeiro', '02':'Fevereiro', '03':'Março', '04':'Abril', '05':'Maio', '06':'Junho', '07':'Julho', '08':'Agosto', '09':'Setembro', '10':'Outubro', '11':'Novembro', '12':'Dezembro' };
-                            return `${p[2]} de ${meses[p[1]] || p[1]}`;
-                        }
-                    }
-                    return 'Não informado';
-                };
-
-                let indicaTexto = 'Não Indica';
-                let indicaCor = 'text-rose-900 font-bold';
-                if(d.indicates === 'sim') {
-                    indicaTexto = 'Indica';
-                    indicaCor = 'text-emerald-900 font-bold';
-                } else if(d.indicates === 'deixou') {
-                    indicaTexto = 'Deixou de indicar';
-                    indicaCor = 'text-amber-900 font-bold';
-                }
-
-                let statusBadgeClass = "text-slate-900 font-semibold";
-                if(d.status === 'Concluído') statusBadgeClass = "text-emerald-900 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block";
-                if(d.status === 'Visitar') statusBadgeClass = "text-rose-900 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200 inline-block";
-
-                const conteudo = `
-                    <div class="space-y-3">
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">CRM</span>
-                                <span class="font-bold text-slate-900">${d.crm}</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Status Indicação</span>
-                                <span class="${indicaCor}">${indicaTexto}</span>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
-                            <span class="block text-xs text-slate-500 uppercase font-semibold">Clínica & Endereço</span>
-                            <p class="font-bold text-slate-900">${d.hospital} - <span class="font-normal text-slate-600">${enderecoClinica}</span></p>
-                            <p class="text-xs text-slate-600">Andar/Sala: ${d.room || 'Não informado'}</p>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Especialidade</span>
-                                <span class="font-bold text-slate-900">${d.specialization}</span>
-                                <p class="text-[11px] text-slate-500 mt-0.5">Subs: ${subsHtml}</p>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Status Atendimento</span>
-                                <span class="${statusBadgeClass}">${d.status}</span>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
-                            <span class="block text-xs text-slate-500 uppercase font-semibold">Horários de Atendimento</span>
-                            <ul class="space-y-0.5">${horariosHtml}</ul>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Telefone Comercial</span>
-                                <span class="font-medium text-slate-800">${d.phone || 'Não informado'}</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Celular Pessoal</span>
-                                <span class="font-medium text-slate-800">${d.cellphone || 'Não informado'}</span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Secretária(s)</span>
-                                <span class="font-medium text-slate-800">${d.secretary || 'Não informada'}</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Presente Habitual</span>
-                                <span class="font-medium text-slate-800">${d.present || 'Não informado'}</span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Aniversário</span>
-                                <span class="font-medium text-slate-800">${formatarAniversario(d)}</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Última Visita</span>
-                                <span class="font-medium text-slate-800">${formatarDataBR(d.visitDate)}</span>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Responsável</span>
-                                <span class="font-medium text-slate-800">${d.responsible || 'Kelen Mesquita'}</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Última Indicação</span>
-                                <span class="font-medium text-slate-800">${formatarDataBR(d.lastIndicationDate)}</span>
-                            </div>
-                        </div>
-
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
-                            <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Unidade Próxima</span>
-                            <span class="font-medium text-slate-800">${d.nearbyUnit || 'Não informada'}</span>
-                        </div>
-
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
-                            <span class="block text-xs text-slate-500 uppercase font-semibold">Observações</span>
-                            <p class="text-xs text-slate-700 leading-relaxed font-mono">${d.notes || 'Nenhuma observação registrada.'}</p>
-                        </div>
-                    </div>
-                `;
-
-                document.getElementById('modalConteudo').innerHTML = conteudo;
-                document.getElementById('modalBtnEditar').setAttribute('onclick', `app.prepararEdicaoMedico('${d.id}')`);
-                document.getElementById('modalBtnExcluir').setAttribute('onclick', `app.excluirMedico('${d.id}')`);
-                document.getElementById('modalDetalhes').classList.remove('hidden');
-            }
-
-            fecharModal() {
-                document.getElementById('modalDetalhes').classList.add('hidden');
-            }
-
-            excluirMedico(id) {
-                this.doctors = this.doctors.filter(item => item.id !== id);
-                this.saveStorage();
-                this.fecharModal();
-                this.renderList();
-                this.showAlert("Removido", "O médico foi excluído com sucesso.", "sucesso");
+                // Redireciona ou abre share.html se existir
+                setTimeout(() => {
+                    window.location.href = 'share.html';
+                }, 1200);
             }
 
             showAlert(titulo, texto, tipo = "aviso") {
                 const modal = document.getElementById('modalAlerta');
                 document.getElementById('alertaTitulo').textContent = titulo;
                 document.getElementById('alertaTexto').textContent = texto;
+                const iconeDiv = document.getElementById('alertaIcone');
                 
-                const icone = document.getElementById('alertaIcone');
                 if (tipo === "sucesso") {
-                    icone.className = "w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mx-auto";
-                    icone.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    iconeDiv.className = "w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mx-auto";
+                    iconeDiv.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
                 } else {
-                    icone.className = "w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto";
-                    icone.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                    iconeDiv.className = "w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto";
+                    iconeDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
                 }
                 modal.classList.remove('hidden');
             }
@@ -1895,4 +1866,3 @@
     </script>
 </body>
 </html>
-```[cite: 15]
