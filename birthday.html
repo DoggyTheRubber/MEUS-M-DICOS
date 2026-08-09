@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Optica La Patrícia - Aniversários</title>
+    <link rel="icon" type="image/png" href="la pipita.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f4f7f6; margin: 0; padding-bottom: 80px; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
+
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <!-- BOTÃO DE VOLTAR ADICIONADO AQUI -->
+            <a href="index.html" class="text-slate-400 hover:text-white mr-1">
+                <i class="fa-solid fa-arrow-left text-base"></i>
+            </a>
+            
+            <div>
+                <h1 class="font-bold text-base tracking-tight">Aniversários da Semana</h1>
+                <p class="text-xs text-slate-400">Ótica La Patricia</p>
+            </div>
+        </div>
+        <!-- ENGRENAGEM NO TOPO DIREITO -->
+        <a href="settings.html" class="text-slate-400 hover:text-white transition">
+            <i class="fa-solid fa-gear text-xl"></i>
+        </a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-4">
+        
+        <!-- Card Informativo -->
+        <div class="bg-amber-50 border border-amber-200 p-4 rounded-2xl flex items-start gap-3 shadow-2xs">
+            <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 mt-0.5">
+                <i class="fa-solid fa-cake-candles text-lg"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="font-bold text-slate-900 text-sm">Próximos Aniversários (7 Dias)</h3>
+                <p class="text-xs text-slate-600 leading-relaxed">Listando médicos que fazem aniversário do dia de hoje até os próximos 7 dias. O sistema notificará automaticamente caso haja algum aniversário amanhã!</p>
+            </div>
+        </div>
+
+        <!-- Lista de Aniversariantes -->
+        <div id="birthday-list" class="space-y-3 pb-6"></div>
+    </main>
+
+    <!-- Modal Detalhes -->
+    <div id="modalDetalhes" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
+                <h3 id="modalNomeTitulo" class="font-bold text-base">Detalhes do Médico</h3>
+                <button onclick="app.fecharModal()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto space-y-3 text-sm" id="modalConteudo"></div>
+            <div class="bg-slate-50 border-t border-slate-100 p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <button id="modalBtnEditar" class="text-xs bg-amber-50 text-amber-700 font-semibold px-3 py-2 rounded-xl"><i class="fa-solid fa-pen"></i> Editar</button>
+                    <button id="modalBtnExcluir" class="text-xs bg-rose-50 text-rose-600 font-semibold px-3 py-2 rounded-xl"><i class="fa-solid fa-trash"></i> Excluir</button>
+                </div>
+                <button onclick="app.fecharModal()" class="bg-slate-900 text-white text-xs px-4 py-2 rounded-xl font-semibold">Fechar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://qhtwbbrapldxidlqikzf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFodHdiYnJhcGxkeGlkbHFpa3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNDA1OTgsImV4cCI6MjEwMTgxNjU5OH0.nhHFnhPvSdhl9z38OX0V6wqDCYaF9-Y8T4PgEfFcw80';
+        let supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        class BirthdayApp {
+            constructor() {
+                this.doctors = [];
+                this.loadData();
+                
+                // Inicia o loop APENAS UMA VEZ ao abrir
+                if (localStorage.getItem('notif_ativa') === 'true') {
+                    const intervalo = parseInt(localStorage.getItem('notif_intervalo') || '3600000');
+                    setInterval(() => {
+                        this.loadData(); // Recarrega do banco e processa
+                    }, intervalo);
+                }
+            }
+
+            async loadData() {
+                try {
+                    if (supabaseClient) {
+                        const res = await supabaseClient.from('doctors').select('*');
+                        if (!res.error && res.data) this.doctors = res.data;
+                    }
+                    this.processarAniversarios();
+                } catch(e) { console.error(e); }
+            }
+
+            async solicitarPermissaoNotificacao() {
+                if (!("Notification" in window)) {
+                    alert("Este navegador não suporta notificações de desktop/dispositivo.");
+                    return;
+                }
+                let permission = await Notification.requestPermission();
+                if (permission === "granted") {
+                    alert("Permissão concedida! Você receberá alertas dos aniversários.");
+                } else {
+                    alert("Permissão negada para notificações.");
+                }
+            }
+
+            dispararNotificacaoNativa(titulo, corpo) {
+                if (Notification.permission === "granted") {
+                    new Notification(titulo, {
+                        body: corpo,
+                        icon: "la pipita.png"
+                    });
+                }
+            }
+
+            processarAniversarios() {
+                const container = document.getElementById('birthday-list');
+                if(!container) return;
+
+                const hoje = new Date();
+                hoje.setHours(0, 0, 0, 0);
+
+                let aniversariantesDaSemana = [];
+                let temAniversarioAmanha = false;
+                let medicoAmanhaNome = "";
+
+                this.doctors.forEach(d => {
+                    if (!d.birthdate) return;
+
+                    // Trata datas no formato YYYY-MM-DD evitando problemas de fuso horário (UTC vs Local)
+                    const partes = d.birthdate.split('-');
+                    if (partes.length !== 3) return;
+                    const anoNasc = parseInt(partes[0], 10);
+                    const mesAniversario = parseInt(partes[1], 10) - 1;
+                    const diaAniversario = parseInt(partes[2], 10);
+
+                    // Testa para os próximos 7 dias (incluindo hoje)
+                    for (let i = 0; i < 7; i++) {
+                        let dataTeste = new Date(hoje);
+                        dataTeste.setDate(hoje.getDate() + i);
+
+                        if (dataTeste.getDate() === diaAniversario && dataTeste.getMonth() === mesAniversario) {
+                            let statusDia = i === 0 ? "🎂 Hoje!" : (i === 1 ? "🎉 Amanhã!" : `Em ${i} dias`);
+                            
+                            aniversariantesDaSemana.push({
+                                doctor: d,
+                                diasRestantes: i,
+                                rotuloDia: statusDia,
+                                dataFormatada: `${String(diaAniversario).padStart(2, '0')}/${String(mesAniversario + 1).padStart(2, '0')}`
+                            });
+
+                            if (i === 1) {
+                                temAniversarioAmanha = true;
+                                medicoAmanhaNome = d.name;
+                            }
+                            break;
+                        }
+                    }
+                });
+
+                if (temAniversarioAmanha && Notification.permission === "granted") {
+                    if (!sessionStorage.getItem(`notificado_${medicoAmanhaNome}`)) {
+                        this.dispararNotificacaoNativa(
+                            "Lembrete de Aniversário 🎈",
+                            `Olá! Amanhã é aniversário do Dr(a). ${medicoAmanhaNome}!`
+                        );
+                        sessionStorage.setItem(`notificado_${medicoAmanhaNome}`, "true");
+                    }
+                }
+
+                if (aniversariantesDaSemana.length === 0) {
+                    container.innerHTML = `
+                        <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 mt-2 shadow-sm">
+                            <h3 class="font-bold text-slate-800 text-sm mb-1">Nenhum aniversário nos próximos 7 dias</h3>
+                            <p class="text-xs text-slate-500">Certifique-se de preencher a data de nascimento dos médicos no cadastro.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                aniversariantesDaSemana.sort((a, b) => a.diasRestantes - b.diasRestantes);
+
+                let html = '<div class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2 px-1">Aniversariantes da Semana</div>';
+                
+                aniversariantesDaSemana.forEach(item => {
+                    const d = item.doctor;
+                    let badgeClass = item.diasRestantes === 0 ? "bg-emerald-50 text-emerald-900 border-emerald-200" : (item.diasRestantes === 1 ? "bg-amber-50 text-amber-900 border-amber-200" : "bg-slate-100 text-slate-700 border-slate-200");
+
+                    html += `
+                        <div onclick="app.abrirDetalhes('${d.id}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs hover:border-amber-300 transition cursor-pointer flex items-center justify-between group">
+                            <div class="space-y-1 pr-2">
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600">${d.name}</h4>
+                                    <span class="px-2 py-0.5 rounded-md text-[10px] font-semibold border ${badgeClass}">${item.rotuloDia}</span>
+                                </div>
+                                <p class="text-xs text-slate-600"><i class="fa-solid fa-cake-candles text-amber-600 mr-1"></i> Data: ${item.dataFormatada} | Clínica: ${d.hospital || 'Sem clínica'}</p>
+                            </div>
+                            <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-amber-50 text-slate-400 flex items-center justify-center"><i class="fa-solid fa-chevron-right text-xs"></i></div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+            }
+
+            abrirDetalhes(id) {
+                const d = this.doctors.find(item => String(item.id) === String(id));
+                if(!d) return;
+
+                document.getElementById('modalNomeTitulo').textContent = d.name;
+                document.getElementById('modalConteudo').innerHTML = `
+                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">CRM</span><span class="font-medium text-slate-800">${d.crm || 'N/A'}</span></div>
+                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Data de Nascimento</span><span class="font-medium text-slate-800">${d.birthdate ? d.birthdate.split('-').reverse().join('/') : 'Não informada'}</span></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3 bg-slate-50 p-3 rounded-xl border border-slate-100">
+                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Clínica</span><span class="font-medium text-slate-800">${d.hospital || 'N/A'}</span></div>
+                        <div><span class="text-[11px] font-semibold text-slate-400 uppercase block">Celular / WhatsApp</span><span class="font-medium text-slate-800">${d.cellphone || 'Não informado'}</span></div>
+                    </div>
+                `;
+                document.getElementById('modalBtnEditar').setAttribute('onclick', `window.location.href='add.html?id=${d.id}'`);
+                document.getElementById('modalBtnExcluir').setAttribute('onclick', `app.excluirMedico('${d.id}')`);
+                document.getElementById('modalDetalhes').classList.remove('hidden');
+            }
+
+            async excluirMedico(id) {
+                if(!confirm("Deseja realmente excluir este médico?")) return;
+                try {
+                    if(supabaseClient) {
+                        const { error } = await supabaseClient.from('doctors').delete().eq('id', id);
+                        if(error) {
+                            alert("Erro ao excluir do banco de dados.");
+                            return;
+                        }
+                    }
+                    this.doctors = this.doctors.filter(d => String(d.id) !== String(id));
+                    this.fecharModal();
+                    this.processarAniversarios();
+                } catch(e) {
+                    console.error(e);
+                }
+            }
+
+            fecharModal() { document.getElementById('modalDetalhes').classList.add('hidden'); }
+        }
+
+        const app = new BirthdayApp();
+    </script>
+</body>
+</html>

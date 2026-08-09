@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ótica La Patrícia - Cadastrar Médico</title>
+    <link rel="icon" type="image/png" href="la pipita.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen pb-20">
+
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <a href="index.html" class="text-slate-400 hover:text-white mr-1"><i class="fa-solid fa-arrow-left text-base"></i></a>
+            <div>
+                <h1 id="header-title" class="font-bold text-base tracking-tight">Cadastrar Novo Médico</h1>
+                <p class="text-xs text-slate-400">Ótica La Patrícia</p>
+            </div>
+        </div>
+        <!-- ENGRENAGEM NO TOPO DIREITO -->
+        <a href="settings.html" class="text-slate-400 hover:text-white transition">
+            <i class="fa-solid fa-gear text-xl"></i>
+        </a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-4">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
+                <h2 id="form-doctor-title" class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-user-doctor text-amber-600"></i> Informações do Médico
+                </h2>
+                <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Campos completos</span>
+            </div>
+
+            <form id="formNovoMedico" onsubmit="addApp.saveDoctor(event)" class="space-y-4 text-sm">
+                <input type="hidden" id="doctorEditId">
+                
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Gênero / Tratamento *</label>
+                    <div class="flex items-center gap-4 bg-slate-50 p-2.5 border border-slate-200 rounded-xl">
+                        <label class="flex items-center gap-2 cursor-pointer font-medium">
+                            <input type="radio" name="gender" value="Dr." checked class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Homem (Dr.)
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer font-medium">
+                            <input type="radio" name="gender" value="Dra." class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Mulher (Dra.)
+                        </label>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nome Completo *</label>
+                    <input type="text" id="name" required placeholder="Ex: Carlos Eduardo Silva" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">CRM (Identificador único) *</label>
+                    <input type="text" id="crm" required placeholder="Ex: 54321-MG" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Especialização *</label>
+                    <select id="specialization" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                        <option value="Oftalmo Geral">Oftalmo Geral</option>
+                        <option value="Oftalmo Pediatria">Oftalmo Pediatria</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Subespecializações</label>
+                    <div id="subspec-tags" class="flex flex-wrap gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl"></div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Aniversário (Dia e Mês)</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <select id="dobDay" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
+                                <option value="">Dia</option>
+                            </select>
+                            <select id="dobMonth" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
+                                <option value="">Mês</option>
+                                <option value="01">Janeiro</option><option value="02">Fevereiro</option><option value="03">Março</option><option value="04">Abril</option><option value="05">Maio</option><option value="06">Junho</option><option value="07">Julho</option><option value="08">Agosto</option><option value="09">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Data da Visita</label>
+                        <input type="date" id="visitDate" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+
+                <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl space-y-3">
+                    <div class="flex items-center justify-between">
+                        <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Horários de Atendimento</label>
+                        <button type="button" onclick="addApp.adicionarHorarioLinha()" class="text-xs bg-amber-600 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-700 transition flex items-center gap-1">
+                            <i class="fa-solid fa-plus"></i> Adicionar Horário
+                        </button>
+                    </div>
+                    <div id="horariosContainer" class="space-y-2"></div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Clínica Vinculada *</label>
+                    <select id="selectHospital" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl"></select>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Andar / Consultório</label>
+                        <input type="text" id="room" placeholder="Ex: Sala 402" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Telefone Comercial</label>
+                        <input type="text" id="phone" placeholder="Ex: (31) 3222-1122" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Celular Pessoal</label>
+                        <input type="text" id="cellphone" placeholder="Ex: (31) 99887-7665" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Secretária(s)</label>
+                        <input type="text" id="secretary" placeholder="Ex: Maria" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Já Indica a Ótica?</label>
+                        <div class="flex items-center gap-3 bg-slate-50 p-2.5 border border-slate-200 rounded-xl flex-wrap">
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="sim" class="text-amber-600"> Sim</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="nao" checked class="text-amber-600"> Não</label>
+                            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="deixou" class="text-amber-600"> Deixou de indicar</label>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Presente Habitual</label>
+                        <select id="present" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <option value="Bombom">Bombom Fino</option>
+                            <option value="Vinho">Vinho Importado / Caro</option>
+                            <option value="Outro">Outro Brinde / Especial</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Responsável</label>
+                        <select id="responsible" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <option value="Kelen Mesquita">Kelen Mesquita</option>
+                            <option value="Vitório Quites">Vitório Quites</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Status Atendimento</label>
+                        <select id="status" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                            <option value="Visitar">Visitar</option>
+                            <option value="Concluído">Concluído</option>
+                            <option value="Rota de visita">Rota de visita</option>
+                            <option value="Não recebeu/Remarcar">Não recebeu/Remarcar</option>
+                            <option value="Férias">Férias</option>
+                            <option value="Licença">Licença</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Última Indicação</label>
+                        <input type="date" id="lastIndicationDate" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Unidade Próxima</label>
+                    <select id="nearbyUnit" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <option value="BRASIL 80 - SANTA EFIGÊNIA">BRASIL 80 - SANTA EFIGÊNIA</option>
+                        <option value="BRASIL 685 - FUNCIONÁRIOS">BRASIL 685 - FUNCIONÁRIOS</option>
+                        <option value="CONTORNO 4679 - SERRA">CONTORNO 4679 - SERRA</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Observações</label>
+                    <textarea id="notes" rows="3" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl"></textarea>
+                </div>
+
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Médico Completo
+                    </button>
+                    <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-3 rounded-xl transition text-xs flex items-center justify-center">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <!-- Modal Alerta -->
+    <div id="modalAlerta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4">
+            <h4 id="alertaTitulo" class="font-bold text-slate-900 text-base">Aviso</h4>
+            <p id="alertaTexto" class="text-xs text-slate-600 leading-relaxed"></p>
+            <button onclick="addApp.fecharAlerta()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs">Entendido</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://qhtwbbrapldxidlqikzf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFodHdiYnJhcGxkeGlkbHFpa3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNDA1OTgsImV4cCI6MjEwMTgxNjU5OH0.nhHFnhPvSdhl9z38OX0V6wqDCYaF9-Y8T4PgEfFcw80';
+        let supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        const SUBESPECIALIDADES_LISTA = [
+            "Retina", "Uveite", "Glaucoma", "Catarata", 
+            "Estrabismo", "Córnea", "Neuro Oftamologia", 
+            "Plástica Ocular", "Urgência", "Refrativa"
+        ];
+
+        class AddApp {
+            constructor() {
+                this.clinics = [];
+                this.doctors = [];
+                this.initDobDays();
+                this.initSubspecTags();
+                this.adicionarHorarioLinha();
+                this.loadDataAndCheckEdit();
+            }
+
+            initDobDays() {
+                const daySelect = document.getElementById('dobDay');
+                if(!daySelect) return;
+                let html = '<option value="">Dia</option>';
+                for(let i = 1; i <= 31; i++) {
+                    const diaStr = i < 10 ? '0' + i : '' + i;
+                    html += `<option value="${diaStr}">${i}</option>`;
+                }
+                daySelect.innerHTML = html;
+            }
+
+            initSubspecTags() {
+                const container = document.getElementById('subspec-tags');
+                if(!container) return;
+                let html = '';
+                SUBESPECIALIDADES_LISTA.forEach((sub) => {
+                    html += `
+                        <label class="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:border-amber-400 transition select-none">
+                            <input type="checkbox" name="subspecialty" value="${sub}" class="text-amber-600 h-3.5 w-3.5 rounded">
+                            <span class="font-medium text-slate-700">${sub}</span>
+                        </label>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            adicionarHorarioLinha(diaPre = 'SEG', periodoPre = 'Manhã (08:00 - 12:00)') {
+                const container = document.getElementById('horariosContainer');
+                if(!container) return;
+                const linhaId = 'horario_' + Date.now() + Math.floor(Math.random()*1000);
+                
+                const div = document.createElement('div');
+                div.id = linhaId;
+                div.className = "flex items-center gap-2 bg-white p-2.5 rounded-xl border border-slate-200";
+                div.innerHTML = `
+                    <select class="horario-dia flex-1 bg-slate-50 border rounded-lg p-1.5 text-xs font-semibold">
+                        <option value="SEG" ${diaPre==='SEG'?'selected':''}>Segunda</option>
+                        <option value="TER" ${diaPre==='TER'?'selected':''}>Terça</option>
+                        <option value="QUA" ${diaPre==='QUA'?'selected':''}>Quarta</option>
+                        <option value="QUI" ${diaPre==='QUI'?'selected':''}>Quinta</option>
+                        <option value="SEX" ${diaPre==='SEX'?'selected':''}>Sexta</option>
+                        <option value="SAB" ${diaPre==='SAB'?'selected':''}>Sábado</option>
+                        <option value="DOM" ${diaPre==='DOM'?'selected':''}>Domingo</option>
+                    </select>
+                    <select class="horario-periodo flex-1 bg-slate-50 border rounded-lg p-1.5 text-xs font-semibold">
+                        <option value="Manhã (08:00 - 12:00)" ${periodoPre.includes('Manhã')?'selected':''}>Manhã</option>
+                        <option value="Tarde (13:00 - 18:00)" ${periodoPre.includes('Tarde')?'selected':''}>Tarde</option>
+                        <option value="Noite (18:00 - 21:00)" ${periodoPre.includes('Noite')?'selected':''}>Noite</option>
+                    </select>
+                    <button type="button" onclick="document.getElementById('${linhaId}').remove()" class="text-rose-500 p-1.5 text-xs"><i class="fa-solid fa-trash-can"></i></button>
+                `;
+                container.appendChild(div);
+            }
+
+            async loadDataAndCheckEdit() {
+                try {
+                    if (supabaseClient) {
+                        const [resClinicas, resMedicos] = await Promise.all([
+                            supabaseClient.from('clinics').select('*'),
+                            supabaseClient.from('doctors').select('*')
+                        ]);
+                        if (!resClinicas.error && resClinicas.data) this.clinics = resClinicas.data;
+                        if (!resMedicos.error && resMedicos.data) this.doctors = resMedicos.data;
+                    }
+                    this.preencherSelectClinicas();
+
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const editId = urlParams.get('id');
+                    if (editId) {
+                        const d = this.doctors.find(item => String(item.id) === String(editId));
+                        if (d) this.prepararEdicao(d);
+                    }
+                } catch(e) { console.error(e); }
+            }
+
+            preencherSelectClinicas(selectedName = '') {
+                const select = document.getElementById('selectHospital');
+                if(!select) return;
+                if(this.clinics.length === 0) {
+                    select.innerHTML = '<option value="">Nenhuma clínica cadastrada (Cadastre na aba Clínicas)</option>';
+                    return;
+                }
+                let html = '<option value="">Selecione a Clínica...</option>';
+                this.clinics.forEach(c => {
+                    const sel = (c.name === selectedName) ? 'selected' : '';
+                    html += `<option value="${c.name}" ${sel}>${c.name} - ${c.address}</option>`;
+                });
+                select.innerHTML = html;
+            }
+
+            prepararEdicao(d) {
+                document.getElementById('header-title').textContent = 'Editar Médico';
+                document.getElementById('form-doctor-title').innerHTML = '<i class="fa-solid fa-user-pen text-amber-600"></i> Editar Informações';
+                document.getElementById('doctorEditId').value = d.id;
+
+                let limpoNome = d.name.replace('Dr. ', '').replace('Dra. ', '');
+                document.getElementById('name').value = limpoNome;
+                document.getElementById('crm').value = d.crm;
+                document.getElementById('specialization').value = d.specialization || 'Oftalmo Geral';
+                document.getElementById('room').value = d.room || '';
+                document.getElementById('phone').value = d.phone || '';
+                document.getElementById('cellphone').value = d.cellphone || '';
+                document.getElementById('secretary').value = d.secretary || '';
+                document.getElementById('notes').value = d.notes || '';
+                if(d.present) document.getElementById('present').value = d.present;
+                if(d.responsible) document.getElementById('responsible').value = d.responsible;
+                if(d.status) document.getElementById('status').value = d.status;
+                if(d.nearbyUnit) document.getElementById('nearbyUnit').value = d.nearbyUnit;
+                if(d.visitDate) document.getElementById('visitDate').value = d.visitDate;
+                if(d.lastIndicationDate) document.getElementById('lastIndicationDate').value = d.lastIndicationDate;
+
+                if(d.birthdate) {
+                    const partes = d.birthdate.split('-');
+                    if(partes.length === 3) {
+                        document.getElementById('dobMonth').value = partes[1];
+                        document.getElementById('dobDay').value = partes[2];
+                    }
+                }
+
+                if(d.name.startsWith('Dra.')) {
+                    document.querySelector('input[name="gender"][value="Dra."]').checked = true;
+                }
+
+                if(d.indicates) {
+                    const radio = document.querySelector(`input[name="indicates"][value="${d.indicates}"]`);
+                    if(radio) radio.checked = true;
+                }
+
+                this.preencherSelectClinicas(d.hospital);
+            }
+
+            async saveDoctor(e) {
+                e.preventDefault();
+                const editId = document.getElementById('doctorEditId').value;
+                const gender = document.querySelector('input[name="gender"]:checked').value;
+                const rawName = document.getElementById('name').value.trim();
+                const name = rawName.toLowerCase().startsWith('dr') ? rawName : `${gender} ${rawName}`;
+                const crm = document.getElementById('crm').value.trim();
+                const specialization = document.getElementById('specialization').value;
+                const hospital = document.getElementById('selectHospital').value;
+                const room = document.getElementById('room').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const cellphone = document.getElementById('cellphone').value.trim();
+                const secretary = document.getElementById('secretary').value.trim();
+                const notes = document.getElementById('notes').value.trim();
+                const indicates = document.querySelector('input[name="indicates"]:checked').value;
+                const present = document.getElementById('present').value;
+                const responsible = document.getElementById('responsible').value;
+                const status = document.getElementById('status').value;
+                const nearbyUnit = document.getElementById('nearbyUnit').value;
+                const visitDate = document.getElementById('visitDate').value;
+                const lastIndicationDate = document.getElementById('lastIndicationDate').value;
+
+                const dobDay = document.getElementById('dobDay').value;
+                const dobMonth = document.getElementById('dobMonth').value;
+                let birthdate = null;
+                if(dobDay && dobMonth) {
+                    birthdate = `2000-${dobMonth}-${dobDay}`;
+                }
+
+                if(!hospital) {
+                    this.showAlert("Atenção", "Selecione uma clínica.");
+                    return;
+                }
+
+                const obj = {
+                    id: editId ? Number(editId) : Date.now(),
+                    name, crm, specialization, hospital, room, phone, cellphone, secretary, notes, indicates,
+                    present, responsible, status, nearbyUnit, visitDate, lastIndicationDate, birthdate
+                };
+
+                if(editId) {
+                    const idx = this.doctors.findIndex(item => String(item.id) === String(editId));
+                    if(idx !== -1) this.doctors[idx] = obj;
+                } else {
+                    this.doctors.unshift(obj);
+                }
+
+                if (supabaseClient) {
+                    await supabaseClient.from('doctors').upsert(obj);
+                }
+
+                window.location.href = 'index.html';
+            }
+
+            showAlert(titulo, texto) {
+                document.getElementById('alertaTitulo').textContent = titulo;
+                document.getElementById('alertaTexto').textContent = texto;
+                document.getElementById('modalAlerta').classList.remove('hidden');
+            }
+            fecharAlerta() { document.getElementById('modalAlerta').classList.add('hidden'); }
+        }
+        const addApp = new AddApp();
+    </script>
+</body>
+</html>

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ótica La Patrícia - Gestão de Clínicas</title>
+    <link rel="icon" type="image/png" href="la pipita.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen pb-20">
+
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <a href="index.html" class="text-slate-400 hover:text-white mr-1"><i class="fa-solid fa-arrow-left text-base"></i></a>
+            <div>
+                <h1 class="font-bold text-base tracking-tight">Gestão de Clínicas</h1>
+                <p class="text-xs text-slate-400">Ótica La Patrícia</p>
+            </div>
+        </div>
+        <!-- ENGRENAGEM NO TOPO DIREITO -->
+        <a href="settings.html" class="text-slate-400 hover:text-white transition">
+            <i class="fa-solid fa-gear text-xl"></i>
+        </a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-4">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-hospital text-amber-600"></i> Gerenciar Clínicas
+                </h2>
+                <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Nome e Endereço</span>
+            </div>
+
+            <form id="formClinica" onsubmit="clinicApp.salvarClinica(event)" class="space-y-3 text-sm">
+                <input type="hidden" id="clinicaEditId">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nome da Clínica *</label>
+                    <input type="text" id="inputNomeClinica" required placeholder="Ex: Hospital Vision" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Endereço da Clínica *</label>
+                    <input type="text" id="inputEnderecoClinica" required placeholder="Ex: Av. Contorno, 4500 - Savassi" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                </div>
+                <div class="flex gap-2 pt-1">
+                    <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl transition shadow-sm text-xs flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Clínica
+                    </button>
+                    <button type="button" id="btnCancelarEdicaoClinica" onclick="clinicApp.cancelarEdicaoClinica()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl transition text-xs">
+                        Cancelar
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="space-y-3">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Clínicas Cadastradas</div>
+            <div id="clinics-list-container" class="space-y-2 pb-6"></div>
+        </div>
+    </main>
+
+    <!-- Modal Alerta -->
+    <div id="modalAlerta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4">
+            <h4 id="alertaTitulo" class="font-bold text-slate-900 text-base">Aviso</h4>
+            <p id="alertaTexto" class="text-xs text-slate-600 leading-relaxed"></p>
+            <button onclick="clinicApp.fecharAlerta()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs">Entendido</button>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://qhtwbbrapldxidlqikzf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFodHdiYnJhcGxkeGlkbHFpa3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNDA1OTgsImV4cCI6MjEwMTgxNjU5OH0.nhHFnhPvSdhl9z38OX0V6wqDCYaF9-Y8T4PgEfFcw80';
+        let supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        class ClinicApp {
+            constructor() {
+                this.clinics = [];
+                this.doctors = [];
+                this.loadData();
+            }
+
+            async loadData() {
+                try {
+                    if (supabaseClient) {
+                        const [resClinicas, resMedicos] = await Promise.all([
+                            supabaseClient.from('clinics').select('*'),
+                            supabaseClient.from('doctors').select('*')
+                        ]);
+                        if (!resClinicas.error && resClinicas.data) this.clinics = resClinicas.data;
+                        if (!resMedicos.error && resMedicos.data) this.doctors = resMedicos.data;
+                    }
+                    this.renderClinicsList();
+                } catch(e) { console.error(e); }
+            }
+
+            async salvarClinica(e) {
+                e.preventDefault();
+                const idEdit = document.getElementById('clinicaEditId').value;
+                const nome = document.getElementById('inputNomeClinica').value.trim();
+                const endereco = document.getElementById('inputEnderecoClinica').value.trim();
+
+                if(!nome || !endereco) {
+                    this.showAlert("Atenção", "Nome e endereço da clínica são obrigatórios.");
+                    return;
+                }
+
+                if(idEdit) {
+                    const cli = this.clinics.find(c => String(c.id) === String(idEdit));
+                    if(cli) {
+                        const antigoNome = cli.name;
+                        cli.name = nome;
+                        cli.address = endereco;
+                        this.doctors.forEach(d => { if(d.hospital === antigoNome) d.hospital = nome; });
+                    }
+                    document.getElementById('clinicaEditId').value = '';
+                    document.getElementById('btnCancelarEdicaoClinica').classList.add('hidden');
+                } else {
+                    this.clinics.push({ id: Date.now(), name: nome, address: endereco });
+                }
+
+                if (supabaseClient) {
+                    for (let c of this.clinics) await supabaseClient.from('clinics').upsert(c);
+                    for (let d of this.doctors) await supabaseClient.from('doctors').upsert(d);
+                }
+
+                document.getElementById('formClinica').reset();
+                this.renderClinicsList();
+                this.showAlert("Sucesso", "Clínica salva com sucesso!");
+            }
+
+            editarClinica(id) {
+                const cli = this.clinics.find(c => String(c.id) === String(id));
+                if(!cli) return;
+                document.getElementById('clinicaEditId').value = cli.id;
+                document.getElementById('inputNomeClinica').value = cli.name;
+                document.getElementById('inputEnderecoClinica').value = cli.address;
+                document.getElementById('btnCancelarEdicaoClinica').classList.remove('hidden');
+            }
+
+            cancelarEdicaoClinica() {
+                document.getElementById('clinicaEditId').value = '';
+                document.getElementById('formClinica').reset();
+                document.getElementById('btnCancelarEdicaoClinica').classList.add('hidden');
+            }
+
+            async excluirClinica(id) {
+                const cli = this.clinics.find(c => String(c.id) === String(id));
+                if(!cli) return;
+                const medicosVinculados = this.doctors.filter(d => d.hospital === cli.name);
+                if(medicosVinculados.length > 0) {
+                    this.showAlert("Aviso", `Existem ${medicosVinculados.length} médico(s) vinculados a esta clínica.`);
+                    return;
+                }
+
+                this.clinics = this.clinics.filter(c => String(c.id) !== String(id));
+                if (supabaseClient) await supabaseClient.from('clinics').delete().eq('id', id);
+                this.renderClinicsList();
+            }
+
+            renderClinicsList() {
+                const container = document.getElementById('clinics-list-container');
+                if(!container) return;
+
+                if(this.clinics.length === 0) {
+                    container.innerHTML = `<div class="bg-white rounded-2xl p-6 text-center border border-slate-200 shadow-sm"><p class="text-xs text-slate-500">Nenhuma clínica cadastrada.</p></div>`;
+                    return;
+                }
+
+                let html = '';
+                this.clinics.forEach(c => {
+                    const totalMedicos = this.doctors.filter(d => d.hospital === c.name).length;
+                    html += `
+                        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs flex items-center justify-between">
+                            <div class="space-y-0.5 pr-2">
+                                <h4 class="font-bold text-slate-900 text-sm"><i class="fa-solid fa-hospital text-amber-600"></i> ${c.name}</h4>
+                                <p class="text-xs text-slate-500">${c.address}</p>
+                                <p class="text-[11px] text-amber-700 font-semibold">${totalMedicos} médico(s) vinculado(s)</p>
+                            </div>
+                            <div class="flex items-center gap-1">
+                                <button onclick="clinicApp.editarClinica('${c.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-2 rounded-xl text-xs"><i class="fa-solid fa-pen"></i></button>
+                                <button onclick="clinicApp.excluirClinica('${c.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-2 rounded-xl text-xs"><i class="fa-solid fa-trash"></i></button>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            showAlert(titulo, texto) {
+                document.getElementById('alertaTitulo').textContent = titulo;
+                document.getElementById('alertaTexto').textContent = texto;
+                document.getElementById('modalAlerta').classList.remove('hidden');
+            }
+            fecharAlerta() { document.getElementById('modalAlerta').classList.add('hidden'); }
+        }
+        const clinicApp = new ClinicApp();
+    </script>
+</body>
+</html>

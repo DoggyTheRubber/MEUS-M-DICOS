@@ -1,0 +1,10 @@
+// sw.js
+self.addEventListener('push', function(event) {
+    const data = event.data.json();
+    const options = {
+        body: data.body,
+        icon: 'la pipita.png',
+        badge: 'la pipita.png'
+    };
+    event.waitUntil(self.registration.showNotification(data.title, options));
+});

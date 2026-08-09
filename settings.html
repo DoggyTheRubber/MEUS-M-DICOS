@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Configurações - Ótica La Patrícia</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-slate-50 text-slate-800 pb-20">
+
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <a href="index.html" class="text-slate-400 hover:text-white mr-1">
+                <i class="fa-solid fa-arrow-left text-base"></i>
+            </a>
+            <div>
+                <h1 class="font-bold text-base tracking-tight">Configurações</h1>
+            </div>
+        </div>
+    </header>
+
+    <main class="p-4 max-w-2xl mx-auto space-y-6">
+        
+        <!-- Toggle Notificações -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+            <div>
+                <h3 class="font-bold text-slate-900 text-sm">Ativar notificações</h3>
+                <p class="text-xs text-slate-500">Receber alertas automáticos</p>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="toggleNotif" class="sr-only peer">
+                <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+            </label>
+        </div>
+
+        <!-- Seletor de Intervalo -->
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
+            <h3 class="font-bold text-slate-900 text-sm">Intervalo entre Notificações</h3>
+            <select id="intervaloSelect" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                <option value="3600000">1 hora</option>
+                <option value="1800000">30 minutos</option>
+                <option value="900000">15 minutos</option>
+                <option value="5000">5 segundos (DEV)</option>
+            </select>
+        </div>
+    </main>
+
+    <script>
+        const toggle = document.getElementById('toggleNotif');
+        const select = document.getElementById('intervaloSelect');
+
+        // Carregar configurações salvas
+        toggle.checked = localStorage.getItem('notif_ativa') === 'true';
+        select.value = localStorage.getItem('notif_intervalo') || '3600000';
+
+        // Função para solicitar permissão
+        async function pedirPermissao() {
+            if (!("Notification" in window)) {
+                alert("Este navegador não suporta notificações.");
+                toggle.checked = false;
+                return;
+            }
+            
+            const permissao = await Notification.requestPermission();
+            if (permissao !== "granted") {
+                alert("Você precisa permitir as notificações nas configurações do navegador para receber alertas.");
+                toggle.checked = false;
+                localStorage.setItem('notif_ativa', 'false');
+            } else {
+                localStorage.setItem('notif_ativa', 'true');
+            }
+        }
+
+        // Salvar ao alterar
+        toggle.addEventListener('change', () => {
+            if (toggle.checked) {
+                pedirPermissao();
+            } else {
+                localStorage.setItem('notif_ativa', 'false');
+            }
+        });
+
+        select.addEventListener('change', () => {
+            localStorage.setItem('notif_intervalo', select.value);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ótica La Patrícia - Relatórios</title>
+    <link rel="icon" type="image/png" href="la pipita.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <style>
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen pb-20">
+
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <a href="index.html" class="text-slate-400 hover:text-white mr-1"><i class="fa-solid fa-arrow-left text-base"></i></a>
+            <div>
+                <h1 class="font-bold text-base tracking-tight">Relatórios de Visitas</h1>
+                <p class="text-xs text-slate-400">Ótica La Patrícia</p>
+            </div>
+        </div>
+        <!-- ENGRENAGEM NO TOPO DIREITO -->
+        <a href="settings.html" class="text-slate-400 hover:text-white transition">
+            <i class="fa-solid fa-gear text-xl"></i>
+        </a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-4">
+        <button onclick="reportApp.abrirModalSelecaoCompartilhar()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm">
+            <i class="fa-solid fa-share-nodes"></i> Compartilhar Relatórios Selecionados
+        </button>
+
+        <div class="space-y-3">
+            <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                </span>
+                <input type="text" id="reportSearch" oninput="reportApp.renderReportsList()" placeholder="Buscar relatórios..." class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl text-sm shadow-sm">
+            </div>
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
+                <button onclick="reportApp.setReportFilter('concluidos')" id="report-filter-concluidos" class="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap">Concluídos</button>
+                <button onclick="reportApp.setReportFilter('pendentes')" id="report-filter-pendentes" class="px-3.5 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap">Pendentes (<span id="count-pendentes">0</span>)</button>
+            </div>
+        </div>
+
+        <div id="reports-list-container" class="space-y-3 max-h-[55vh] overflow-y-auto pr-1 no-scrollbar"></div>
+
+        <button onclick="reportApp.abrirFormRelatorio()" class="w-full bg-amber-600 hover:bg-amber-700 text-white font-semibold py-3.5 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm">
+            <i class="fa-solid fa-plus-circle"></i> Adicionar Novo Relatório
+        </button>
+    </main>
+
+    <!-- Modal Relatório -->
+    <div id="modalRelatorio" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
+                <h3 id="modalRelatorioTitulo" class="font-bold text-base">Novo Relatório</h3>
+                <button onclick="reportApp.fecharModalRelatorio()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form id="formRelatorio" onsubmit="reportApp.salvarRelatorio(event)" class="p-5 overflow-y-auto space-y-4 text-sm flex-1">
+                <input type="hidden" id="reportId">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Título *</label>
+                    <input type="text" id="reportTitle" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Data *</label>
+                    <input type="date" id="reportDate" required class="w-full px-3.5 py-2.5 bg-slate-100 border border-slate-200 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Médico Correspondente *</label>
+                    <select id="reportDoctorId" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Anotações *</label>
+                    <textarea id="reportContent" rows="6" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs"></textarea>
+                </div>
+                <div class="flex items-center justify-between pt-2">
+                    <button type="button" id="btnExcluirRelatorio" class="hidden text-xs bg-rose-50 text-rose-600 hover:bg-rose-100 font-semibold px-3 py-2.5 rounded-xl"><i class="fa-solid fa-trash"></i> Excluir</button>
+                    <button type="submit" class="flex-1 ml-auto bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl">Salvar Relatório</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Seleção Compartilhar -->
+    <div id="modalSelecaoCompartilhar" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
+                <h3 class="font-bold text-base">Selecionar Relatórios para Compartilhar</h3>
+                <button onclick="reportApp.fecharModalSelecaoCompartilhar()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <div class="p-5 overflow-y-auto space-y-3 text-sm flex-1">
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
+                    <button type="button" onclick="reportApp.marcarTodosCompartilhar(true)" class="text-amber-600 font-semibold">Selecionar Todos</button>
+                    <button type="button" onclick="reportApp.marcarTodosCompartilhar(false)" class="text-slate-500">Desmarcar Todos</button>
+                </div>
+                <div id="lista-checkbox-compartilhar" class="space-y-2"></div>
+            </div>
+            <div class="bg-slate-50 border-t border-slate-100 p-4 flex gap-2">
+                <button onclick="reportApp.enviarRelatoriosSelecionados()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Gerar Link com Supabase
+                </button>
+                <button onclick="reportApp.fecharModalSelecaoCompartilhar()" class="bg-slate-200 text-slate-700 font-semibold px-4 py-3 rounded-xl text-xs">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://qhtwbbrapldxidlqikzf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFodHdiYnJhcGxkeGlkbHFpa3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNDA1OTgsImV4cCI6MjEwMTgxNjU5OH0.nhHFnhPvSdhl9z38OX0V6wqDCYaF9-Y8T4PgEfFcw80';
+        let supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        class ReportApp {
+            constructor() {
+                this.doctors = [];
+                this.reports = [];
+                this.reportFilter = 'concluidos';
+                this.loadData();
+            }
+
+            async loadData() {
+                try {
+                    if (supabaseClient) {
+                        const [resDoc, resRep] = await Promise.all([
+                            supabaseClient.from('doctors').select('*'),
+                            supabaseClient.from('reports').select('*')
+                        ]);
+                        if (!resDoc.error && resDoc.data) this.doctors = resDoc.data;
+                        if (!resRep.error && resRep.data) {
+                            this.reports = resRep.data.map(r => ({ ...r, doctorId: r.doctor_id !== undefined ? r.doctor_id : r.doctorId }));
+                        }
+                    }
+                    this.renderReportsList();
+                } catch(e) { console.error(e); }
+            }
+
+            preencherSelectMedicos(selectedId = '') {
+                const select = document.getElementById('reportDoctorId');
+                if(!select) return;
+                if(this.doctors.length === 0) {
+                    select.innerHTML = '<option value="">Nenhum médico cadastrado</option>';
+                    return;
+                }
+                let html = '<option value="">Selecione o Médico...</option>';
+                this.doctors.forEach(d => {
+                    const sel = (String(d.id) === String(selectedId)) ? 'selected' : '';
+                    html += `<option value="${d.id}" ${sel}>${d.name} (${d.hospital || 'Sem clínica'})</option>`;
+                });
+                select.innerHTML = html;
+            }
+
+            setReportFilter(f) {
+                this.reportFilter = f;
+                const btnConcluidos = document.getElementById('report-filter-concluidos');
+                const btnPendentes = document.getElementById('report-filter-pendentes');
+                
+                if (f === 'concluidos') {
+                    btnConcluidos.className = "px-3.5 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap";
+                    btnPendentes.className = "px-3.5 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap";
+                } else {
+                    btnPendentes.className = "px-3.5 py-1.5 text-xs font-medium rounded-lg bg-slate-900 text-white transition whitespace-nowrap";
+                    btnConcluidos.className = "px-3.5 py-1.5 text-xs font-medium rounded-lg bg-white border border-slate-200 text-slate-600 transition whitespace-nowrap";
+                }
+                this.renderReportsList();
+            }
+
+            abrirFormRelatorio(id = null) {
+                const modal = document.getElementById('modalRelatorio');
+                this.preencherSelectMedicos();
+                if(id) {
+                    const rep = this.reports.find(r => String(r.id) === String(id));
+                    if(!rep) return;
+                    document.getElementById('reportId').value = rep.id;
+                    document.getElementById('reportTitle').value = rep.title;
+                    document.getElementById('reportDate').value = rep.date;
+                    document.getElementById('reportContent').value = rep.content;
+                    this.preencherSelectMedicos(rep.doctorId);
+                    document.getElementById('btnExcluirRelatorio').classList.remove('hidden');
+                    document.getElementById('btnExcluirRelatorio').setAttribute('onclick', `reportApp.excluirRelatorio('${rep.id}')`);
+                } else {
+                    document.getElementById('formRelatorio').reset();
+                    document.getElementById('reportId').value = '';
+                    document.getElementById('reportDate').value = new Date().toISOString().split('T')[0];
+                    document.getElementById('btnExcluirRelatorio').classList.add('hidden');
+                }
+                modal.classList.remove('hidden');
+            }
+
+            fecharModalRelatorio() { document.getElementById('modalRelatorio').classList.add('hidden'); }
+
+            async salvarRelatorio(e) {
+                e.preventDefault();
+                const id = document.getElementById('reportId').value;
+                const title = document.getElementById('reportTitle').value.trim();
+                const date = document.getElementById('reportDate').value;
+                const doctorId = document.getElementById('reportDoctorId').value;
+                const content = document.getElementById('reportContent').value.trim();
+
+                const obj = { 
+                    id: id ? Number(id) : Date.now(), 
+                    title, 
+                    date, 
+                    doctor_id: String(doctorId),
+                    doctorId: doctorId, 
+                    content, 
+                    isPending: false 
+                };
+
+                if(id) {
+                    const idx = this.reports.findIndex(r => String(r.id) === String(id));
+                    if(idx !== -1) this.reports[idx] = obj;
+                } else {
+                    this.reports.unshift(obj);
+                }
+
+                if (supabaseClient) await supabaseClient.from('reports').upsert(obj);
+                this.fecharModalRelatorio();
+                this.renderReportsList();
+            }
+
+            async excluirRelatorio(id) {
+                this.reports = this.reports.filter(r => String(r.id) !== String(id));
+                if (supabaseClient) await supabaseClient.from('reports').delete().eq('id', id);
+                this.fecharModalRelatorio();
+                this.renderReportsList();
+            }
+
+            renderReportsList() {
+                const container = document.getElementById('reports-list-container');
+                if(!container) return;
+
+                const searchTerm = document.getElementById('reportSearch') ? document.getElementById('reportSearch').value.toLowerCase() : '';
+                const concluidos = this.reports.filter(r => !r.isPending);
+                const pendentes = this.reports.filter(r => r.isPending);
+                document.getElementById('count-pendentes').textContent = pendentes.length;
+
+                let lista = (this.reportFilter === 'pendentes') ? pendentes : concluidos;
+
+                if (searchTerm) {
+                    lista = lista.filter(r => {
+                        const doc = this.doctors.find(d => String(d.id) === String(r.doctorId));
+                        const docName = doc ? doc.name.toLowerCase() : '';
+                        return r.title.toLowerCase().includes(searchTerm) || 
+                               r.content.toLowerCase().includes(searchTerm) || 
+                               docName.includes(searchTerm);
+                    });
+                }
+
+                if(lista.length === 0) {
+                    container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border"><p class="text-xs text-slate-500">Nenhum relatório nesta categoria.</p></div>`;
+                    return;
+                }
+
+                let html = '';
+                lista.forEach(r => {
+                    const doc = this.doctors.find(d => String(d.id) === String(r.doctorId));
+                    html += `
+                        <div onclick="reportApp.abrirFormRelatorio('${r.id}')" class="bg-white p-4 rounded-2xl border cursor-pointer hover:border-amber-300">
+                            <h4 class="font-bold text-sm">${r.title}</h4>
+                            <p class="text-xs text-amber-700">${doc ? doc.name : 'Médico'}</p>
+                            <p class="text-xs text-slate-500 truncate">${r.content}</p>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+
+            abrirModalSelecaoCompartilhar() {
+                const container = document.getElementById('lista-checkbox-compartilhar');
+                const concluidos = this.reports.filter(r => !r.isPending);
+
+                if(concluidos.length === 0) {
+                    alert("Não há relatórios concluídos para compartilhar.");
+                    return;
+                }
+
+                let html = '';
+                concluidos.forEach(r => {
+                    html += `
+                        <label class="flex items-center gap-2 p-2 bg-slate-50 rounded border cursor-pointer">
+                            <input type="checkbox" value="${r.id}" class="check-compartilhar w-4 h-4 text-emerald-600 rounded" checked>
+                            <span class="text-xs font-semibold">${r.title}</span>
+                        </label>
+                    `;
+                });
+                container.innerHTML = html;
+                document.getElementById('modalSelecaoCompartilhar').classList.remove('hidden');
+            }
+
+            fecharModalSelecaoCompartilhar() { document.getElementById('modalSelecaoCompartilhar').classList.add('hidden'); }
+            marcarTodosCompartilhar(marcar) { document.querySelectorAll('.check-compartilhar').forEach(cb => cb.checked = marcar); }
+
+            enviarRelatoriosSelecionados() {
+                const checkboxes = document.querySelectorAll('.check-compartilhar:checked');
+                const ids = Array.from(checkboxes).map(cb => cb.value);
+                if(ids.length === 0) {
+                    alert("Selecione pelo menos um relatório.");
+                    return;
+                }
+                window.open(`share.html?ids=${ids.join(',')}`, '_blank');
+                this.fecharModalSelecaoCompartilhar();
+            }
+        }
+        const reportApp = new ReportApp();
+    </script>
+</body>
+</html>

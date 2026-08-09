@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ótica La Patrícia - Planejamento</title>
+    <link rel="icon" type="image/png" href="la pipita.png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+</head>
+<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen pb-20">
+
+    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+            <a href="index.html" class="text-slate-400 hover:text-white mr-1"><i class="fa-solid fa-arrow-left text-base"></i></a>
+            <div>
+                <h1 class="font-bold text-base tracking-tight">Planejamento Diário</h1>
+                <p class="text-xs text-slate-400">Ótica La Patrícia</p>
+            </div>
+        </div>
+        <!-- ENGRENAGEM NO TOPO DIREITO -->
+        <a href="settings.html" class="text-slate-400 hover:text-white transition">
+            <i class="fa-solid fa-gear text-xl"></i>
+        </a>
+    </header>
+
+    <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-4">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-calendar-days text-amber-600"></i> Novo Planejamento
+                </h2>
+            </div>
+
+            <form id="formPlanejamento" onsubmit="planApp.adicionarPlanejamento(event)" class="space-y-3 text-sm">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Selecione o Médico *</label>
+                    <select id="planDoctorId" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl"></select>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Texto da Tarefa *</label>
+                    <input type="text" id="planText" required placeholder="Ex: Entregar presente" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                </div>
+                <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-sm text-xs flex items-center justify-center gap-1.5">
+                    <i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento
+                </button>
+            </form>
+        </div>
+
+        <div class="space-y-3">
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Itens de Hoje</div>
+            <div id="planning-list-container" class="space-y-3 pb-6"></div>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+
+    <script>
+        const SUPABASE_URL = 'https://qhtwbbrapldxidlqikzf.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFodHdiYnJhcGxkeGlkbHFpa3pmIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODYyNDA1OTgsImV4cCI6MjEwMTgxNjU5OH0.nhHFnhPvSdhl9z38OX0V6wqDCYaF9-Y8T4PgEfFcw80';
+        let supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+
+        class PlanningApp {
+            constructor() {
+                this.doctors = [];
+                this.planning = [];
+                this.reports = [];
+                this.loadData();
+            }
+
+            async loadData() {
+                try {
+                    if (supabaseClient) {
+                        const [resDoc, resPlan, resRep] = await Promise.all([
+                            supabaseClient.from('doctors').select('*'),
+                            supabaseClient.from('planning').select('*'),
+                            supabaseClient.from('reports').select('*')
+                        ]);
+                        if (!resDoc.error && resDoc.data) this.doctors = resDoc.data;
+                        if (!resPlan.error && resPlan.data) this.planning = resPlan.data.map(p => ({ ...p, doctorId: p.doctor_id !== undefined ? p.doctor_id : p.doctorId }));
+                        if (!resRep.error && resRep.data) this.reports = resRep.data;
+                    }
+                    this.preencherSelectPlanejamentoMedicos();
+                    this.renderPlanningList();
+                } catch(e) { console.error(e); }
+            }
+
+            preencherSelectPlanejamentoMedicos() {
+                const select = document.getElementById('planDoctorId');
+                if(!select) return;
+                if(this.doctors.length === 0) {
+                    select.innerHTML = '<option value="">Nenhum médico cadastrado</option>';
+                    return;
+                }
+                let html = '<option value="">Selecione o Médico...</option>';
+                this.doctors.forEach(d => {
+                    html += `<option value="${d.id}">${d.name} (${d.hospital || 'Sem clínica'})</option>`;
+                });
+                select.innerHTML = html;
+            }
+
+            async adicionarPlanejamento(e) {
+                e.preventDefault();
+                const doctorId = document.getElementById('planDoctorId').value;
+                const text = document.getElementById('planText').value.trim();
+                if(!doctorId || !text) return;
+
+                const novoItem = {
+                    id: Date.now(),
+                    doctor_id: String(doctorId),
+                    doctorId: doctorId,
+                    text,
+                    dayGroup: 'Hoje',
+                    checked: false
+                };
+
+                this.planning.unshift(novoItem);
+                if (supabaseClient) {
+                    await supabaseClient.from('planning').upsert(novoItem);
+                }
+                document.getElementById('formPlanejamento').reset();
+                this.renderPlanningList();
+            }
+
+            async togglePlanningItem(id) {
+                const item = this.planning.find(p => String(p.id) === String(id));
+                if(!item || item.checked) return;
+
+                item.checked = true;
+                if (supabaseClient) await supabaseClient.from('planning').upsert(item);
+
+                const novoRelatorio = {
+                    id: Date.now(),
+                    title: `Relatório #${String(Date.now()).slice(-4)}`,
+                    date: new Date().toISOString().split('T')[0],
+                    doctor_id: String(item.doctorId),
+                    doctorId: item.doctorId,
+                    content: `Planejamento concluído: "${item.text}".`,
+                    isPending: true
+                };
+
+                this.reports.unshift(novoRelatorio);
+                if (supabaseClient) await supabaseClient.from('reports').upsert(novoRelatorio);
+                this.renderPlanningList();
+            }
+
+            renderPlanningList() {
+                const container = document.getElementById('planning-list-container');
+                if(!container) return;
+
+                if(this.planning.length === 0) {
+                    container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border"><p class="text-xs text-slate-500">Nenhum planejamento.</p></div>`;
+                    return;
+                }
+
+                let html = '';
+                this.planning.forEach(item => {
+                    const doc = this.doctors.find(d => String(d.id) === String(item.doctorId));
+                    html += `
+                        <div class="flex items-center justify-between p-3 rounded-xl border bg-white">
+                            <div class="flex items-center gap-3">
+                                <input type="checkbox" ${item.checked ? 'checked disabled' : ''} onchange="planApp.togglePlanningItem('${item.id}')" class="w-4 h-4 text-amber-600 rounded">
+                                <span class="text-xs font-semibold">${doc ? doc.name : 'Médico'} - ${item.text}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            }
+        }
+        const planApp = new PlanningApp();
+    </script>
+</body>
+</html>
