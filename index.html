@@ -344,11 +344,12 @@
                         </h2>
                         <p class="text-xs text-slate-500">Gerencie e anote todas as suas visitas detalhadas</p>
                     </div>
-                    <!-- Botão de Compartilhar Relatórios no Topo -->
-                    <button onclick="app.abrirModalCompartilhar()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-3 py-2 rounded-xl transition text-xs flex items-center gap-1.5 shadow-sm shrink-0">
-                        <i class="fa-solid fa-share-nodes"></i> Compartilhar
-                    </button>
                 </div>
+
+                <!-- Botão de Compartilhar Relatórios -->
+                <button onclick="app.abrirModalSelecaoCompartilhamento()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm">
+                    <i class="fa-solid fa-share-nodes"></i> Compartilhar Relatórios Selecionados
+                </button>
 
                 <!-- Barra de Pesquisa e Tags de Relatórios -->
                 <div class="space-y-3">
@@ -372,71 +373,6 @@
             </div>
         </section>
     </main>
-
-    <!-- ==================== MODAL DE COMPARTILHAR (SELEÇÃO) ==================== -->
-    <div id="modalCompartilhar" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center font-bold text-sm">
-                        <i class="fa-solid fa-share-nodes"></i>
-                    </div>
-                    <h3 class="font-bold text-base">Compartilhar Relatórios</h3>
-                </div>
-                <button onclick="app.fecharModalCompartilhar()" class="text-slate-400 hover:text-white p-2">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            <div class="p-4 bg-slate-50 border-b border-slate-100 text-xs text-slate-600">
-                Selecione os relatórios desejados. Ao confirmar, abrirá diretamente a tela integrada de compartilhamento (<code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">share.html</code> unificado).
-            </div>
-            <div id="listaCheckCompartilhar" class="p-4 overflow-y-auto space-y-2 flex-1 max-h-[50vh]"></div>
-            <div class="bg-white border-t border-slate-100 p-4 flex items-center justify-between gap-3">
-                <button onclick="app.fecharModalCompartilhar()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs transition">
-                    Cancelar
-                </button>
-                <button onclick="app.executarCompartilhamento()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-check"></i> OK (Abrir Tela Share)
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== TELA SHARE / APRESENTAÇÃO INTEGRADA (SHARE.HTML COMPLETO) ==================== -->
-    <div id="viewShareScreen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col hidden overflow-hidden text-slate-800">
-        <!-- Top bar da tela Share -->
-        <header class="bg-slate-900 text-white shadow-md px-4 py-3 flex items-center justify-between border-b border-slate-800 shrink-0">
-            <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700 shadow shrink-0">
-                    <img src="la pipita.png" alt="La Pipita Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-eye text-amber-500 text-lg\'></i>';">
-                </div>
-                <div>
-                    <h1 class="font-bold text-base tracking-tight">Optica La Patrícia</h1>
-                    <p class="text-xs text-amber-400 font-medium">Relatórios Compartilhados (Modo Chefe / Somente Leitura)</p>
-                </div>
-            </div>
-            <button onclick="app.fecharShareScreen()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3.5 py-2 rounded-xl font-semibold transition border border-slate-700 flex items-center gap-1.5">
-                <i class="fa-solid fa-arrow-left"></i> Voltar ao App
-            </button>
-        </header>
-
-        <!-- Corpo da Tela Share com abas de Visualização Guiada ou Geral -->
-        <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-4 bg-slate-100">
-            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
-                <div>
-                    <h2 class="font-bold text-slate-900 text-base">Visualização dos Relatórios Selecionados</h2>
-                    <p class="text-xs text-slate-500" id="shareSubInfo">Total de 0 relatórios</p>
-                </div>
-                <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-                    <button onclick="app.setShareMode('passo')" id="btnShareModePasso" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 text-white transition">Passo a Passo</button>
-                    <button onclick="app.setShareMode('geral')" id="btnShareModeGeral" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition">Lista Completa</button>
-                </div>
-            </div>
-
-            <!-- Conteúdo dinâmico da tela Share -->
-            <div id="shareContainerContent" class="space-y-4 pb-12"></div>
-        </main>
-    </div>
 
     <!-- ==================== MODAL DE CRIAR / EDITAR RELATÓRIO ==================== -->
     <div id="modalRelatorio" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
@@ -533,6 +469,41 @@
         </div>
     </div>
 
+    <!-- ==================== MODAL DE SELEÇÃO PARA COMPARTILHAR ==================== -->
+    <div id="modalSelecaoCompartilhar" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-900 flex items-center justify-center font-bold text-sm">
+                        <i class="fa-solid fa-square-check"></i>
+                    </div>
+                    <h3 class="font-bold text-base">Selecionar Relatórios Completos</h3>
+                </div>
+                <button onclick="app.fecharModalSelecaoCompartilhar()" class="text-slate-400 hover:text-white p-2">
+                    <i class="fa-solid fa-xmark text-lg"></i>
+                </button>
+            </div>
+
+            <div class="p-5 overflow-y-auto space-y-3 text-sm flex-1">
+                <p class="text-xs text-slate-500">Selecione abaixo quais relatórios concluídos você deseja enviar para visualização:</p>
+                <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
+                    <button type="button" onclick="app.marcarTodosCompartilhar(true)" class="text-amber-600 font-semibold hover:underline">Selecionar Todos</button>
+                    <button type="button" onclick="app.marcarTodosCompartilhar(false)" class="text-slate-500 hover:underline">Desmarcar Todos</button>
+                </div>
+                <div id="lista-checkbox-compartilhar" class="space-y-2"></div>
+            </div>
+
+            <div class="bg-slate-50 border-t border-slate-100 p-4 flex gap-2">
+                <button onclick="app.enviarRelatoriosSelecionados()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-md text-xs flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-paper-plane"></i> Enviar e Abrir Share
+                </button>
+                <button onclick="app.fecharModalSelecaoCompartilhar()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-3 rounded-xl transition text-xs">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- ==================== HOMEBAR INFERIOR ==================== -->
     <nav class="bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-30 shadow-lg">
         <div class="max-w-md mx-auto flex justify-around py-2">
@@ -574,13 +545,8 @@
                 this.reports = [];
                 this.planning = [];
                 this.currentFilter = 'all';
-                this.reportFilter = 'concluidos'; 
+                this.reportFilter = 'concluidos'; // 'concluidos' ou 'pendentes'
                 this.clinicaSelecionada = null; 
-                
-                this.relatoriosSelecionadosCompartilhamento = [];
-                this.shareMode = 'passo'; // 'passo' ou 'geral'
-                this.indiceSharePassoAtual = 0;
-
                 this.initDobDays();
                 this.loadData();
                 this.initSubspecTags();
@@ -1342,6 +1308,7 @@
                 this.showAlert("Sucesso", "Médico salvo com sucesso!", "sucesso");
             }
 
+            // ==================== PLANEJAMENTO ====================
             adicionarPlanejamento(e) {
                 e.preventDefault();
                 const doctorId = document.getElementById('planDoctorId').value;
@@ -1378,11 +1345,12 @@
 
             togglePlanningItem(id) {
                 const item = this.planning.find(p => p.id === id);
-                if(!item || item.checked) return;
+                if(!item || item.checked) return; // Se já está marcado, não pode desmarcar
 
                 item.checked = true;
                 this.savePlanningStorage();
 
+                // Cria automaticamente um relatório PENDENTE na aba relatórios com flag isPending: true
                 const doc = this.doctors.find(d => d.id === item.doctorId);
                 const docName = doc ? doc.name : 'Médico';
                 
@@ -1395,7 +1363,7 @@
                     date: hojeIso,
                     doctorId: item.doctorId,
                     content: `Planejamento concluído: "${item.text}". (Preencha as anotações detalhadas da visita para finalizar)`,
-                    isPending: true 
+                    isPending: true // Marcado como pendente na aba Relatórios
                 };
 
                 this.reports.unshift(novoRelatorio);
@@ -1465,7 +1433,7 @@
                             </div>
                         </div>
                     `;
-                });
+                }
 
                 container.innerHTML = html;
             }
@@ -1563,7 +1531,7 @@
                             date, 
                             doctorId, 
                             content, 
-                            isPending: false 
+                            isPending: false // Ao salvar, o relatório sai de pendente e vai direto para concluídos
                         };
                     }
                 } else {
@@ -1663,6 +1631,7 @@
                     return;
                 }
 
+                // Filtro Concluídos
                 let filtradosReps = concluidosReps;
                 if(q) {
                     filtradosReps = concluidosReps.filter(r => {
@@ -1722,169 +1691,65 @@
                 container.innerHTML = html;
             }
 
-            abrirModalCompartilhar() {
-                const container = document.getElementById('listaCheckCompartilhar');
-                if(!container) return;
+            abrirModalSelecaoCompartilhar() {
+                const modal = document.getElementById('modalSelecaoCompartilhar');
+                const container = document.getElementById('lista-checkbox-compartilhar');
+                const concluidos = this.reports.filter(r => !r.isPending);
 
-                if(this.reports.length === 0) {
-                    this.showAlert("Aviso", "Não há relatórios cadastrados para compartilhar.");
+                if(concluidos.length === 0) {
+                    this.showAlert("Atenção", "Não há relatórios concluídos para compartilhar.");
                     return;
                 }
 
                 let html = '';
-                this.reports.forEach(r => {
+                concluidos.forEach(r => {
                     const doc = this.doctors.find(d => d.id === r.doctorId);
                     const docName = doc ? doc.name : 'Médico';
-                    const statusTag = r.isPending ? '<span class="text-[10px] bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded font-medium">Pendente</span>' : '<span class="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-medium">Concluído</span>';
-
                     html += `
-                        <label class="flex items-center gap-3 p-3 bg-white border border-slate-200 rounded-xl cursor-pointer hover:border-amber-400 transition select-none">
-                            <input type="checkbox" name="shareReportCheckbox" value="${r.id}" class="w-4 h-4 text-amber-600 rounded focus:ring-amber-500">
-                            <div class="flex-1 space-y-0.5">
-                                <div class="flex items-center justify-between">
-                                    <span class="font-bold text-xs text-slate-900">${r.title} (${r.date})</span>
-                                    ${statusTag}
-                                </div>
-                                <p class="text-xs text-amber-700 font-medium">${docName}</p>
-                                <p class="text-[11px] text-slate-500 truncate">${r.content}</p>
+                        <label class="flex items-start gap-3 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:border-amber-400 transition">
+                            <input type="checkbox" value="${r.id}" class="check-compartilhar mt-0.5 w-4 h-4 text-emerald-600 rounded focus:ring-emerald-500 cursor-pointer" checked>
+                            <div class="space-y-0.5 flex-1">
+                                <div class="font-bold text-slate-900 text-xs">${r.title} - <span class="text-amber-700">${docName}</span></div>
+                                <p class="text-[11px] text-slate-500 line-clamp-1">${r.content}</p>
                             </div>
                         </label>
                     `;
                 });
                 container.innerHTML = html;
-                document.getElementById('modalCompartilhar').classList.remove('hidden');
+                modal.classList.remove('hidden');
             }
 
-            fecharModalCompartilhar() {
-                document.getElementById('modalCompartilhar').classList.add('hidden');
+            fecharModalSelecaoCompartilhar() {
+                document.getElementById('modalSelecaoCompartilhar').classList.add('hidden');
             }
 
-            executarCompartilhamento() {
-                const checkboxes = document.querySelectorAll('input[name="shareReportCheckbox"]:checked');
-                const selecionadosIds = Array.from(checkboxes).map(cb => cb.value);
+            marcarTodosCompartilhar(marcar) {
+                document.querySelectorAll('.check-compartilhar').forEach(cb => cb.checked = marcar);
+            }
 
-                if(selecionadosIds.length === 0) {
-                    this.showAlert("Atenção", "Selecione pelo menos um relatório para compartilhar.");
+            enviarRelatoriosSelecionados() {
+                const checkboxes = document.querySelectorAll('.check-compartilhar:checked');
+                const idsSelecionados = Array.from(checkboxes).map(cb => cb.value);
+
+                if(idsSelecionados.length === 0) {
+                    this.showAlert("Atenção", "Selecione pelo menos um relatório para enviar.");
                     return;
                 }
 
-                this.relatoriosSelecionadosCompartilhamento = selecionadosIds.map(id => this.reports.find(r => r.id === id)).filter(Boolean);
-                this.indiceSharePassoAtual = 0;
-                this.shareMode = 'passo';
-
-                this.fecharModalCompartilhar();
-                this.abrirShareScreen();
-            }
-
-            abrirShareScreen() {
-                const view = document.getElementById('viewShareScreen');
-                view.classList.remove('hidden');
-                this.atualizarBotoesShareMode();
-                this.renderShareContent();
-            }
-
-            fecharShareScreen() {
-                document.getElementById('viewShareScreen').classList.add('hidden');
-                this.relatoriosSelecionadosCompartilhamento = [];
-            }
-
-            setShareMode(mode) {
-                this.shareMode = mode;
-                this.atualizarBotoesShareMode();
-                this.renderShareContent();
-            }
-
-            atualizarBotoesShareMode() {
-                const btnPasso = document.getElementById('btnShareModePasso');
-                const btnGeral = document.getElementById('btnShareModeGeral');
-                if(!btnPasso || !btnGeral) return;
-
-                if(this.shareMode === 'passo') {
-                    btnPasso.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 text-white transition";
-                    btnGeral.className = "px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition";
-                } else {
-                    btnPasso.className = "px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition";
-                    btnGeral.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 text-white transition";
-                }
-            }
-
-            renderShareContent() {
-                const container = document.getElementById('shareContainerContent');
-                const subInfo = document.getElementById('shareSubInfo');
-                if(!container) return;
-
-                const total = this.relatoriosSelecionadosCompartilhamento.length;
-                if(subInfo) subInfo.textContent = `Total de ${total} relatório(s) selecionado(s)`;
-
-                if(this.shareMode === 'passo') {
-                    const r = this.relatoriosSelecionadosCompartilhamento[this.indiceSharePassoAtual];
-                    if(!r) return;
-
+                const relatoriosParaEnviar = this.reports.filter(r => idsSelecionados.includes(r.id)).map(r => {
                     const doc = this.doctors.find(d => d.id === r.doctorId);
-                    const docName = doc ? doc.name : 'Médico não encontrado';
-                    const docHosp = doc ? doc.hospital : '';
+                    return {
+                        ...r,
+                        doctorName: doc ? doc.name : 'Médico',
+                        hospitalName: doc ? doc.hospital : ''
+                    };
+                });
 
-                    container.innerHTML = `
-                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
-                                <div class="flex items-center gap-2">
-                                    <span class="w-8 h-8 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center font-bold text-xs">${this.indiceSharePassoAtual + 1}/${total}</span>
-                                    <h3 class="font-bold text-slate-900 text-base">${r.title}</h3>
-                                </div>
-                                <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg font-medium">${r.date}</span>
-                            </div>
-                            <div class="space-y-1">
-                                <p class="text-xs font-semibold text-amber-700 flex items-center gap-1.5">
-                                    <i class="fa-solid fa-user-doctor"></i> ${docName} ${docHosp ? '(' + docHosp + ')' : ''}
-                                </p>
-                                <div class="text-xs text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100 whitespace-pre-wrap font-mono leading-relaxed">${r.content}</div>
-                            </div>
-                            <div class="flex items-center justify-between pt-2">
-                                <button onclick="app.sharePassoAnterior()" ${this.indiceSharePassoAtual === 0 ? 'disabled' : ''} class="bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5">
-                                    <i class="fa-solid fa-arrow-left"></i> Anterior
-                                </button>
-                                <span class="text-[11px] text-slate-400 italic">Modo de Apresentação Guiada</span>
-                                <button onclick="app.sharePassoProximo()" ${this.indiceSharePassoAtual === total - 1 ? 'disabled' : ''} class="bg-amber-600 hover:bg-amber-700 disabled:opacity-40 text-white font-semibold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5">
-                                    Próximo <i class="fa-solid fa-arrow-right"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    let html = '<div class="space-y-4">';
-                    this.relatoriosSelecionadosCompartilhamento.forEach((r, idx) => {
-                        const doc = this.doctors.find(d => d.id === r.doctorId);
-                        const docName = doc ? doc.name : 'Médico';
-                        const docHosp = doc ? doc.hospital : '';
-
-                        html += `
-                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-2">
-                                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                                    <span class="font-bold text-xs text-slate-900">${idx + 1}. ${r.title}</span>
-                                    <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">${r.date}</span>
-                                </div>
-                                <p class="text-xs font-semibold text-amber-700"><i class="fa-solid fa-user-doctor"></i> ${docName} ${docHosp ? '(' + docHosp + ')' : ''}</p>
-                                <div class="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 whitespace-pre-wrap font-mono leading-relaxed">${r.content}</div>
-                            </div>
-                        `;
-                    });
-                    html += '</div>';
-                    container.innerHTML = html;
-                }
-            }
-
-            sharePassoAnterior() {
-                if(this.indiceSharePassoAtual > 0) {
-                    this.indiceSharePassoAtual--;
-                    this.renderShareContent();
-                }
-            }
-
-            sharePassoProximo() {
-                if(this.indiceSharePassoAtual < this.relatoriosSelecionadosCompartilhamento.length - 1) {
-                    this.indiceSharePassoAtual++;
-                    this.renderShareContent();
-                }
+                localStorage.setItem('otica_shared_reports', JSON.stringify(relatoriosParaEnviar));
+                this.fecharModalSelecaoCompartilhar();
+                
+                // Abre o share.html
+                window.open('share.html', '_blank');
             }
 
             abrirDetalhes(id) {
@@ -1921,72 +1786,120 @@
                     return 'Não informado';
                 };
 
-                let badgeIndica = '';
-                if(d.indicates === 'sim') badgeIndica = 'Sim';
-                else if(d.indicates === 'deixou') badgeIndica = 'Deixou de indicar';
-                else badgeIndica = 'Não';
+                let indicaTexto = 'Não Indica';
+                let indicaCor = 'text-rose-900 font-bold';
+                if(d.indicates === 'sim') {
+                    indicaTexto = 'Indica';
+                    indicaCor = 'text-emerald-900 font-bold';
+                } else if(d.indicates === 'deixou') {
+                    indicaTexto = 'Deixou de indicar';
+                    indicaCor = 'text-amber-900 font-bold';
+                }
 
-                const html = `
+                let statusBadgeClass = "text-slate-900 font-semibold";
+                if(d.status === 'Concluído') statusBadgeClass = "text-emerald-900 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 inline-block";
+                if(d.status === 'Visitar') statusBadgeClass = "text-rose-900 font-bold bg-rose-50 px-2 py-0.5 rounded border border-rose-200 inline-block";
+
+                const conteudo = `
                     <div class="space-y-3">
-                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-slate-900 text-sm">${d.name}</span>
-                                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-amber-100 text-amber-800">CRM: ${d.crm}</span>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">CRM</span>
+                                <span class="font-bold text-slate-900">${d.crm}</span>
                             </div>
-                            <p class="text-xs text-slate-600">Especialidade: <span class="font-semibold text-slate-800">${d.specialization}</span> (${subsHtml})</p>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-2 text-xs">
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                <span class="block font-bold text-slate-500 uppercase text-[10px]">Aniversário</span>
-                                <span class="font-semibold text-slate-800">${formatarAniversario(d)}</span>
-                            </div>
-                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
-                                <span class="block font-bold text-slate-500 uppercase text-[10px]">Data da Visita</span>
-                                <span class="font-semibold text-slate-800">${formatarDataBR(d.visitDate)}</span>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Status Indicação</span>
+                                <span class="${indicaCor}">${indicaTexto}</span>
                             </div>
                         </div>
 
-                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
-                            <span class="block font-bold text-slate-500 uppercase text-[10px]">Horários de Atendimento</span>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
+                            <span class="block text-xs text-slate-500 uppercase font-semibold">Clínica & Endereço</span>
+                            <p class="font-bold text-slate-900">${d.hospital} - <span class="font-normal text-slate-600">${enderecoClinica}</span></p>
+                            <p class="text-xs text-slate-600">Andar/Sala: ${d.room || 'Não informado'}</p>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Especialidade</span>
+                                <span class="font-bold text-slate-900">${d.specialization}</span>
+                                <p class="text-[11px] text-slate-500 mt-0.5">Subs: ${subsHtml}</p>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Status Atendimento</span>
+                                <span class="${statusBadgeClass}">${d.status}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
+                            <span class="block text-xs text-slate-500 uppercase font-semibold">Horários de Atendimento</span>
                             <ul class="space-y-0.5">${horariosHtml}</ul>
                         </div>
 
-                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
-                            <span class="block font-bold text-slate-500 uppercase text-[10px]">Localização e Contato</span>
-                            <p class="text-xs text-slate-700"><b>Clínica:</b> ${d.hospital} - ${enderecoClinica}</p>
-                            <p class="text-xs text-slate-700"><b>Consultório/Sala:</b> ${d.room || 'Não informada'}</p>
-                            <p class="text-xs text-slate-700"><b>Telefone Comercial:</b> ${d.phone || 'Não informado'}</p>
-                            <p class="text-xs text-slate-700"><b>Celular Pessoal:</b> ${d.cellphone || 'Não informado'}</p>
-                            <p class="text-xs text-slate-700"><b>Secretária(s):</b> ${d.secretary || 'Não informada'}</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Telefone Comercial</span>
+                                <span class="font-medium text-slate-800">${d.phone || 'Não informado'}</span>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Celular Pessoal</span>
+                                <span class="font-medium text-slate-800">${d.cellphone || 'Não informado'}</span>
+                            </div>
                         </div>
 
-                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
-                            <span class="block font-bold text-slate-500 uppercase text-[10px]">Parceria e Bonificação</span>
-                            <p class="text-xs text-slate-700"><b>Já Indica a Ótica:</b> ${badgeIndica}</p>
-                            <p class="text-xs text-slate-700"><b>Presente Habitual:</b> ${d.present || 'Não informado'}</p>
-                            <p class="text-xs text-slate-700"><b>Responsável:</b> ${d.responsible || 'Não informado'}</p>
-                            <p class="text-xs text-slate-700"><b>Status:</b> ${d.status || 'Visitar'}</p>
-                            <p class="text-xs text-slate-700"><b>Última Indicação:</b> ${formatarDataBR(d.lastIndicationDate)}</p>
-                            <p class="text-xs text-slate-700"><b>Unidade Próxima:</b> ${d.nearbyUnit || 'Não informada'}</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Secretária(s)</span>
+                                <span class="font-medium text-slate-800">${d.secretary || 'Não informada'}</span>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Presente Habitual</span>
+                                <span class="font-medium text-slate-800">${d.present || 'Não informado'}</span>
+                            </div>
                         </div>
 
-                        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
-                            <span class="block font-bold text-slate-500 uppercase text-[10px]">Observações Extras</span>
-                            <p class="text-xs text-slate-700 whitespace-pre-wrap">${d.notes || 'Nenhuma observação cadastrada.'}</p>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Aniversário</span>
+                                <span class="font-medium text-slate-800">${formatarAniversario(d)}</span>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Última Visita</span>
+                                <span class="font-medium text-slate-800">${formatarDataBR(d.visitDate)}</span>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Responsável</span>
+                                <span class="font-medium text-slate-800">${d.responsible || 'Kelen Mesquita'}</span>
+                            </div>
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                                <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Última Indicação</span>
+                                <span class="font-medium text-slate-800">${formatarDataBR(d.lastIndicationDate)}</span>
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                            <span class="block text-xs text-slate-500 uppercase font-semibold mb-1">Unidade Próxima</span>
+                            <span class="font-medium text-slate-800">${d.nearbyUnit || 'Não informada'}</span>
+                        </div>
+
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
+                            <span class="block text-xs text-slate-500 uppercase font-semibold">Observações</span>
+                            <p class="text-xs text-slate-700 leading-relaxed font-mono">${d.notes || 'Nenhuma observação registrada.'}</p>
                         </div>
                     </div>
                 `;
 
-                document.getElementById('modalConteudo').innerHTML = html;
-                
-                const btnEditar = document.getElementById('modalBtnEditar');
-                const btnExcluir = document.getElementById('modalBtnExcluir');
-                
-                btnEditar.setAttribute('onclick', `app.prepararEdicaoMedico('${d.id}')`);
-                btnExcluir.setAttribute('onclick', `app.excluirMedico('${d.id}')`);
-
+                document.getElementById('modalConteudo').innerHTML = conteudo;
+                document.getElementById('modalBtnEditar').setAttribute('onclick', `app.prepararEdicaoMedico('${d.id}')`);
+                document.getElementById('modalBtnExcluir').setAttribute('onclick', `app.excluirMedico('${d.id}')`);
                 document.getElementById('modalDetalhes').classList.remove('hidden');
+            }
+
+            fecharModal() {
+                document.getElementById('modalDetalhes').classList.add('hidden');
             }
 
             excluirMedico(id) {
@@ -1997,22 +1910,18 @@
                 this.showAlert("Removido", "O médico foi excluído com sucesso.", "sucesso");
             }
 
-            fecharModal() {
-                document.getElementById('modalDetalhes').classList.add('hidden');
-            }
-
             showAlert(titulo, texto, tipo = "aviso") {
                 const modal = document.getElementById('modalAlerta');
                 document.getElementById('alertaTitulo').textContent = titulo;
                 document.getElementById('alertaTexto').textContent = texto;
-                const iconeDiv = document.getElementById('alertaIcone');
                 
+                const icone = document.getElementById('alertaIcone');
                 if (tipo === "sucesso") {
-                    iconeDiv.className = "w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mx-auto";
-                    iconeDiv.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    icone.className = "w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mx-auto";
+                    icone.innerHTML = '<i class="fa-solid fa-check"></i>';
                 } else {
-                    iconeDiv.className = "w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto";
-                    iconeDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                    icone.className = "w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto";
+                    icone.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
                 }
 
                 modal.classList.remove('hidden');
@@ -2023,7 +1932,6 @@
             }
         }
 
-        // Inicialização global da aplicação
         const app = new OticaApp();
     </script>
 </body>
