@@ -205,11 +205,10 @@
 
                 const obj = { 
                     id: id ? Number(id) : Date.now(), 
-                    title, 
-                    date, 
+                    title: title, 
+                    date: date, 
                     doctor_id: String(doctorId),
-                    doctorId: doctorId, 
-                    content, 
+                    content: content, 
                     isPending: false 
                 };
 
@@ -220,7 +219,10 @@
                     this.reports.unshift(obj);
                 }
 
-                if (supabaseClient) await supabaseClient.from('reports').upsert(obj);
+                if (supabaseClient) {
+                    const { error } = await supabaseClient.from('reports').upsert([obj]);
+                    if (error) console.error("Erro ao salvar relatório:", error);
+                }
                 this.fecharModalRelatorio();
                 this.renderReportsList();
             }
