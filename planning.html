@@ -109,17 +109,44 @@
                 const novoItem = {
                     id: Date.now(),
                     doctor_id: String(doctorId),
-                    doctorId: doctorId,
-                    text,
+                    text: text,
                     dayGroup: 'Hoje',
                     checked: false
                 };
 
                 this.planning.unshift(novoItem);
                 if (supabaseClient) {
-                    await supabaseClient.from('planning').upsert(novoItem);
+                    const { error } = await supabaseClient.from('planning').upsert([novoItem]);
+                    if (error) console.error("Erro ao salvar planejamento:", error);
                 }
                 document.getElementById('formPlanejamento').reset();
+                this.renderPlanningList();
+            }
+
+            async togglePlanningItem(id) {
+                const item = this.planning.find(p => String(p.id) === String(id));
+                if(!item || item.checked) return;
+
+                item.checked = true;
+                if (supabaseClient) {
+                    const { error } = await supabaseClient.from('planning').upsert([item]);
+                    if (error) console.error("Erro ao atualizar planejamento:", error);
+                }
+
+                const novoRelatorio = {
+                    id: Date.now(),
+                    title: `Relatório #${String(Date.now()).slice(-4)}`,
+                    date: new Date().toISOString().split('T')[0],
+                    doctor_id: String(item.doctor_id),
+                    content: `Planejamento concluído: "${item.text}".`,
+                    isPending: true
+                };
+
+                this.reports.unshift(novoRelatorio);
+                if (supabaseClient) {
+                    const { error } = await supabaseClient.from('reports').upsert([novoRelatorio]);
+                    if (error) console.error("Erro ao gerar relatório automático:", error);
+                }
                 this.renderPlanningList();
             }
 
