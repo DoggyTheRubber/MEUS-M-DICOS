@@ -388,7 +388,7 @@
                 </button>
             </div>
             <div class="p-4 bg-slate-50 border-b border-slate-100 text-xs text-slate-600">
-                Selecione um ou mais relatórios para exibir ao chefe. Ao confirmar, abrirá a visualização guiada e completa em modo somente leitura.
+                Selecione os relatórios desejados. Ao confirmar, abrirá diretamente a tela integrada de compartilhamento (<code class="bg-slate-200 px-1 py-0.5 rounded text-slate-800">share.html</code> unificado).
             </div>
             <div id="listaCheckCompartilhar" class="p-4 overflow-y-auto space-y-2 flex-1 max-h-[50vh]"></div>
             <div class="bg-white border-t border-slate-100 p-4 flex items-center justify-between gap-3">
@@ -396,62 +396,46 @@
                     Cancelar
                 </button>
                 <button onclick="app.executarCompartilhamento()" class="flex-1 bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-sm flex items-center justify-center gap-1.5">
-                    <i class="fa-solid fa-check"></i> OK (Visualizar Selecionados)
+                    <i class="fa-solid fa-check"></i> OK (Abrir Tela Share)
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- ==================== MODAL DE APRESENTAÇÃO / LEITURA PASSO A PASSO ==================== -->
-    <div id="modalApresentacao" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center font-bold text-xs" id="apresentacaoContadorBadge">
-                        1/1
-                    </div>
-                    <div>
-                        <h3 id="apresentacaoTitulo" class="font-bold text-sm truncate">Relatório</h3>
-                        <p id="apresentacaoSub" class="text-[11px] text-slate-400">Modo de Apresentação Único</p>
-                    </div>
+    <!-- ==================== TELA SHARE / APRESENTAÇÃO INTEGRADA (SHARE.HTML COMPLETO) ==================== -->
+    <div id="viewShareScreen" class="fixed inset-0 bg-slate-900 z-50 flex flex-col hidden overflow-hidden text-slate-800">
+        <!-- Top bar da tela Share -->
+        <header class="bg-slate-900 text-white shadow-md px-4 py-3 flex items-center justify-between border-b border-slate-800 shrink-0">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700 shadow shrink-0">
+                    <img src="la pipita.png" alt="La Pipita Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-eye text-amber-500 text-lg\'></i>';">
                 </div>
-                <button onclick="app.fecharApresentacao()" class="text-slate-400 hover:text-white p-2">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
-            
-            <div id="apresentacaoConteudo" class="p-5 overflow-y-auto space-y-4 text-sm flex-1 font-mono text-xs leading-relaxed bg-slate-50"></div>
-
-            <div class="bg-white border-t border-slate-100 p-4 flex items-center justify-between">
-                <span class="text-[11px] text-slate-500 italic">Visualização não editável</span>
-                <button id="btnProximoRelatorio" onclick="app.proximoRelatorioApresentacao()" class="bg-amber-600 hover:bg-amber-700 text-white font-semibold px-5 py-2.5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5">
-                    Próximo <i class="fa-solid fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- ==================== MODAL DE VISUALIZAÇÃO GERAL COMPLETA ==================== -->
-    <div id="modalVisualizacaoGeral" class="fixed inset-0 bg-slate-900/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-2xl rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                    <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-900 flex items-center justify-center font-bold text-sm">
-                        <i class="fa-solid fa-eye"></i>
-                    </div>
-                    <h3 class="font-bold text-base">Todos os Relatórios Selecionados (Somente Leitura)</h3>
+                <div>
+                    <h1 class="font-bold text-base tracking-tight">Optica La Patrícia</h1>
+                    <p class="text-xs text-amber-400 font-medium">Relatórios Compartilhados (Modo Chefe / Somente Leitura)</p>
                 </div>
-                <button onclick="app.fecharVisualizacaoGeral()" class="text-slate-400 hover:text-white p-2">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
             </div>
-            <div id="conteudoVisualizacaoGeral" class="p-5 overflow-y-auto space-y-4 text-sm flex-1 bg-slate-50"></div>
-            <div class="bg-white border-t border-slate-100 p-4 flex justify-end">
-                <button onclick="app.fecharVisualizacaoGeral()" class="bg-slate-900 hover:bg-slate-800 text-white font-semibold px-6 py-2.5 rounded-xl text-xs transition">
-                    Concluir / Fechar
-                </button>
+            <button onclick="app.fecharShareScreen()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-3.5 py-2 rounded-xl font-semibold transition border border-slate-700 flex items-center gap-1.5">
+                <i class="fa-solid fa-arrow-left"></i> Voltar ao App
+            </button>
+        </header>
+
+        <!-- Corpo da Tela Share com abas de Visualização Guiada ou Geral -->
+        <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-4 bg-slate-100">
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 flex items-center justify-between">
+                <div>
+                    <h2 class="font-bold text-slate-900 text-base">Visualização dos Relatórios Selecionados</h2>
+                    <p class="text-xs text-slate-500" id="shareSubInfo">Total de 0 relatórios</p>
+                </div>
+                <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <button onclick="app.setShareMode('passo')" id="btnShareModePasso" class="px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 text-white transition">Passo a Passo</button>
+                    <button onclick="app.setShareMode('geral')" id="btnShareModeGeral" class="px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition">Lista Completa</button>
+                </div>
             </div>
-        </div>
+
+            <!-- Conteúdo dinâmico da tela Share -->
+            <div id="shareContainerContent" class="space-y-4 pb-12"></div>
+        </main>
     </div>
 
     <!-- ==================== MODAL DE CRIAR / EDITAR RELATÓRIO ==================== -->
@@ -594,7 +578,8 @@
                 this.clinicaSelecionada = null; 
                 
                 this.relatoriosSelecionadosCompartilhamento = [];
-                this.indiceApresentacaoAtual = 0;
+                this.shareMode = 'passo'; // 'passo' ou 'geral'
+                this.indiceSharePassoAtual = 0;
 
                 this.initDobDays();
                 this.loadData();
@@ -1480,7 +1465,7 @@
                             </div>
                         </div>
                     `;
-                }
+                });
 
                 container.innerHTML = html;
             }
@@ -1784,99 +1769,122 @@
                 }
 
                 this.relatoriosSelecionadosCompartilhamento = selecionadosIds.map(id => this.reports.find(r => r.id === id)).filter(Boolean);
-                this.indiceApresentacaoAtual = 0;
+                this.indiceSharePassoAtual = 0;
+                this.shareMode = 'passo';
 
                 this.fecharModalCompartilhar();
-                this.abrirApresentacaoModal();
+                this.abrirShareScreen();
             }
 
-            abrirApresentacaoModal() {
-                const modal = document.getElementById('modalApresentacao');
-                modal.classList.remove('hidden');
-                this.renderizarItemApresentacao();
+            abrirShareScreen() {
+                const view = document.getElementById('viewShareScreen');
+                view.classList.remove('hidden');
+                this.atualizarBotoesShareMode();
+                this.renderShareContent();
             }
 
-            renderizarItemApresentacao() {
-                const total = this.relatoriosSelecionadosCompartilhamento.length;
-                const index = this.indiceApresentacaoAtual;
-                const r = this.relatoriosSelecionadosCompartilhamento[index];
-                if(!r) return;
+            fecharShareScreen() {
+                document.getElementById('viewShareScreen').classList.add('hidden');
+                this.relatoriosSelecionadosCompartilhamento = [];
+            }
 
-                const doc = this.doctors.find(d => d.id === r.doctorId);
-                const docName = doc ? doc.name : 'Médico não encontrado';
-                const docHosp = doc ? doc.hospital : '';
+            setShareMode(mode) {
+                this.shareMode = mode;
+                this.atualizarBotoesShareMode();
+                this.renderShareContent();
+            }
 
-                document.getElementById('apresentacaoContadorBadge').textContent = `${index + 1}/${total}`;
-                document.getElementById('apresentacaoTitulo').textContent = `${r.title} - ${docName}`;
-                document.getElementById('apresentacaoSub').textContent = `Clínica: ${docHosp || 'Não informada'} | Data: ${r.date}`;
+            atualizarBotoesShareMode() {
+                const btnPasso = document.getElementById('btnShareModePasso');
+                const btnGeral = document.getElementById('btnShareModeGeral');
+                if(!btnPasso || !btnGeral) return;
 
-                const conteudoHtml = `
-                    <div class="space-y-3 bg-white p-4 rounded-xl border border-slate-200 shadow-2xs">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                            <span class="font-bold text-slate-900 text-sm">${r.title}</span>
-                            <span class="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">${r.date}</span>
-                        </div>
-                        <div class="space-y-1">
-                            <p class="text-xs font-semibold text-amber-800"><i class="fa-solid fa-user-doctor"></i> ${docName} ${docHosp ? '(' + docHosp + ')' : ''}</p>
-                            <div class="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 whitespace-pre-wrap leading-relaxed">${r.content}</div>
-                        </div>
-                    </div>
-                `;
-
-                document.getElementById('apresentacaoConteudo').innerHTML = conteudoHtml;
-
-                const btnProximo = document.getElementById('btnProximoRelatorio');
-                if (index < total - 1) {
-                    btnProximo.innerHTML = 'Próximo <i class="fa-solid fa-arrow-right"></i>';
+                if(this.shareMode === 'passo') {
+                    btnPasso.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 text-white transition";
+                    btnGeral.className = "px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition";
                 } else {
-                    btnProximo.innerHTML = 'Concluído <i class="fa-solid fa-check"></i>';
+                    btnPasso.className = "px-3 py-1.5 text-xs font-bold rounded-lg text-slate-600 transition";
+                    btnGeral.className = "px-3 py-1.5 text-xs font-bold rounded-lg bg-slate-900 text-white transition";
                 }
             }
 
-            proximoRelatorioApresentacao() {
-                this.indiceApresentacaoAtual++;
-                if (this.indiceApresentacaoAtual < this.relatoriosSelecionadosCompartilhamento.length) {
-                    this.renderizarItemApresentacao();
-                } else {
-                    this.fecharApresentacao();
-                    this.abrirVisualizacaoGeral();
-                }
-            }
-
-            fecharApresentacao() {
-                document.getElementById('modalApresentacao').classList.add('hidden');
-            }
-
-            abrirVisualizacaoGeral() {
-                const container = document.getElementById('conteudoVisualizacaoGeral');
+            renderShareContent() {
+                const container = document.getElementById('shareContainerContent');
+                const subInfo = document.getElementById('shareSubInfo');
                 if(!container) return;
 
-                let html = '<div class="space-y-3">';
-                this.relatoriosSelecionadosCompartilhamento.forEach((r, idx) => {
+                const total = this.relatoriosSelecionadosCompartilhamento.length;
+                if(subInfo) subInfo.textContent = `Total de ${total} relatório(s) selecionado(s)`;
+
+                if(this.shareMode === 'passo') {
+                    const r = this.relatoriosSelecionadosCompartilhamento[this.indiceSharePassoAtual];
+                    if(!r) return;
+
                     const doc = this.doctors.find(d => d.id === r.doctorId);
-                    const docName = doc ? doc.name : 'Médico';
+                    const docName = doc ? doc.name : 'Médico não encontrado';
                     const docHosp = doc ? doc.hospital : '';
 
-                    html += `
-                        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-2xs space-y-2">
-                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                                <span class="font-bold text-xs text-slate-900">${idx + 1}. ${r.title}</span>
-                                <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">${r.date}</span>
+                    container.innerHTML = `
+                        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-4">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-8 h-8 rounded-full bg-amber-500 text-slate-900 flex items-center justify-center font-bold text-xs">${this.indiceSharePassoAtual + 1}/${total}</span>
+                                    <h3 class="font-bold text-slate-900 text-base">${r.title}</h3>
+                                </div>
+                                <span class="text-xs bg-slate-100 text-slate-600 px-2.5 py-1 rounded-lg font-medium">${r.date}</span>
                             </div>
-                            <p class="text-xs font-semibold text-amber-800"><i class="fa-solid fa-user-doctor"></i> ${docName} ${docHosp ? '(' + docHosp + ')' : ''}</p>
-                            <div class="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 whitespace-pre-wrap font-mono leading-relaxed">${r.content}</div>
+                            <div class="space-y-1">
+                                <p class="text-xs font-semibold text-amber-700 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-user-doctor"></i> ${docName} ${docHosp ? '(' + docHosp + ')' : ''}
+                                </p>
+                                <div class="text-xs text-slate-700 bg-slate-50 p-4 rounded-xl border border-slate-100 whitespace-pre-wrap font-mono leading-relaxed">${r.content}</div>
+                            </div>
+                            <div class="flex items-center justify-between pt-2">
+                                <button onclick="app.sharePassoAnterior()" ${this.indiceSharePassoAtual === 0 ? 'disabled' : ''} class="bg-slate-100 hover:bg-slate-200 disabled:opacity-40 text-slate-700 font-semibold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5">
+                                    <i class="fa-solid fa-arrow-left"></i> Anterior
+                                </button>
+                                <span class="text-[11px] text-slate-400 italic">Modo de Apresentação Guiada</span>
+                                <button onclick="app.sharePassoProximo()" ${this.indiceSharePassoAtual === total - 1 ? 'disabled' : ''} class="bg-amber-600 hover:bg-amber-700 disabled:opacity-40 text-white font-semibold px-4 py-2.5 rounded-xl text-xs transition flex items-center gap-1.5">
+                                    Próximo <i class="fa-solid fa-arrow-right"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
-                });
-                html += '</div>';
+                } else {
+                    let html = '<div class="space-y-4">';
+                    this.relatoriosSelecionadosCompartilhamento.forEach((r, idx) => {
+                        const doc = this.doctors.find(d => d.id === r.doctorId);
+                        const docName = doc ? doc.name : 'Médico';
+                        const docHosp = doc ? doc.hospital : '';
 
-                container.innerHTML = html;
-                document.getElementById('modalVisualizacaoGeral').classList.remove('hidden');
+                        html += `
+                            <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 space-y-2">
+                                <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                    <span class="font-bold text-xs text-slate-900">${idx + 1}. ${r.title}</span>
+                                    <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-medium">${r.date}</span>
+                                </div>
+                                <p class="text-xs font-semibold text-amber-700"><i class="fa-solid fa-user-doctor"></i> ${docName} ${docHosp ? '(' + docHosp + ')' : ''}</p>
+                                <div class="text-xs text-slate-700 bg-slate-50 p-3 rounded-xl border border-slate-100 whitespace-pre-wrap font-mono leading-relaxed">${r.content}</div>
+                            </div>
+                        `;
+                    });
+                    html += '</div>';
+                    container.innerHTML = html;
+                }
             }
 
-            fecharVisualizacaoGeral() {
-                document.getElementById('modalVisualizacaoGeral').classList.add('hidden');
-                this.relatoriosSelecionadosCompartilhamento = [];
+            sharePassoAnterior() {
+                if(this.indiceSharePassoAtual > 0) {
+                    this.indiceSharePassoAtual--;
+                    this.renderShareContent();
+                }
+            }
+
+            sharePassoProximo() {
+                if(this.indiceSharePassoAtual < this.relatoriosSelecionadosCompartilhamento.length - 1) {
+                    this.indiceSharePassoAtual++;
+                    this.renderShareContent();
+                }
             }
 
             abrirDetalhes(id) {
@@ -1913,59 +1921,93 @@
                     return 'Não informado';
                 };
 
-                let indicaTexto = 'Não Indica';
-                let indicaCor = 'text-rose-900 font-bold';
-                if(d.indicates === 'sim') {
-                    indicaTexto = 'Indica';
-                    indicaCor = 'text-emerald-900 font-bold';
-                } else if(d.indicates === 'deixou') {
-                    indicaTexto = 'Deixou de indicar';
-                    indicaCor = 'text-amber-900 font-bold';
+                let badge = '';
+                if (d.indicates === 'sim') {
+                    badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-emerald-50 text-emerald-900 border border-emerald-200"><i class="fa-solid fa-check mr-1 text-emerald-700"></i> Indica</span>';
+                } else if (d.indicates === 'deixou') {
+                    badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-amber-50 text-amber-900 border border-amber-200"><i class="fa-solid fa-triangle-exclamation mr-1 text-amber-700"></i> Deixou de indicar</span>';
+                } else {
+                    badge = '<span class="px-2 py-0.5 rounded-md text-[10px] font-semibold bg-rose-50 text-rose-900 border border-rose-200"><i class="fa-solid fa-xmark mr-1 text-rose-700"></i> Não Indica</span>';
                 }
 
-                let statusBadgeClass = "text-slate-900 font-semibold";
-                if(d.status === 'Concluído') statusBadgeClass = "text-emerald-700 font-semibold";
-                else if(d.status === 'Visitar') statusBadgeClass = "text-rose-700 font-semibold";
+                let statusColorClass = "bg-slate-100 text-slate-900 border-slate-200";
+                if (d.status === 'Concluído') {
+                    statusColorClass = "bg-emerald-50 text-emerald-900 border-emerald-200";
+                } else if (d.status === 'Visitar') {
+                    statusColorClass = "bg-rose-50 text-rose-900 border-rose-200";
+                }
 
                 const conteudo = `
                     <div class="space-y-3">
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                            <p class="text-xs text-slate-500 font-semibold uppercase">Informações Principais</p>
-                            <p class="text-xs"><b>CRM:</b> ${d.crm}</p>
-                            <p class="text-xs"><b>Especialização:</b> ${d.specialization}</p>
-                            <p class="text-xs"><b>Subespecializações:</b> ${subsHtml}</p>
-                            <p class="text-xs"><b>Aniversário:</b> ${formatarAniversario(d)}</p>
-                            <p class="text-xs"><b>Data da Visita:</b> ${formatarDataBR(d.visitDate)}</p>
+                        <div class="flex items-center justify-between bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <div>
+                                <p class="text-xs text-slate-500 font-semibold">CRM & Especialidade</p>
+                                <p class="font-bold text-slate-900 text-sm">${d.crm} - ${d.specialization}</p>
+                                <p class="text-[11px] text-slate-600">Sub: ${subsHtml}</p>
+                            </div>
+                            <div class="text-right">${badge}</div>
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                            <p class="text-xs text-slate-500 font-semibold uppercase">Local e Horários</p>
-                            <p class="text-xs"><b>Clínica:</b> ${d.hospital}</p>
-                            <p class="text-xs text-slate-600"><b>Endereço:</b> ${enderecoClinica}</p>
-                            <p class="text-xs"><b>Consultório/Sala:</b> ${d.room || 'Não informado'}</p>
-                            <p class="text-xs mt-1"><b>Dias e Horários:</b></p>
-                            <ul class="pl-2 space-y-0.5">${horariosHtml}</ul>
+                            <p class="text-xs text-slate-500 font-semibold"><i class="fa-solid fa-hospital text-amber-600"></i> Clínica & Endereço</p>
+                            <p class="font-bold text-slate-900 text-xs">${d.hospital}</p>
+                            <p class="text-xs text-slate-600">${enderecoClinica}</p>
+                            <p class="text-[11px] text-amber-700 font-medium">Consultório / Sala: ${d.room || 'Não informada'}</p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <p class="text-[11px] text-slate-500 font-semibold">Aniversário</p>
+                                <p class="text-xs font-bold text-slate-900">${formatarAniversario(d)}</p>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <p class="text-[11px] text-slate-500 font-semibold">Data da Visita</p>
+                                <p class="text-xs font-bold text-slate-900">${formatarDataBR(d.visitDate)}</p>
+                            </div>
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                            <p class="text-xs text-slate-500 font-semibold uppercase">Contato e Equipe</p>
-                            <p class="text-xs"><b>Telefone Comercial:</b> ${d.phone || 'Não informado'}</p>
-                            <p class="text-xs"><b>Celular Pessoal:</b> ${d.cellphone || 'Não informado'}</p>
-                            <p class="text-xs"><b>Secretária(s):</b> ${d.secretary || 'Não informada'}</p>
+                            <p class="text-xs text-slate-500 font-semibold"><i class="fa-solid fa-clock text-amber-600"></i> Horários de Atendimento</p>
+                            <ul class="space-y-0.5">${horariosHtml}</ul>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <span class="font-semibold text-slate-500">Tel. Comercial:</span> ${d.phone || 'Não inf.'}
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <span class="font-semibold text-slate-500">Cel. Pessoal:</span> ${d.cellphone || 'Não inf.'}
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs">
+                            <span class="font-semibold text-slate-500">Secretária(s):</span> ${d.secretary || 'Não informada'}
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <span class="font-semibold text-slate-500">Presente:</span> ${d.present || 'Bombom'}
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <span class="font-semibold text-slate-500">Responsável:</span> ${d.responsible || 'Kelen'}
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <span class="font-semibold text-slate-500">Status:</span> <span class="px-2 py-0.5 rounded border ${statusColorClass}">${d.status}</span>
+                            </div>
+                            <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                                <span class="font-semibold text-slate-500">Última Indicação:</span> ${formatarDataBR(d.lastIndicationDate)}
+                            </div>
+                        </div>
+
+                        <div class="bg-slate-50 p-2.5 rounded-xl border border-slate-200 text-xs">
+                            <span class="font-semibold text-slate-500">Unidade Próxima:</span> ${d.nearbyUnit || 'Não inf.'}
                         </div>
 
                         <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                            <p class="text-xs text-slate-500 font-semibold uppercase">Gestão e Relacionamento</p>
-                            <p class="text-xs"><b>Já Indica a Ótica?:</b> <span class="${indicaCor}">${indicaTexto}</span></p>
-                            <p class="text-xs"><b>Presente Habitual:</b> ${d.present || 'Não informado'}</p>
-                            <p class="text-xs"><b>Responsável:</b> ${d.responsible || 'Não informado'}</p>
-                            <p class="text-xs"><b>Status:</b> <span class="${statusBadgeClass}">${d.status}</span></p>
-                            <p class="text-xs"><b>Última Indicação:</b> ${formatarDataBR(d.lastIndicationDate)}</p>
-                            <p class="text-xs"><b>Unidade Próxima:</b> ${d.nearbyUnit || 'Não informada'}</p>
-                        </div>
-
-                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1">
-                            <p class="text-xs text-slate-500 font-semibold uppercase">Observações</p>
+                            <p class="text-xs text-slate-500 font-semibold">Observações</p>
                             <p class="text-xs text-slate-700 whitespace-pre-wrap">${d.notes || 'Nenhuma observação registrada.'}</p>
                         </div>
                     </div>
@@ -1986,21 +2028,24 @@
                 this.saveStorage();
                 this.fecharModal();
                 this.renderList();
-                this.showAlert("Removido", "Médico excluído com sucesso.", "sucesso");
+                this.showAlert("Removido", "O médico foi excluído com sucesso.", "sucesso");
             }
 
             showAlert(titulo, texto, tipo = "aviso") {
+                const modal = document.getElementById('modalAlerta');
                 document.getElementById('alertaTitulo').textContent = titulo;
                 document.getElementById('alertaTexto').textContent = texto;
-                const iconeDiv = document.getElementById('alertaIcone');
-                if (tipo === "sucesso") {
-                    iconeDiv.className = "w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mx-auto";
-                    iconeDiv.innerHTML = '<i class="fa-solid fa-check"></i>';
+                const icone = document.getElementById('alertaIcone');
+                
+                if(tipo === 'sucesso') {
+                    icone.className = "w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mx-auto";
+                    icone.innerHTML = '<i class="fa-solid fa-check"></i>';
                 } else {
-                    iconeDiv.className = "w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto";
-                    iconeDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                    icone.className = "w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto";
+                    icone.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
                 }
-                document.getElementById('modalAlerta').classList.remove('hidden');
+
+                modal.classList.remove('hidden');
             }
 
             fecharAlerta() {
