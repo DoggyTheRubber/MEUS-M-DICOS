@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualização de Relatórios Compartilhados</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+            --text-secondary: #666666;
+            --primary-color: #007bff;
+            --primary-hover: #0056b3;
+            --border-color: #e0e0e0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin: 0;
+        }
+
+        .actions-bar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            flex: 1;
+            min-width: 140px;
+            padding: 12px 16px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-share {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-share:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-copy {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+
+        .btn-copy:hover {
+            background-color: #dde2e6;
+        }
+
+        .reports-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .reports-list li {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-color);
+            background: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .reports-list li:last-child {
+            border-bottom: none;
+        }
+
+        .reports-list li:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        .empty-state {
+            text-align: center;
+            color: var(--text-secondary);
+            padding: 40px 20px;
+        }
+
+        /* Feedback visual de cópia */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Relatórios Selecionados</h1>
+            <p class="subtitle">Lista consolidada para compartilhamento e visualização.</p>
+        </header>
+
+        <div class="actions-bar">
+            <button class="btn-share" id="shareBtn" onclick="compartilharPagina()">
+                📤 Compartilhar
+            </button>
+            <button class="btn-copy" id="copyBtn" onclick="copiarLink()">
+                📋 Copiar Link
+            </button>
+        </div>
+
+        <ul class="reports-list" id="listaRelatorios">
+            <!-- Os itens injetados dinamicamente via URL aparecerão aqui -->
+        </ul>
+    </div>
+
+    <div class="toast" id="toastMessage">Link copiado com sucesso!</div>
+
+    <script>
+        // Função para ler os parâmetros da URL e montar a lista
+        function carregarRelatoriosDaURL() {
+            const params = new URLSearchParams(window.location.search);
+            const dadosCodificados = params.get('data');
+            const ul = document.getElementById('listaRelatorios');
+
+            if (!dadosCodificados) {
+                ul.innerHTML = `<li class="empty-state">Nenhum relatório foi selecionado ou os dados são inválidos.</li>`;
+                return;
+            }
+
+            try {
+                // Decodifica os dados que vieram em JSON comprimido/codificado na URL
+                const jsonString = decodeURIComponent(escape(atob(dadosCodificados)));
+                const itens = JSON.parse(jsonString);
+
+                if (!Array.isArray(itens) || itens.length === 0) {
+                    ul.innerHTML = `<li class="empty-state">A lista de relatórios está vazia.</li>`;
+                    return;
+                }
+
+                ul.innerHTML = '';
+                itens.forEach(item => {
+                    const li = document.createElement('li');
+                    li.innerHTML = `<span>${item}</span>`;
+                    ul.appendChild(li);
+                });
+
+            } catch (e) {
+                console.error(e);
+                ul.innerHTML = `<li class="empty-state">Erro ao processar os dados do relatório.</li>`;
+            }
+        }
+
+        // Ação do Botão Copiar Link
+        function copiarLink() {
+            const urlAtual = window.location.href;
+            navigator.clipboard.writeText(urlAtual).then(() => {
+                mostrarToast("Link copiado para a área de transferência!");
+            }).catch(err => {
+                console.error('Erro ao copiar: ', err);
+                alert('Não foi possível copiar o link.');
+            });
+        }
+
+        // Ação do Botão Compartilhar Nativo (API do Navegador)
+        async function compartilharPagina() {
+            if (navigator.share) {
+                try {
+                    await navigator.share({
+                        title: 'Relatórios Selecionados',
+                        text: 'Confira estes relatórios selecionados.',
+                        url: window.location.href,
+                    });
+                } catch (err) {
+                    if (err.name !== 'AbortError') {
+                        console.error('Erro ao compartilhar:', err);
+                    }
+                }
+            } else {
+                // Fallback caso o navegador não suporte a Web Share API
+                copiarLink();
+            }
+        }
+
+        // Exibir notificação flutuante temporária
+        function mostrarToast(mensagem) {
+            const toast = document.getElementById('toastMessage');
+            toast.textContent = mensagem;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // Executar leitura ao carregar a página
+        window.onload = carregarRelatoriosDaURL;
+    </script>
+</body>
+</html>
