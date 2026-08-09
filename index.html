@@ -25,11 +25,11 @@
             </div>
             <div>
                 <h1 class="font-bold text-base tracking-tight">Optica La Patrícia</h1>
-                <p class="text-xs text-slate-400">Gestão de Atendimentos (JSON Sync)</p>
+                <p class="text-xs text-slate-400">Gestão de Atendimentos (GitHub JSON Sync)</p>
             </div>
         </div>
         <div class="text-xs text-emerald-400 font-medium bg-slate-800/80 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1.5 shadow-sm">
-            <i class="fa-solid fa-cloud-circle-check text-emerald-400"></i> Auto-JSON Ativo
+            <i class="fa-solid fa-cloud-circle-check text-emerald-400"></i> GitHub Sync Ativo
         </div>
     </header>
 
@@ -526,6 +526,12 @@
                 this.currentFilter = 'all';
                 this.reportFilter = 'concluidos';
                 this.clinicaSelecionada = null; 
+
+                // Configurações do GitHub (Insira seu user e repo aqui)
+                this.ghOwner = "SEU_USUARIO_OU_ORGANIZACAO"; 
+                this.ghRepo = "NOME_DO_REPOSITORIO";
+                this.ghToken = "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";
+
                 this.initDobDays();
                 this.loadData();
                 this.initSubspecTags();
@@ -544,36 +550,13 @@
                 daySelect.innerHTML = html;
             }
 
-            loadData() {
+            async loadData() {
                 try {
-                    // Sem templates padrão: inicia vazio caso não haja nada salvo
-                    const savedClinics = localStorage.getItem('otica_clinica_json');
-                    if (savedClinics) {
-                        this.clinics = JSON.parse(savedClinics);
-                    } else {
-                        this.clinics = [];
-                    }
-
-                    const savedDocs = localStorage.getItem('otica_medico_json');
-                    if (savedDocs) {
-                        this.doctors = JSON.parse(savedDocs);
-                    } else {
-                        this.doctors = [];
-                    }
-
-                    const savedReports = localStorage.getItem('otica_relatorio_json');
-                    if (savedReports) {
-                        this.reports = JSON.parse(savedReports);
-                    } else {
-                        this.reports = [];
-                    }
-
-                    const savedPlanning = localStorage.getItem('otica_planejamento_json');
-                    if (savedPlanning) {
-                        this.planning = JSON.parse(savedPlanning);
-                    } else {
-                        this.planning = [];
-                    }
+                    // Carrega do GitHub se possível, fallback para localStorage
+                    this.clinics = await this.loadJsonFromGitHub('clinica.json') || [];
+                    this.doctors = await this.loadJsonFromGitHub('medico.json') || [];
+                    this.reports = await this.loadJsonFromGitHub('relatorio.json') || [];
+                    this.planning = await this.loadJsonFromGitHub('planejamento.json') || [];
                 } catch(e) {
                     this.doctors = [];
                     this.clinics = [];
@@ -582,43 +565,108 @@
                 }
             }
 
-            saveStorage() {
+            async loadJsonFromGitHub(filename) {
                 try {
-                    localStorage.setItem('otica_medico_json', JSON.stringify(this.doctors));
-                } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar medico.json");
+                    const url = `https://api.github.com/repos/${this.ghOwner}/${this.ghRepo}/contents/${filename}`;
+                    const res = await fetch(url, {
+                        headers: {
+                            "Authorization": `Bearer ${this.ghToken}`,
+                            "Accept": "application/vnd.github+json"
+                        }
+                    });
+                    if(!res.ok) return null;
+                    const data = await res.json();
+                    const jsonString = decodeURIComponent(escape(atob(data.content)));
+                    return JSON.parse(jsonString);
+                } catch(err) {
+                    return null;
                 }
             }
 
-            saveClinicsStorage() {
+            async saveJsonToGitHub(filename, jsonData) {
                 try {
-                    localStorage.setItem('otica_clinica_json', JSON.stringify(this.clinics));
+                    const url = `https://api.github.com/repos/${this.ghOwner}/${this.ghRepo}/contents/${filename}`;
+                    
+                    // 1. Busca o SHA atual do arquivo (obrigatório pelo GitHub para atualizar via API)
+                    let sha = null;
+                    const getRes = await fetch(url, {
+                        headers: {
+                            "Authorization": `Bearer ${this.ghToken}`,
+                            "Accept": "application/vnd.github+json"
+                        }
+                    });
+                    if(getRes.ok) {
+                        const fileData = await getRes.json();
+                        sha = fileData.sha;
+                    }
+
+                    // 2. Prepara o payload convertendo o JSON para Base64 de forma segura
+                    const contentString = JSON.stringify(jsonData, null, 2);
+                    const base64Content = btoa(unescape(encodeURIComponent(contentString)));
+
+                    const bodyData = {
+                        message: `Atualização automática de ${filename} via app`,
+                        content: base64Content
+                    };
+                    if(sha) bodyData.sha = sha;
+
+                    // 3. Envia o PUT para o repositório
+                    const putRes = await fetch(url, {
+                        method: "PUT",
+                        headers: {
+                            "Authorization": `Bearer ${this.ghToken}`,
+                            "Accept": "application/vnd.github+json",
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify(bodyData)
+                    });
+
+                    if(!putRes.ok) {
+                        throw new Error("Falha ao salvar no GitHub");
+                    }
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar clinica.json");
+                    console.error(e);
+                    throw e;
                 }
             }
 
-            saveReportsStorage() {
+            async saveStorage() {
                 try {
-                    localStorage.setItem('otica_relatorio_json', JSON.stringify(this.reports));
+                    await this.saveJsonToGitHub('medico.json', this.doctors);
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar relatorio.json");
+                    this.showAlert("Erro GitHub", "Não foi possível sincronizar medico.json com o repositório.");
                 }
             }
 
-            savePlanningStorage() {
+            async saveClinicsStorage() {
                 try {
-                    localStorage.setItem('otica_planejamento_json', JSON.stringify(this.planning));
+                    await this.saveJsonToGitHub('clinica.json', this.clinics);
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar planejamento.json");
+                    this.showAlert("Erro GitHub", "Não foi possível sincronizar clinica.json com o repositório.");
                 }
             }
 
-            saveShareStorage(shareData) {
+            async saveReportsStorage() {
                 try {
-                    localStorage.setItem('otica_share_json', JSON.stringify(shareData));
+                    await this.saveJsonToGitHub('relatorio.json', this.reports);
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar share.json");
+                    this.showAlert("Erro GitHub", "Não foi possível sincronizar relatorio.json com o repositório.");
+                }
+            }
+
+            async savePlanningStorage() {
+                try {
+                    await this.saveJsonToGitHub('planejamento.json', this.planning);
+                } catch(e) {
+                    this.showAlert("Erro GitHub", "Não foi possível sincronizar planejamento.json com o repositório.");
+                }
+            }
+
+            async saveShareStorage(shareData) {
+                try {
+                    await this.saveJsonToGitHub('share.json', shareData);
+                } catch(e) {
+                    this.showAlert("Erro GitHub", "Não foi possível sincronizar share.json com o repositório.");
                 }
             }
 
@@ -687,7 +735,7 @@
                 select.innerHTML = html;
             }
 
-            salvarClinica(e) {
+            async salvarClinica(e) {
                 e.preventDefault();
                 const idEdit = document.getElementById('clinicaEditId').value;
                 const nome = document.getElementById('inputNomeClinica').value.trim();
@@ -710,7 +758,7 @@
                                 d.hospital = nome;
                             }
                         });
-                        this.saveStorage();
+                        await this.saveStorage();
                     }
                     document.getElementById('clinicaEditId').value = '';
                     document.getElementById('btnCancelarEdicaoClinica').classList.add('hidden');
@@ -723,10 +771,10 @@
                     this.clinics.push(nova);
                 }
 
-                this.saveClinicsStorage();
+                await this.saveClinicsStorage();
                 document.getElementById('formClinica').reset();
                 this.renderClinicsList();
-                this.showAlert("Sucesso", "Clínica salva automaticamente em clinica.json!", "sucesso");
+                this.showAlert("Sucesso", "Clínica salva e sincronizada em clinica.json no GitHub!", "sucesso");
             }
 
             editarClinica(id) {
@@ -744,7 +792,7 @@
                 document.getElementById('btnCancelarEdicaoClinica').classList.add('hidden');
             }
 
-            excluirClinica(id) {
+            async excluirClinica(id) {
                 const cli = this.clinics.find(c => c.id === id);
                 if(!cli) return;
 
@@ -755,7 +803,7 @@
                 }
 
                 this.clinics = this.clinics.filter(c => c.id !== id);
-                this.saveClinicsStorage();
+                await this.saveClinicsStorage();
                 this.renderClinicsList();
                 this.showAlert("Removido", "Clínica excluída e atualizada no clinica.json com sucesso.", "sucesso");
             }
@@ -1168,9 +1216,9 @@
                 document.getElementById('modalDetalhes').classList.add('hidden');
             }
 
-            excluirMedico(id) {
+            async excluirMedico(id) {
                 this.doctors = this.doctors.filter(d => d.id !== id);
-                this.saveStorage();
+                await this.saveStorage();
                 this.fecharModal();
                 this.renderList();
                 this.showAlert("Removido", "Médico excluído com sucesso do medico.json.", "sucesso");
@@ -1249,7 +1297,7 @@
                 this.mudarTela('list');
             }
 
-            saveDoctor(e) {
+            async saveDoctor(e) {
                 e.preventDefault();
                 const editId = document.getElementById('doctorEditId').value;
                 const gender = document.querySelector('input[name="gender"]:checked').value;
@@ -1315,15 +1363,15 @@
                     this.doctors.unshift(novoMedico);
                 }
 
-                this.saveStorage();
+                await this.saveStorage();
                 document.getElementById('formNovoMedico').reset();
                 document.getElementById('horariosContainer').innerHTML = '';
                 this.adicionarHorarioLinha();
                 this.mudarTela('list');
-                this.showAlert("Sucesso", "Médico salvo com sucesso no medico.json!", "sucesso");
+                this.showAlert("Sucesso", "Médico salvo com sucesso no medico.json no GitHub!", "sucesso");
             }
 
-            adicionarPlanejamento(e) {
+            async adicionarPlanejamento(e) {
                 e.preventDefault();
                 const editId = document.getElementById('planEditId').value;
                 const doctorId = document.getElementById('planDoctorId').value;
@@ -1339,7 +1387,7 @@
                     if (item && !item.checked) {
                         item.doctorId = doctorId;
                         item.text = text;
-                        this.savePlanningStorage();
+                        await this.savePlanningStorage();
                     }
                     document.getElementById('planEditId').value = '';
                     document.getElementById('btnSubmitPlanejamento').innerHTML = '<i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento';
@@ -1363,11 +1411,11 @@
                     this.planning.unshift(novoItem);
                 }
 
-                this.savePlanningStorage();
+                await this.savePlanningStorage();
                 document.getElementById('formPlanejamento').reset();
                 this.preencherSelectPlanejamentoMedicos();
                 this.renderPlanningList();
-                this.showAlert("Sucesso", "Planejamento salvo em planejamento.json!", "sucesso");
+                this.showAlert("Sucesso", "Planejamento salvo em planejamento.json no GitHub!", "sucesso");
             }
 
             editarPlanejamento(id) {
@@ -1390,24 +1438,24 @@
                 document.getElementById('btnCancelarEdicaoPlanejamento').classList.add('hidden');
             }
 
-            apagarPlanejamento(id) {
+            async apagarPlanejamento(id) {
                 const item = this.planning.find(p => p.id === id);
                 if (!item || item.checked) {
                     this.showAlert("Aviso", "Itens marcados não podem ser apagados.");
                     return;
                 }
                 this.planning = this.planning.filter(p => p.id !== id);
-                this.savePlanningStorage();
+                await this.savePlanningStorage();
                 this.renderPlanningList();
                 this.showAlert("Removido", "Item apagado com sucesso.", "sucesso");
             }
 
-            togglePlanningItem(id) {
+            async togglePlanningItem(id) {
                 const item = this.planning.find(p => p.id === id);
                 if(!item || item.checked) return;
 
                 item.checked = true;
-                this.savePlanningStorage();
+                await this.savePlanningStorage();
 
                 const doc = this.doctors.find(d => d.id === item.doctorId);
                 const docName = doc ? doc.name : 'Médico';
@@ -1425,7 +1473,7 @@
                 };
 
                 this.reports.unshift(novoRelatorio);
-                this.saveReportsStorage();
+                await this.saveReportsStorage();
 
                 this.renderPlanningList();
                 this.showAlert("Pendente Gerado", `Tarefa concluída! Relatório pendente criado para ${docName} em relatorio.json.`, "sucesso");
@@ -1579,7 +1627,7 @@
                 document.getElementById('modalRelatorio').classList.add('hidden');
             }
 
-            salvarRelatorio(e) {
+            async salvarRelatorio(e) {
                 e.preventDefault();
                 const id = document.getElementById('reportId').value;
                 let title = document.getElementById('reportTitle').value.trim();
@@ -1619,15 +1667,15 @@
                     this.reports.unshift(novoRep);
                 }
 
-                this.saveReportsStorage();
+                await this.saveReportsStorage();
                 this.fecharModalRelatorio();
                 this.renderReportsList();
-                this.showAlert("Sucesso", "Relatório salvo em relatorio.json com sucesso!", "sucesso");
+                this.showAlert("Sucesso", "Relatório salvo em relatorio.json no GitHub!", "sucesso");
             }
 
-            excluirRelatorio(id) {
+            async excluirRelatorio(id) {
                 this.reports = this.reports.filter(r => r.id !== id);
-                this.saveReportsStorage();
+                await this.saveReportsStorage();
                 this.fecharModalRelatorio();
                 this.renderReportsList();
                 this.showAlert("Removido", "Relatório excluído com sucesso.", "sucesso");
@@ -1800,7 +1848,7 @@
                 });
             }
 
-            enviarRelatoriosSelecionados() {
+            async enviarRelatoriosSelecionados() {
                 const selecionadosIds = [];
                 document.querySelectorAll('input[name="shareCheckbox"]:checked').forEach(cb => {
                     selecionadosIds.push(cb.value);
@@ -1831,11 +1879,10 @@
                     reports: relatoriosParaShare
                 };
 
-                this.saveShareStorage(sharePayload);
+                await this.saveShareStorage(sharePayload);
                 this.fecharModalSelecaoCompartilhar();
-                this.showAlert("Sucesso", "share.json atualizado com sucesso com os relatórios selecionados!", "sucesso");
+                this.showAlert("Sucesso", "share.json atualizado no GitHub com sucesso!", "sucesso");
 
-                // Redireciona ou abre share.html se existir
                 setTimeout(() => {
                     window.location.href = 'share.html';
                 }, 1200);
