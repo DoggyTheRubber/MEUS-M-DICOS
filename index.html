@@ -270,7 +270,7 @@
                         <select id="nearbyUnit" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
                             <option value="BRASIL 80 - SANTA EFIGÊNIA">BRASIL 80 - SANTA EFIGÊNIA</option>
                             <option value="BRASIL 685 - FUNCIONÁRIOS">BRASIL 685 - FUNCIONÁRIOS</option>
-                            <option value="CONTORNO 4679 - SERRA">CONTORNO 4679 - Serra</option>
+                            <option value="CONTORNO 4679 - Serra">CONTORNO 4679 - Serra</option>
                         </select>
                     </div>
 
@@ -527,13 +527,15 @@
                 this.reportFilter = 'concluidos';
                 this.clinicaSelecionada = null; 
 
-                // Configurações do GitHub (Insira seu user e repo aqui)
+                // Configurações do GitHub
                 this.ghOwner = "DoggyTheRubber"; 
                 this.ghRepo = "MEUS-M-DICOS";
                 this.ghToken = "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";
+            }
 
+            async init() {
                 this.initDobDays();
-                this.loadData();
+                await this.loadData();
                 this.initSubspecTags();
                 this.adicionarHorarioLinha();
                 this.renderList();
@@ -956,12 +958,14 @@
 
             voltarParaClinicas() {
                 this.clinicaSelecionada = null;
-                document.getElementById('search').value = '';
+                const searchInput = document.getElementById('search');
+                if(searchInput) searchInput.value = '';
                 this.renderList();
             }
 
             renderList() {
-                const q = document.getElementById('search').value.toLowerCase().trim();
+                const searchInput = document.getElementById('search');
+                const q = searchInput ? searchInput.value.toLowerCase().trim() : '';
                 const container = document.getElementById('doctor-list');
                 const breadcrumb = document.getElementById('clinica-breadcrumb');
                 const filterContainer = document.getElementById('filter-container');
@@ -1904,7 +1908,9 @@
             }
         }
 
+        // Instancia e inicializa de forma assíncrona garantindo que tudo carregue corretamente
         const app = new OticaApp();
+        app.init();
     </script>
 </body>
 </html>
