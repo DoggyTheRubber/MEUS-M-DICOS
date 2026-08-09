@@ -28,9 +28,9 @@
                 <p class="text-xs text-slate-400">Gestão de Atendimentos</p>
             </div>
         </div>
-        <button onclick="app.migrarParaSistema()" id="btnMigrarSistema" class="text-xs text-amber-400 font-medium bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg border border-slate-700 transition flex items-center gap-1.5 shadow-sm">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Migrar para Sistema
-        </button>
+        <div class="text-xs text-slate-400 font-medium bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700">
+            Salvamento Automático
+        </div>
     </header>
 
     <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full">
@@ -90,7 +90,7 @@
                     </div>
                     <div class="flex gap-2 pt-1">
                         <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl transition shadow-sm text-xs flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Clínica (data/clinicas/)
+                            <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Clínica
                         </button>
                         <button type="button" id="btnCancelarEdicaoClinica" onclick="app.cancelarEdicaoClinica()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-2.5 rounded-xl transition text-xs">
                             Cancelar
@@ -112,7 +112,7 @@
                     <h2 id="form-doctor-title" class="font-bold text-slate-900 text-lg flex items-center gap-2">
                         <i class="fa-solid fa-user-doctor text-amber-600"></i> Cadastrar Novo Médico
                     </h2>
-                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Salva em data/medicos/</span>
+                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Campos organizados</span>
                 </div>
 
                 <form id="formNovoMedico" onsubmit="app.saveDoctor(event)" class="space-y-4 text-sm">
@@ -310,11 +310,10 @@
                     <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
                         <i class="fa-solid fa-calendar-days text-amber-600"></i> Planejamento Diário
                     </h2>
-                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Salva em data/planejamentos/</span>
+                    <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Lista dinâmica</span>
                 </div>
 
                 <form id="formPlanejamento" onsubmit="app.adicionarPlanejamento(event)" class="space-y-3 text-sm">
-                    <input type="hidden" id="planEditId">
                     <div>
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Selecione o Médico *</label>
                         <select id="planDoctorId" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition"></select>
@@ -323,19 +322,14 @@
                         <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Texto da Tarefa / Checkbox *</label>
                         <input type="text" id="planText" required placeholder="Ex: Entregar presente e confirmar indicações" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:bg-white transition">
                     </div>
-                    <div class="flex gap-2">
-                        <button type="submit" id="btnSubmitPlanejamento" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-sm text-xs flex items-center justify-center gap-1.5">
-                            <i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento
-                        </button>
-                        <button type="button" id="btnCancelarEdicaoPlanejamento" onclick="app.cancelarEdicaoPlanejamento()" class="hidden bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-3 rounded-xl transition text-xs">
-                            Cancelar
-                        </button>
-                    </div>
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-sm text-xs flex items-center justify-center gap-1.5">
+                        <i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento
+                    </button>
                 </form>
             </div>
 
             <div class="space-y-3">
-                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Itens de Hoje (Itens não marcados podem ser editados ou apagados)</div>
+                <div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Itens de Hoje</div>
                 <div id="planning-list-container" class="space-y-3 pb-6"></div>
             </div>
         </section>
@@ -348,13 +342,13 @@
                         <h2 class="font-bold text-slate-900 text-lg flex items-center gap-2">
                             <i class="fa-solid fa-file-lines text-amber-600"></i> Relatórios de Visitas
                         </h2>
-                        <p class="text-xs text-slate-500">Salvos em data/relatorios/ e sincronizados no share.json</p>
+                        <p class="text-xs text-slate-500">Gerencie e anote todas as suas visitas detalhadas</p>
                     </div>
                 </div>
 
                 <!-- Botão de Compartilhar Relatórios -->
                 <button onclick="app.abrirModalSelecaoCompartilhar()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm">
-                    <i class="fa-solid fa-share-nodes"></i> Compartilhar Relatórios (Atualiza share.json)
+                    <i class="fa-solid fa-share-nodes"></i> Compartilhar Relatórios Selecionados
                 </button>
 
                 <!-- Barra de Pesquisa e Tags de Relatórios -->
@@ -483,7 +477,7 @@
                     <div class="w-8 h-8 rounded-full bg-emerald-500 text-slate-900 flex items-center justify-center font-bold text-sm">
                         <i class="fa-solid fa-square-check"></i>
                     </div>
-                    <h3 class="font-bold text-base">Selecionar Relatórios para share.json</h3>
+                    <h3 class="font-bold text-base">Selecionar Relatórios Completos</h3>
                 </div>
                 <button onclick="app.fecharModalSelecaoCompartilhar()" class="text-slate-400 hover:text-white p-2">
                     <i class="fa-solid fa-xmark text-lg"></i>
@@ -491,7 +485,7 @@
             </div>
 
             <div class="p-5 overflow-y-auto space-y-3 text-sm flex-1">
-                <p class="text-xs text-slate-500">Selecione quais relatórios concluídos farão parte da lista de últimos relatórios e do share.json:</p>
+                <p class="text-xs text-slate-500">Selecione abaixo quais relatórios concluídos você deseja enviar para visualização:</p>
                 <div class="flex items-center justify-between pb-2 border-b border-slate-100 text-xs">
                     <button type="button" onclick="app.marcarTodosCompartilhar(true)" class="text-amber-600 font-semibold hover:underline">Selecionar Todos</button>
                     <button type="button" onclick="app.marcarTodosCompartilhar(false)" class="text-slate-500 hover:underline">Desmarcar Todos</button>
@@ -501,7 +495,7 @@
 
             <div class="bg-slate-50 border-t border-slate-100 p-4 flex gap-2">
                 <button onclick="app.enviarRelatoriosSelecionados()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-md text-xs flex items-center justify-center gap-2">
-                    <i class="fa-solid fa-paper-plane"></i> Enviar para share.json e Abrir Share
+                    <i class="fa-solid fa-paper-plane"></i> Enviar e Abrir Share
                 </button>
                 <button onclick="app.fecharModalSelecaoCompartilhar()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold px-4 py-3 rounded-xl transition text-xs">
                     Cancelar
@@ -553,7 +547,6 @@
                 this.currentFilter = 'all';
                 this.reportFilter = 'concluidos';
                 this.clinicaSelecionada = null; 
-                this.usingJsonMode = false;
                 this.initDobDays();
                 this.loadData();
                 this.initSubspecTags();
@@ -574,22 +567,11 @@
 
             loadData() {
                 try {
-                    // Verificar se já está migrado para o modo JSON/sistema
-                    const modoJson = localStorage.getItem('otica_using_json_mode');
-                    if (modoJson === 'true') {
-                        this.usingJsonMode = true;
-                    }
-
-                    // Tenta carregar do navegador primeiro; se vazio, simula leitura de data/ json
                     const savedClinics = localStorage.getItem('otica_clinicas_v1');
                     if (savedClinics) {
                         this.clinics = JSON.parse(savedClinics);
                     } else {
-                        // Simulação de carregamento de data/clinicas/clinicas.json
-                        this.clinics = [
-                            { id: 'cli_1', name: 'Hospital Mater Dei', address: 'Rua Guajajaras, 1200' },
-                            { id: 'cli_2', name: 'Hospital Vila da Serra', address: 'Alameda da Serra, 222' }
-                        ];
+                        this.clinics = [];
                         this.saveClinicsStorage();
                     }
 
@@ -597,32 +579,7 @@
                     if (savedDocs) {
                         this.doctors = JSON.parse(savedDocs);
                     } else {
-                        // Simulação de carregamento de data/medicos/medicos.json
-                        this.doctors = [
-                            {
-                                id: '1',
-                                crm: '12345-MG',
-                                name: 'Dr. Roberto Silveira',
-                                specialization: 'Oftalmo Geral',
-                                subspecialties: ['Retina', 'Catarata'],
-                                dobDay: '12',
-                                dobMonth: '04',
-                                visitDate: '2026-06-15',
-                                schedules: [{ dia: 'SEG', periodo: 'Manhã (08:00 - 12:00)' }],
-                                hospital: 'Hospital Mater Dei',
-                                room: 'Sala 304',
-                                phone: '(31) 3333-4444',
-                                cellphone: '(31) 98888-7777',
-                                secretary: 'Márcia',
-                                indicates: 'sim',
-                                present: 'Vinho',
-                                responsible: 'Kelen Mesquita',
-                                status: 'Concluído',
-                                lastIndicationDate: '2026-06-20',
-                                nearbyUnit: 'BRASIL 80 - SANTA EFIGÊNIA',
-                                notes: 'Prefere vinhos tintos encorpados.'
-                            }
-                        ];
+                        this.doctors = [];
                         this.saveStorage();
                     }
 
@@ -630,17 +587,7 @@
                     if (savedReports) {
                         this.reports = JSON.parse(savedReports);
                     } else {
-                        // Simulação de carregamento de data/relatorios/relatorios.json
-                        this.reports = [
-                            {
-                                id: 'rep_1',
-                                title: 'Relatório #0001',
-                                date: '2026-06-15',
-                                doctorId: '1',
-                                content: 'Visita realizada com sucesso. O Dr. Roberto recebeu o vinho importado.',
-                                isPending: false
-                            }
-                        ];
+                        this.reports = [];
                         this.saveReportsStorage();
                     }
 
@@ -648,7 +595,6 @@
                     if (savedPlanning) {
                         this.planning = JSON.parse(savedPlanning);
                     } else {
-                        // Simulação de carregamento de data/planejamentos/planejamentos.json
                         this.planning = [];
                         this.savePlanningStorage();
                     }
@@ -660,34 +606,11 @@
                 }
             }
 
-            migrarParaSistema() {
-                if (this.usingJsonMode) {
-                    this.showAlert("Aviso", "voce não pode migrar os dados no momento");
-                    return;
-                }
-
-                // Verifica se há dados no navegador para migrar para a estrutura de pastas / JSON
-                const hasLocalData = localStorage.getItem('otica_medicos_v5') || localStorage.getItem('otica_clinicas_v1');
-                if (hasLocalData) {
-                    // Simula envio para data/medicos/, data/clinicas/, data/planejamentos/, data/relatorios/ e share.json
-                    localStorage.setItem('otica_using_json_mode', 'true');
-                    this.usingJsonMode = true;
-                    this.showAlert("Sucesso na Migração", "Todos os dados do navegador foram migrados com sucesso para os arquivos JSON (data/) e agora o sistema opera em modo seguro por JSON!", "sucesso");
-                    const btn = document.getElementById('btnMigrarSistema');
-                    if(btn) {
-                        btn.innerHTML = '<i class="fa-solid fa-check text-emerald-400"></i> Modo Sistema JSON Ativo';
-                        btn.classList.add('border-emerald-500', 'text-emerald-400');
-                    }
-                } else {
-                    this.showAlert("Atenção", "Nenhum dado encontrado no navegador para migrar.");
-                }
-            }
-
             saveStorage() {
                 try {
                     localStorage.setItem('otica_medicos_v5', JSON.stringify(this.doctors));
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar os médicos no sistema.");
+                    this.showAlert("Erro", "Não foi possível salvar os médicos no navegador.");
                 }
             }
 
@@ -695,7 +618,7 @@
                 try {
                     localStorage.setItem('otica_clinicas_v1', JSON.stringify(this.clinics));
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar as clínicas no sistema.");
+                    this.showAlert("Erro", "Não foi possível salvar as clínicas no navegador.");
                 }
             }
 
@@ -703,7 +626,7 @@
                 try {
                     localStorage.setItem('otica_reports_v3', JSON.stringify(this.reports));
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar os relatórios no sistema.");
+                    this.showAlert("Erro", "Não foi possível salvar os relatórios no navegador.");
                 }
             }
 
@@ -711,7 +634,7 @@
                 try {
                     localStorage.setItem('otica_planning_v1', JSON.stringify(this.planning));
                 } catch(e) {
-                    this.showAlert("Erro", "Não foi possível salvar o planejamento no sistema.");
+                    this.showAlert("Erro", "Não foi possível salvar o planejamento no navegador.");
                 }
             }
 
@@ -819,7 +742,7 @@
                 this.saveClinicsStorage();
                 document.getElementById('formClinica').reset();
                 this.renderClinicsList();
-                this.showAlert("Sucesso", "Clínica salva em data/clinicas/ com sucesso!", "sucesso");
+                this.showAlert("Sucesso", "Clínica salva com sucesso!", "sucesso");
             }
 
             editarClinica(id) {
@@ -1346,13 +1269,12 @@
                 document.getElementById('horariosContainer').innerHTML = '';
                 this.adicionarHorarioLinha();
                 this.mudarTela('list');
-                this.showAlert("Sucesso", "Médico salvo em data/medicos/ com sucesso!", "sucesso");
+                this.showAlert("Sucesso", "Médico salvo com sucesso!", "sucesso");
             }
 
             // ==================== PLANEJAMENTO ====================
             adicionarPlanejamento(e) {
                 e.preventDefault();
-                const editId = document.getElementById('planEditId').value;
                 const doctorId = document.getElementById('planDoctorId').value;
                 const text = document.getElementById('planText').value.trim();
 
@@ -1361,73 +1283,28 @@
                     return;
                 }
 
-                if (editId) {
-                    const item = this.planning.find(p => p.id === editId);
-                    if (item && !item.checked) {
-                        item.doctorId = doctorId;
-                        item.text = text;
-                        this.savePlanningStorage();
-                    }
-                    document.getElementById('planEditId').value = '';
-                    document.getElementById('btnSubmitPlanejamento').innerHTML = '<i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento';
-                    document.getElementById('btnCancelarEdicaoPlanejamento').classList.add('hidden');
-                } else {
-                    const hoje = new Date();
-                    const diasSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-                    const diaSemanaStr = diasSemana[hoje.getDay()];
-                    const diaNum = String(hoje.getDate()).padStart(2, '0');
-                    const mesNum = String(hoje.getMonth() + 1).padStart(2, '0');
-                    const dataFormatada = `${diaSemanaStr} - ${diaNum}/${mesNum}`;
+                const hoje = new Date();
+                const diasSemana = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+                const diaSemanaStr = diasSemana[hoje.getDay()];
+                const diaNum = String(hoje.getDate()).padStart(2, '0');
+                const mesNum = String(hoje.getMonth() + 1).padStart(2, '0');
+                const dataFormatada = `${diaSemanaStr} - ${diaNum}/${mesNum}`;
 
-                    const novoItem = {
-                        id: 'plan_' + Date.now(),
-                        doctorId,
-                        text,
-                        dayGroup: dataFormatada,
-                        checked: false,
-                        dateIso: hoje.toISOString().split('T')[0]
-                    };
+                const novoItem = {
+                    id: 'plan_' + Date.now(),
+                    doctorId,
+                    text,
+                    dayGroup: dataFormatada,
+                    checked: false,
+                    dateIso: hoje.toISOString().split('T')[0]
+                };
 
-                    this.planning.unshift(novoItem);
-                }
-
+                this.planning.unshift(novoItem);
                 this.savePlanningStorage();
                 document.getElementById('formPlanejamento').reset();
                 this.preencherSelectPlanejamentoMedicos();
                 this.renderPlanningList();
-                this.showAlert("Sucesso", "Planejamento salvo em data/planejamentos/ com sucesso!", "sucesso");
-            }
-
-            editarPlanejamento(id) {
-                const item = this.planning.find(p => p.id === id);
-                if (!item || item.checked) {
-                    this.showAlert("Aviso", "Itens marcados não podem ser editados.");
-                    return;
-                }
-                document.getElementById('planEditId').value = item.id;
-                document.getElementById('planDoctorId').value = item.doctorId;
-                document.getElementById('planText').value = item.text;
-                document.getElementById('btnSubmitPlanejamento').innerHTML = '<i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Alteração';
-                document.getElementById('btnCancelarEdicaoPlanejamento').classList.remove('hidden');
-            }
-
-            cancelarEdicaoPlanejamento() {
-                document.getElementById('planEditId').value = '';
-                document.getElementById('formPlanejamento').reset();
-                document.getElementById('btnSubmitPlanejamento').innerHTML = '<i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento';
-                document.getElementById('btnCancelarEdicaoPlanejamento').classList.add('hidden');
-            }
-
-            apagarPlanejamento(id) {
-                const item = this.planning.find(p => p.id === id);
-                if (!item || item.checked) {
-                    this.showAlert("Aviso", "Itens marcados não podem ser apagados.");
-                    return;
-                }
-                this.planning = this.planning.filter(p => p.id !== id);
-                this.savePlanningStorage();
-                this.renderPlanningList();
-                this.showAlert("Removido", "Item de planejamento apagado com sucesso.", "sucesso");
+                this.showAlert("Sucesso", "Planejamento adicionado com sucesso!", "sucesso");
             }
 
             togglePlanningItem(id) {
@@ -1456,7 +1333,7 @@
                 this.saveReportsStorage();
 
                 this.renderPlanningList();
-                this.showAlert("Pendente Gerado", `Tarefa marcada! Relatório pendente criado para ${docName} em data/relatorios/.`, "sucesso");
+                this.showAlert("Pendente Gerado", `Tarefa marcada! Relatório pendente criado para ${docName}. Acesse a aba Relatórios -> Pendentes para preencher.`, "sucesso");
             }
 
             renderPlanningList() {
@@ -1501,22 +1378,6 @@
                         const bgStyle = item.checked ? 'bg-slate-50 border-emerald-200 text-slate-400' : 'bg-white border-slate-200 text-slate-800 hover:border-amber-300';
                         const checkText = item.checked ? '<span class="line-through">' + item.text + '</span>' : item.text;
 
-                        let botoesAcao = '';
-                        if (!item.checked) {
-                            botoesAcao = `
-                                <div class="flex items-center gap-1 shrink-0 ml-2">
-                                    <button onclick="app.editarPlanejamento('${item.id}')" class="bg-slate-100 hover:bg-slate-200 text-slate-700 p-1.5 rounded-lg transition text-xs" title="Editar Tarefa">
-                                        <i class="fa-solid fa-pen"></i>
-                                    </button>
-                                    <button onclick="app.apagarPlanejamento('${item.id}')" class="bg-rose-50 hover:bg-rose-100 text-rose-600 p-1.5 rounded-lg transition text-xs" title="Apagar Tarefa">
-                                        <i class="fa-solid fa-trash"></i>
-                                    </button>
-                                </div>
-                            `;
-                        } else {
-                            botoesAcao = '<span class="text-[10px] font-semibold bg-emerald-50 text-emerald-800 px-2 py-1 rounded border border-emerald-200 shrink-0 ml-2">Concluído</span>';
-                        }
-
                         html += `
                             <div class="flex items-center justify-between p-3 rounded-xl border ${bgStyle} transition shadow-2xs">
                                 <div class="flex items-center gap-3 pr-2 flex-1">
@@ -1526,7 +1387,7 @@
                                         <p class="text-xs ${item.checked ? 'text-slate-400 line-through' : 'text-slate-700'}">${checkText}</p>
                                     </div>
                                 </div>
-                                ${botoesAcao}
+                                ${item.checked ? '<span class="text-[10px] font-semibold bg-emerald-50 text-emerald-800 px-2 py-1 rounded border border-emerald-200 shrink-0">Concluído</span>' : '<span class="text-[10px] font-semibold bg-amber-50 text-amber-800 px-2 py-1 rounded border border-amber-200 shrink-0">Pendente</span>'}
                             </div>
                         `;
                     });
@@ -1651,7 +1512,7 @@
                 this.saveReportsStorage();
                 this.fecharModalRelatorio();
                 this.renderReportsList();
-                this.showAlert("Sucesso", "Relatório salvo em data/relatorios/ com sucesso!", "sucesso");
+                this.showAlert("Sucesso", "Relatório salvo e concluído com sucesso!", "sucesso");
             }
 
             excluirRelatorio(id) {
@@ -1846,18 +1707,9 @@
                     };
                 });
 
-                // Estrutura exigida para o share.json contendo todos os relatórios e os "ultimos-Relatórios"
-                const payloadShareJson = {
-                    ultimos_Relatorios: relatoriosParaEnviar.map(r => ({ id: r.id, title: r.title, date: r.date, doctorName: r.doctorName })),
-                    relatorios: relatoriosParaEnviar
-                };
-
                 localStorage.setItem('otica_shared_reports', JSON.stringify(relatoriosParaEnviar));
-                localStorage.setItem('share_json_payload', JSON.stringify(payloadShareJson, null, 2));
-
                 this.fecharModalSelecaoCompartilhar();
                 window.open('share.html', '_blank');
-                this.showAlert("Compartilhado", "Dados exportados para o share.json com sucesso!", "sucesso");
             }
 
             abrirDetalhes(id) {
@@ -2006,16 +1858,16 @@
                 document.getElementById('modalDetalhes').classList.remove('hidden');
             }
 
+            fecharModal() {
+                document.getElementById('modalDetalhes').classList.add('hidden');
+            }
+
             excluirMedico(id) {
                 this.doctors = this.doctors.filter(item => item.id !== id);
                 this.saveStorage();
                 this.fecharModal();
                 this.renderList();
-                this.showAlert("Removido", "Médico excluído com sucesso.", "sucesso");
-            }
-
-            fecharModal() {
-                document.getElementById('modalDetalhes').classList.add('hidden');
+                this.showAlert("Removido", "O médico foi excluído com sucesso.", "sucesso");
             }
 
             showAlert(titulo, texto, tipo = "aviso") {
@@ -2023,15 +1875,14 @@
                 document.getElementById('alertaTitulo').textContent = titulo;
                 document.getElementById('alertaTexto').textContent = texto;
                 
-                const iconeDiv = document.getElementById('alertaIcone');
+                const icone = document.getElementById('alertaIcone');
                 if (tipo === "sucesso") {
-                    iconeDiv.className = "w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mx-auto";
-                    iconeDiv.innerHTML = '<i class="fa-solid fa-check"></i>';
+                    icone.className = "w-12 h-12 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xl mx-auto";
+                    icone.innerHTML = '<i class="fa-solid fa-check"></i>';
                 } else {
-                    iconeDiv.className = "w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto";
-                    iconeDiv.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
+                    icone.className = "w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto";
+                    icone.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
                 }
-
                 modal.classList.remove('hidden');
             }
 
@@ -2044,3 +1895,4 @@
     </script>
 </body>
 </html>
+```[cite: 15]
