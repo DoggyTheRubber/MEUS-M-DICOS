@@ -347,7 +347,7 @@
                 </div>
 
                 <!-- Botão de Compartilhar Relatórios -->
-                <button onclick="app.abrirModalSelecaoCompartilhamento()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm">
+                <button onclick="app.abrirModalSelecaoCompartilhar()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2 text-sm">
                     <i class="fa-solid fa-share-nodes"></i> Compartilhar Relatórios Selecionados
                 </button>
 
@@ -545,7 +545,7 @@
                 this.reports = [];
                 this.planning = [];
                 this.currentFilter = 'all';
-                this.reportFilter = 'concluidos'; // 'concluidos' ou 'pendentes'
+                this.reportFilter = 'concluidos';
                 this.clinicaSelecionada = null; 
                 this.initDobDays();
                 this.loadData();
@@ -1345,12 +1345,11 @@
 
             togglePlanningItem(id) {
                 const item = this.planning.find(p => p.id === id);
-                if(!item || item.checked) return; // Se já está marcado, não pode desmarcar
+                if(!item || item.checked) return;
 
                 item.checked = true;
                 this.savePlanningStorage();
 
-                // Cria automaticamente um relatório PENDENTE na aba relatórios com flag isPending: true
                 const doc = this.doctors.find(d => d.id === item.doctorId);
                 const docName = doc ? doc.name : 'Médico';
                 
@@ -1363,7 +1362,7 @@
                     date: hojeIso,
                     doctorId: item.doctorId,
                     content: `Planejamento concluído: "${item.text}". (Preencha as anotações detalhadas da visita para finalizar)`,
-                    isPending: true // Marcado como pendente na aba Relatórios
+                    isPending: true
                 };
 
                 this.reports.unshift(novoRelatorio);
@@ -1531,7 +1530,7 @@
                             date, 
                             doctorId, 
                             content, 
-                            isPending: false // Ao salvar, o relatório sai de pendente e vai direto para concluídos
+                            isPending: false 
                         };
                     }
                 } else {
@@ -1631,7 +1630,6 @@
                     return;
                 }
 
-                // Filtro Concluídos
                 let filtradosReps = concluidosReps;
                 if(q) {
                     filtradosReps = concluidosReps.filter(r => {
@@ -1747,8 +1745,6 @@
 
                 localStorage.setItem('otica_shared_reports', JSON.stringify(relatoriosParaEnviar));
                 this.fecharModalSelecaoCompartilhar();
-                
-                // Abre o share.html
                 window.open('share.html', '_blank');
             }
 
@@ -1923,7 +1919,6 @@
                     icone.className = "w-12 h-12 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xl mx-auto";
                     icone.innerHTML = '<i class="fa-solid fa-triangle-exclamation"></i>';
                 }
-
                 modal.classList.remove('hidden');
             }
 
