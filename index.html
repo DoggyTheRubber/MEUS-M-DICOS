@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Optica La Patrícia - Gestão de Atendimentos</title>
     <!-- Favicon personalizado -->
-    <link rel="icon" type="image/png" href="la pipita.png">
+    <link rel="icon" type="image/png" href="./la pipita.png">
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome -->
@@ -21,7 +21,7 @@
     <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700 shadow shrink-0">
-                <img src="la pipita.png" alt="La Pipita Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-eye text-amber-500 text-lg\'></i>';">
+                <img src="./la pipita.png" alt="La Pipita Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-eye text-amber-500 text-lg\'></i>';">
             </div>
             <div>
                 <h1 class="font-bold text-base tracking-tight">Optica La Patrícia</h1>
@@ -552,7 +552,6 @@
 
             async loadData() {
                 try {
-                    // Carrega do GitHub se possível, fallback para localStorage
                     this.clinics = await this.loadJsonFromGitHub('clinica.json') || [];
                     this.doctors = await this.loadJsonFromGitHub('medico.json') || [];
                     this.reports = await this.loadJsonFromGitHub('relatorio.json') || [];
@@ -586,8 +585,6 @@
             async saveJsonToGitHub(filename, jsonData) {
                 try {
                     const url = `https://api.github.com/repos/${this.ghOwner}/${this.ghRepo}/contents/${filename}`;
-                    
-                    // 1. Busca o SHA atual do arquivo (obrigatório pelo GitHub para atualizar via API)
                     let sha = null;
                     const getRes = await fetch(url, {
                         headers: {
@@ -600,7 +597,6 @@
                         sha = fileData.sha;
                     }
 
-                    // 2. Prepara o payload convertendo o JSON para Base64 de forma segura
                     const contentString = JSON.stringify(jsonData, null, 2);
                     const base64Content = btoa(unescape(encodeURIComponent(contentString)));
 
@@ -610,7 +606,6 @@
                     };
                     if(sha) bodyData.sha = sha;
 
-                    // 3. Envia o PUT para o repositório
                     const putRes = await fetch(url, {
                         method: "PUT",
                         headers: {
@@ -1884,7 +1879,7 @@
                 this.showAlert("Sucesso", "share.json atualizado no GitHub com sucesso!", "sucesso");
 
                 setTimeout(() => {
-                    window.location.href = 'share.html';
+                    window.location.href = './share.html';
                 }, 1200);
             }
 
