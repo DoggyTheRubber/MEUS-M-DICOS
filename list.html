@@ -6,31 +6,44 @@
     <title>Ótica La Patrícia - Lista de Médicos</title>
     <link rel="icon" type="image/png" href="la pipita.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="colors.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Aplica o tema salvo antes de carregar para evitar piscar a tela
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #f4f7f6; margin: 0; padding-bottom: 80px; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
+            margin: 0; 
+            padding-bottom: 80px; 
+            background-color: var(--bg-body) !important;
+            color: var(--text-main) !important;
+        }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen">
+<body class="transition-colors duration-200 flex flex-col min-h-screen">
 
-    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
+    <header class="app-header shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl overflow-hidden bg-slate-800 flex items-center justify-center border border-slate-700 shadow shrink-0">
                 <img src="la pipita.png" alt="La Pipita Logo" class="w-full h-full object-cover" onerror="this.onerror=null; this.parentNode.innerHTML='<i class=\'fa-solid fa-eye text-amber-500 text-lg\'></i>';">
             </div>
             <div>
                 <h1 class="font-bold text-base tracking-tight">Lista de Médicos e Clínicas</h1>
-                <p class="text-xs text-slate-400">Ótica La Patrícia</p>
+                <p class="text-xs opacity-80">Ótica La Patrícia</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <a href="add.html" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-sm">
+            <a href="add.html" class="app-btn-primary px-3 py-1.5 rounded-xl font-semibold text-xs flex items-center gap-1.5 shadow-sm">
                 <i class="fa-solid fa-plus"></i> Novo
             </a>
-            <a href="settings.html" class="text-slate-400 hover:text-white transition p-1">
+            <a href="settings.html" class="opacity-80 hover:opacity-100 transition p-1">
                 <i class="fa-solid fa-gear text-xl"></i>
             </a>
         </div>
@@ -39,31 +52,31 @@
     <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-4">
         
         <!-- Barra de Busca e Filtros -->
-        <div class="space-y-3 bg-white p-3.5 rounded-2xl border border-slate-200 shadow-sm">
+        <div class="space-y-3 app-card p-3.5 rounded-2xl border shadow-sm">
             <div class="relative">
-                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 opacity-60">
                     <i class="fa-solid fa-magnifying-glass"></i>
                 </span>
-                <input type="text" id="search" oninput="app.renderList()" placeholder="Buscar por CRM, nome, clínica ou especialidade..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
+                <input type="text" id="search" oninput="app.renderList()" placeholder="Buscar por CRM, nome, clínica ou especialidade..." class="w-full pl-10 pr-4 py-2.5 app-input border rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 shadow-xs">
             </div>
             <div id="filter-container" class="hidden items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar pt-1">
-                <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-1">Filtros:</span>
-                <button onclick="app.setFilter('all')" id="filter-all" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white transition whitespace-nowrap">Todos</button>
-                <button onclick="app.setFilter('sim')" id="filter-yes" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 transition whitespace-nowrap">Indica</button>
-                <button onclick="app.setFilter('nao')" id="filter-no" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 transition whitespace-nowrap">Não Indica</button>
-                <button onclick="app.setFilter('deixou')" id="filter-deixou" class="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 transition whitespace-nowrap">Deixou de Indicar</button>
+                <span class="text-[11px] font-bold opacity-60 uppercase tracking-wider mr-1">Filtros:</span>
+                <button onclick="app.setFilter('all')" id="filter-all" class="px-3 py-1 text-xs font-semibold rounded-lg app-btn-primary transition whitespace-nowrap">Todos</button>
+                <button onclick="app.setFilter('sim')" id="filter-yes" class="px-3 py-1 text-xs font-semibold rounded-lg app-btn-secondary transition whitespace-nowrap">Indica</button>
+                <button onclick="app.setFilter('nao')" id="filter-no" class="px-3 py-1 text-xs font-semibold rounded-lg app-btn-secondary transition whitespace-nowrap">Não Indica</button>
+                <button onclick="app.setFilter('deixou')" id="filter-deixou" class="px-3 py-1 text-xs font-semibold rounded-lg app-btn-secondary transition whitespace-nowrap">Deixou de Indicar</button>
             </div>
         </div>
 
         <!-- Breadcrumb / Navegação por Clínica -->
-        <div id="clinica-breadcrumb" class="hidden items-center justify-between bg-amber-50 border border-amber-200 px-4 py-3 rounded-2xl shadow-2xs">
+        <div id="clinica-breadcrumb" class="hidden items-center justify-between bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 px-4 py-3 rounded-2xl shadow-2xs">
             <div class="flex items-center gap-2">
-                <button onclick="app.voltarParaClinicas()" class="bg-white text-amber-900 hover:bg-amber-100 px-2.5 py-1.5 rounded-xl border border-amber-300 text-xs font-bold transition flex items-center gap-1 shadow-2xs">
+                <button onclick="app.voltarParaClinicas()" class="app-card text-amber-900 dark:text-amber-300 px-2.5 py-1.5 rounded-xl border text-xs font-bold transition flex items-center gap-1 shadow-2xs">
                     <i class="fa-solid fa-arrow-left"></i> Clínicas
                 </button>
-                <span id="breadcrumb-titulo" class="font-bold text-slate-900 text-xs truncate max-w-[180px]">Clínica</span>
+                <span id="breadcrumb-titulo" class="font-bold text-xs truncate max-w-[180px]">Clínica</span>
             </div>
-            <span id="breadcrumb-contador" class="text-xs bg-amber-200/80 text-amber-900 font-bold px-2.5 py-1 rounded-lg">0 médicos</span>
+            <span id="breadcrumb-contador" class="text-xs bg-amber-200/80 dark:bg-amber-900/80 text-amber-900 dark:text-amber-200 font-bold px-2.5 py-1 rounded-lg">0 médicos</span>
         </div>
 
         <!-- Container de Listagem Principal -->
@@ -72,31 +85,31 @@
 
     <!-- Modal de Detalhes -->
     <div id="modalDetalhes" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div class="bg-slate-900 text-white p-4 flex items-center justify-between">
+        <div class="app-card w-full max-w-lg rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh] border">
+            <div class="app-header p-4 flex items-center justify-between border-b">
                 <div>
                     <span class="text-[10px] bg-amber-500 text-slate-950 font-bold px-2 py-0.5 rounded uppercase tracking-wider">Ficha Completa</span>
                     <h3 id="modalNomeTitulo" class="font-bold text-base mt-0.5">Detalhes do Médico</h3>
                 </div>
-                <button onclick="app.fecharModal()" class="text-slate-400 hover:text-white p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
+                <button onclick="app.fecharModal()" class="opacity-70 hover:opacity-100 p-2"><i class="fa-solid fa-xmark text-lg"></i></button>
             </div>
             <div class="p-5 overflow-y-auto space-y-3.5 text-sm" id="modalConteudo"></div>
-            <div class="bg-slate-50 border-t border-slate-100 p-4 flex items-center justify-between">
+            <div class="app-card border-t p-4 flex items-center justify-between">
                 <div class="flex items-center gap-2">
-                    <button id="modalBtnEditar" class="text-xs bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-2xs"><i class="fa-solid fa-pen"></i> Editar</button>
-                    <button id="modalBtnExcluir" class="text-xs bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5"><i class="fa-solid fa-trash"></i> Excluir</button>
+                    <button id="modalBtnEditar" class="text-xs app-btn-primary font-bold px-3.5 py-2 rounded-xl transition flex items-center gap-1.5 shadow-2xs"><i class="fa-solid fa-pen"></i> Editar</button>
+                    <button id="modalBtnExcluir" class="text-xs bg-rose-50 dark:bg-rose-950/50 text-rose-700 dark:text-rose-400 font-semibold px-3 py-2 rounded-xl transition flex items-center gap-1.5 border border-rose-200 dark:border-rose-900"><i class="fa-solid fa-trash"></i> Excluir</button>
                 </div>
-                <button onclick="app.fecharModal()" class="bg-slate-900 hover:bg-slate-800 text-white text-xs px-4 py-2 rounded-xl font-semibold transition">Fechar</button>
+                <button onclick="app.fecharModal()" class="app-btn-secondary text-xs px-4 py-2 rounded-xl font-semibold transition">Fechar</button>
             </div>
         </div>
     </div>
 
     <!-- Modal de Alerta -->
     <div id="modalAlerta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4">
-            <h4 id="alertaTitulo" class="font-bold text-slate-900 text-base">Aviso</h4>
-            <p id="alertaTexto" class="text-xs text-slate-600 leading-relaxed"></p>
-            <button onclick="app.fecharAlerta()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs">Entendido</button>
+        <div class="app-card w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4 border">
+            <h4 id="alertaTitulo" class="font-bold text-base">Aviso</h4>
+            <p id="alertaTexto" class="text-xs opacity-80 leading-relaxed"></p>
+            <button onclick="app.fecharAlerta()" class="w-full app-btn-secondary font-semibold py-2.5 rounded-xl text-xs">Entendido</button>
         </div>
     </div>
 
@@ -150,8 +163,8 @@
                     const btn = document.getElementById(`filter-${btnId}`);
                     if(!btn) return;
                     btn.className = (id === f) 
-                        ? "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-900 text-white transition whitespace-nowrap shadow-2xs" 
-                        : "px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 text-slate-600 hover:bg-slate-200 transition whitespace-nowrap";
+                        ? "px-3 py-1 text-xs font-semibold rounded-lg app-btn-primary transition whitespace-nowrap shadow-2xs" 
+                        : "px-3 py-1 text-xs font-semibold rounded-lg app-btn-secondary transition whitespace-nowrap";
                 });
                 this.renderList();
             }
@@ -243,37 +256,37 @@
 
                 if(this.clinics.length === 0) {
                     container.innerHTML = `
-                        <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 mt-6 shadow-sm space-y-2">
-                            <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-full flex items-center justify-center mx-auto text-lg"><i class="fa-solid fa-hospital"></i></div>
-                            <h3 class="font-bold text-slate-800 text-sm">Nenhuma clínica cadastrada</h3>
-                            <p class="text-xs text-slate-500">Cadastre clínicas para organizar seus médicos com facilidade.</p>
-                            <a href="clinics.html" class="inline-block bg-amber-600 hover:bg-amber-700 text-white font-semibold px-4 py-2 rounded-xl text-xs transition shadow-sm mt-1">Ir para Clínicas</a>
+                        <div class="app-card rounded-2xl p-8 text-center border mt-6 shadow-sm space-y-2">
+                            <div class="w-12 h-12 bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 rounded-full flex items-center justify-center mx-auto text-lg"><i class="fa-solid fa-hospital"></i></div>
+                            <h3 class="font-bold text-sm">Nenhuma clínica cadastrada</h3>
+                            <p class="text-xs opacity-70">Cadastre clínicas para organizar seus médicos com facilidade.</p>
+                            <a href="clinics.html" class="inline-block app-btn-primary font-semibold px-4 py-2 rounded-xl text-xs transition shadow-sm mt-1">Ir para Clínicas</a>
                         </div>
                     `;
                     return;
                 }
 
-                let html = '<div class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2 px-1 flex items-center justify-between"><span>Selecione uma Clínica</span><span class="text-[11px] font-normal text-slate-500">Total: ' + this.clinics.length + '</span></div>';
+                let html = '<div class="text-xs font-bold opacity-60 uppercase tracking-wider mb-2 px-1 flex items-center justify-between"><span>Selecione uma Clínica</span><span class="text-[11px] font-normal opacity-70">Total: ' + this.clinics.length + '</span></div>';
                 
                 this.clinics.forEach(c => {
                     const totalMedicos = this.doctors.filter(d => d.hospital && d.hospital.trim().toLowerCase() === c.name.trim().toLowerCase()).length;
                     html += `
-                        <div onclick="app.selecionarClinica('${c.name.replace(/'/g, "\\'")}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs hover:border-amber-400 hover:shadow-md transition cursor-pointer flex items-center justify-between group">
+                        <div onclick="app.selecionarClinica('${c.name.replace(/'/g, "\\'")}')" class="app-card p-4 rounded-2xl border shadow-2xs hover:border-amber-400 hover:shadow-md transition cursor-pointer flex items-center justify-between group">
                             <div class="flex items-center gap-3.5 pr-2">
-                                <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-base shrink-0 group-hover:bg-amber-600 group-hover:text-white transition shadow-2xs">
+                                <div class="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-950 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold text-base shrink-0 group-hover:bg-amber-600 group-hover:text-white transition shadow-2xs">
                                     <i class="fa-solid fa-hospital"></i>
                                 </div>
                                 <div class="space-y-0.5">
-                                    <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition">${c.name}</h4>
-                                    <p class="text-xs text-slate-500 line-clamp-1">${c.address || 'Endereço não informado'}</p>
+                                    <h4 class="font-bold text-sm group-hover:text-amber-600 transition">${c.name}</h4>
+                                    <p class="text-xs opacity-70 line-clamp-1">${c.address || 'Endereço não informado'}</p>
                                     <div class="flex items-center gap-1.5 pt-0.5">
-                                        <span class="inline-flex items-center gap-1 text-[11px] font-semibold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
+                                        <span class="inline-flex items-center gap-1 text-[11px] font-semibold app-btn-secondary px-2 py-0.5 rounded-md">
                                             <i class="fa-solid fa-user-doctor text-amber-600"></i> ${totalMedicos} médico(s)
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                            <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-amber-100 text-slate-400 group-hover:text-amber-700 flex items-center justify-center transition shrink-0"><i class="fa-solid fa-chevron-right text-xs"></i></div>
+                            <div class="w-8 h-8 rounded-full app-btn-secondary flex items-center justify-center transition shrink-0 shadow-xs"><i class="fa-solid fa-chevron-right text-xs"></i></div>
                         </div>
                     `;
                 });
@@ -283,10 +296,10 @@
             renderizarCardsMedicos(filtered, container, msgVazia) {
                 if(filtered.length === 0) {
                     container.innerHTML = `
-                        <div class="bg-white rounded-2xl p-8 text-center border border-slate-200 mt-4 shadow-sm space-y-2">
-                            <div class="w-12 h-12 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto text-lg"><i class="fa-solid fa-user-slash"></i></div>
-                            <h3 class="font-bold text-slate-800 text-sm">${msgVazia}</h3>
-                            <p class="text-xs text-slate-500">Tente ajustar os filtros ou os termos da busca.</p>
+                        <div class="app-card rounded-2xl p-8 text-center border mt-4 shadow-sm space-y-2">
+                            <div class="w-12 h-12 app-btn-secondary rounded-full flex items-center justify-center mx-auto text-lg"><i class="fa-solid fa-user-slash"></i></div>
+                            <h3 class="font-bold text-sm">${msgVazia}</h3>
+                            <p class="text-xs opacity-70">Tente ajustar os filtros ou os termos da busca.</p>
                         </div>
                     `;
                     return;
@@ -296,11 +309,11 @@
                 filtered.forEach(d => {
                     let badge = '';
                     if (d.indicates === 'sim') {
-                        badge = '<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Indica</span>';
+                        badge = '<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-900 flex items-center gap-1"><i class="fa-solid fa-circle-check"></i> Indica</span>';
                     } else if (d.indicates === 'deixou') {
-                        badge = '<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> Deixou de Indicar</span>';
+                        badge = '<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-amber-100 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-900 flex items-center gap-1"><i class="fa-solid fa-circle-exclamation"></i> Deixou de Indicar</span>';
                     } else {
-                        badge = '<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-rose-100 text-rose-800 border border-rose-200 flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> Não Indica</span>';
+                        badge = '<span class="px-2.5 py-0.5 rounded-lg text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300 border border-rose-200 dark:border-rose-900 flex items-center gap-1"><i class="fa-solid fa-circle-xmark"></i> Não Indica</span>';
                     }
 
                     const nomeExibir = (d.name && d.name !== ' ') ? d.name : 'Médico sem nome';
@@ -311,22 +324,22 @@
                     const subspecExibir = (d.subspecialties && d.subspecialties !== ' ') ? ` • ${d.subspecialties}` : '';
 
                     html += `
-                        <div onclick="app.abrirDetalhes('${d.id}')" class="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs hover:border-amber-400 hover:shadow-md transition cursor-pointer flex items-center justify-between group">
+                        <div onclick="app.abrirDetalhes('${d.id}')" class="app-card p-4 rounded-2xl border shadow-2xs hover:border-amber-400 hover:shadow-md transition cursor-pointer flex items-center justify-between group">
                             <div class="space-y-1.5 pr-2 flex-1">
                                 <div class="flex items-center justify-between gap-2">
-                                    <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition truncate">${nomeExibir}</h4>
+                                    <h4 class="font-bold text-sm group-hover:text-amber-600 transition truncate">${nomeExibir}</h4>
                                     <div class="shrink-0"></div>
                                 </div>
-                                <div class="flex items-center gap-3 text-xs text-slate-500 flex-wrap">
-                                    <span class="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded"><i class="fa-solid fa-id-card text-slate-400"></i> ${crmExibir}</span>
-                                    <span class="font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 truncate"><i class="fa-solid fa-clock text-amber-600"></i> ${statusAtendimentoExibir}</span>
+                                <div class="flex items-center gap-3 text-xs opacity-80 flex-wrap">
+                                    <span class="font-semibold app-btn-secondary px-2 py-0.5 rounded"><i class="fa-solid fa-id-card opacity-60"></i> ${crmExibir}</span>
+                                    <span class="font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/50 dark:border-amber-900/50 truncate"><i class="fa-solid fa-clock text-amber-600"></i> ${statusAtendimentoExibir}</span>
                                     <div class="shrink-0">${badge}</div>
                                 </div>
-                                <div class="flex items-center gap-3 text-[11px] text-slate-400 pt-0.5">
+                                <div class="flex items-center gap-3 text-[11px] opacity-70 pt-0.5">
                                     <span><i class="fa-solid fa-stethoscope text-amber-600/70"></i> ${specExibir}${subspecExibir}</span>
                                 </div>
                             </div>
-                            <div class="w-8 h-8 rounded-full bg-slate-50 group-hover:bg-amber-100 text-slate-400 group-hover:text-amber-700 flex items-center justify-center transition shrink-0 ml-2"><i class="fa-solid fa-chevron-right text-xs"></i></div>
+                            <div class="w-8 h-8 rounded-full app-btn-secondary flex items-center justify-center transition shrink-0 ml-2 shadow-xs"><i class="fa-solid fa-chevron-right text-xs"></i></div>
                         </div>
                     `;
                 });
@@ -338,10 +351,10 @@
                 if(!d) return;
 
                 let statusIndicaTexto = 'Não Informado';
-                let indicaCor = 'bg-slate-100 text-slate-800 border-slate-200';
-                if(d.indicates === 'sim') { statusIndicaTexto = 'Indica'; indicaCor = 'bg-emerald-50 text-emerald-800 border-emerald-200'; }
-                else if(d.indicates === 'nao') { statusIndicaTexto = 'Não Indica'; indicaCor = 'bg-rose-50 text-rose-800 border-rose-200'; }
-                else if(d.indicates === 'deixou') { statusIndicaTexto = 'Deixou de Indicar'; indicaCor = 'bg-amber-50 text-amber-800 border-amber-200'; }
+                let indicaCor = 'bg-slate-100 dark:bg-slate-900 border-slate-200 dark:border-slate-800';
+                if(d.indicates === 'sim') { statusIndicaTexto = 'Indica'; indicaCor = 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-800 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900'; }
+                else if(d.indicates === 'nao') { statusIndicaTexto = 'Não Indica'; indicaCor = 'bg-rose-50 dark:bg-rose-950/50 text-rose-800 dark:text-rose-300 border-rose-200 dark:border-rose-900'; }
+                else if(d.indicates === 'deixou') { statusIndicaTexto = 'Deixou de Indicar'; indicaCor = 'bg-amber-50 dark:bg-amber-950/50 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900'; }
 
                 let aniverFormatado = 'Não informado';
                 if(d.birthdate && d.birthdate !== ' ') {
@@ -371,59 +384,59 @@
 
                 document.getElementById('modalNomeTitulo').textContent = val(d.name);
                 document.getElementById('modalConteudo').innerHTML = `
-                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">CRM</span><span class="font-bold text-slate-800 text-xs">${val(d.crm)}</span></div>
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Especialização</span><span class="font-bold text-slate-800 text-xs">${val(d.specialization)}</span></div>
+                    <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">CRM</span><span class="font-bold text-xs">${val(d.crm)}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Especialização</span><span class="font-bold text-xs">${val(d.specialization)}</span></div>
                     </div>
 
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Subespecializações</span>
-                        <span class="font-medium text-slate-800 text-xs">${val(d.subspecialties)}</span>
+                    <div class="app-btn-secondary p-3 rounded-xl border">
+                        <span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block mb-0.5">Subespecializações</span>
+                        <span class="font-medium text-xs">${val(d.subspecialties)}</span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Clínica Vinculada</span><span class="font-medium text-slate-800 text-xs">${val(d.hospital)}</span></div>
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sala / Consultório</span><span class="font-medium text-slate-800 text-xs">${val(d.room)}</span></div>
+                    <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Clínica Vinculada</span><span class="font-medium text-xs">${val(d.hospital)}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Sala / Consultório</span><span class="font-medium text-xs">${val(d.room)}</span></div>
                     </div>
 
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Horários de Atendimento</span>
-                        <span class="font-medium text-slate-800 text-xs">${horariosFormatados}</span>
+                    <div class="app-btn-secondary p-3 rounded-xl border">
+                        <span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block mb-0.5">Horários de Atendimento</span>
+                        <span class="font-medium text-xs">${horariosFormatados}</span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Telefone Comercial</span><span class="font-medium text-slate-800 text-xs">${val(d.phone)}</span></div>
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Celular / WhatsApp</span><span class="font-medium text-slate-800 text-xs">${val(d.cellphone)}</span></div>
+                    <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Telefone Comercial</span><span class="font-medium text-xs">${val(d.phone)}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Celular / WhatsApp</span><span class="font-medium text-xs">${val(d.cellphone)}</span></div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Telefone Pessoal</span><span class="font-medium text-slate-800 text-xs">${val(d.personalPhone)}</span></div>
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Secretária(s)</span><span class="font-medium text-slate-800 text-xs">${val(d.secretary)}</span></div>
+                    <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Telefone Pessoal</span><span class="font-medium text-xs">${val(d.personalPhone)}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Secretária(s)</span><span class="font-medium text-xs">${val(d.secretary)}</span></div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Aniversário</span><span class="font-medium text-slate-800 text-xs">${aniverFormatado}</span></div>
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Presente Habitual</span><span class="font-medium text-slate-800 text-xs">${val(d.present)}</span></div>
+                    <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Aniversário</span><span class="font-medium text-xs">${aniverFormatado}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Presente Habitual</span><span class="font-medium text-xs">${val(d.present)}</span></div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Data da Visita</span><span class="font-medium text-slate-800 text-xs">${val(d.visitDate)}</span></div>
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Última Indicação</span><span class="font-medium text-slate-800 text-xs">${val(d.lastIndicationDate)}</span></div>
+                    <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Data da Visita</span><span class="font-medium text-xs">${val(d.visitDate)}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Última Indicação</span><span class="font-medium text-xs">${val(d.lastIndicationDate)}</span></div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Responsável</span><span class="font-medium text-slate-800 text-xs">${val(d.responsible)}</span></div>
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Status Atendimento</span><span class="font-medium text-slate-800 text-xs">${val(d.status)}</span></div>
+                    <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Responsável</span><span class="font-medium text-xs">${val(d.responsible)}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Status Atendimento</span><span class="font-medium text-xs">${val(d.status)}</span></div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Status Indicação</span><span class="inline-block mt-0.5 px-2 py-0.5 rounded text-xs font-bold border ${indicaCor}">${statusIndicaTexto}</span></div>
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Unidade Próxima</span><span class="font-medium text-slate-800 text-xs">${val(d.nearbyUnit)}</span></div>
+                    <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Status Indicação</span><span class="inline-block mt-0.5 px-2 py-0.5 rounded text-xs font-bold border ${indicaCor}">${statusIndicaTexto}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Unidade Próxima</span><span class="font-medium text-xs">${val(d.nearbyUnit)}</span></div>
                     </div>
 
-                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Observações</span>
-                        <p class="font-medium text-slate-800 text-xs whitespace-pre-wrap leading-relaxed">${(d.notes && d.notes !== ' ') ? d.notes : 'Nenhuma observação registrada.'}</p>
+                    <div class="app-btn-secondary p-3 rounded-xl border">
+                        <span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block mb-0.5">Observações</span>
+                        <p class="font-medium text-xs whitespace-pre-wrap leading-relaxed">${(d.notes && d.notes !== ' ') ? d.notes : 'Nenhuma observação registrada.'}</p>
                     </div>
                 `;
                 document.getElementById('modalBtnEditar').setAttribute('onclick', `window.location.href='add.html?id=${d.id}'`);

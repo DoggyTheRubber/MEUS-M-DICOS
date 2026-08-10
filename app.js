@@ -19,7 +19,8 @@ function renderGlobalHomebar() {
     if (!navContainer) {
         navContainer = document.createElement('nav');
         navContainer.id = 'global-homebar';
-        navContainer.className = "bg-white border-t border-slate-200 fixed bottom-0 left-0 right-0 z-30 shadow-lg";
+        // CORRIGIDO: Usa app-card para acompanhar dinamicamente o tema claro/escuro
+        navContainer.className = "app-card border-t fixed bottom-0 left-0 right-0 z-30 shadow-lg transition-colors duration-200";
         document.body.appendChild(navContainer);
     }
 
@@ -27,7 +28,7 @@ function renderGlobalHomebar() {
     HOMEBAR_ITEMS.forEach(item => {
         const isActive = currentPath === item.path;
         // Se for a página atual, pinta de âmbar, senão fica cinza padrão
-        const textColor = isActive ? "text-amber-600 font-semibold" : "text-slate-400 font-medium";
+        const textColor = isActive ? "text-amber-600 dark:text-amber-400 font-semibold" : "text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-medium";
         
         linksHtml += `
             <a href="${item.path}" class="flex flex-col items-center justify-center flex-1 py-1.5 ${textColor} transition">

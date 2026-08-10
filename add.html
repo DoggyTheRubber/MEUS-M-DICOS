@@ -6,39 +6,46 @@
     <title>Ótica La Patrícia - Cadastrar Médico</title>
     <link rel="icon" type="image/png" href="la pipita.png">
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="colors.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // Aplica o tema salvo antes de carregar para evitar piscar a tela
+        if (localStorage.getItem('theme') === 'dark') {
+            document.documentElement.classList.add('dark');
+        }
+    </script>
 </head>
-<body class="bg-slate-50 text-slate-800 flex flex-col min-h-screen pb-20">
+<body class="flex flex-col min-h-screen pb-20 transition-colors duration-200">
 
-    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
+    <header class="app-header shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-3">
-            <a href="index.html" class="text-slate-400 hover:text-white mr-1"><i class="fa-solid fa-arrow-left text-base"></i></a>
+            <a href="index.html" class="opacity-70 hover:opacity-100 mr-1"><i class="fa-solid fa-arrow-left text-base"></i></a>
             <div>
                 <h1 id="header-title" class="font-bold text-base tracking-tight">Cadastrar Novo Médico</h1>
-                <p class="text-xs text-slate-400">Ótica La Patrícia</p>
+                <p class="text-xs opacity-70">Ótica La Patrícia</p>
             </div>
         </div>
-        <a href="settings.html" class="text-slate-400 hover:text-white transition">
+        <a href="settings.html" class="opacity-70 hover:opacity-100 transition">
             <i class="fa-solid fa-gear text-xl"></i>
         </a>
     </header>
 
     <main class="flex-1 overflow-y-auto p-4 max-w-2xl mx-auto w-full space-y-4">
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
-            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100">
-                <h2 id="form-doctor-title" class="font-bold text-slate-900 text-lg flex items-center gap-2">
-                    <i class="fa-solid fa-user-doctor text-amber-600"></i> Informações do Médico
+        <div class="app-card p-5 rounded-2xl shadow-sm border">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-700">
+                <h2 id="form-doctor-title" class="font-bold text-lg flex items-center gap-2">
+                    <i class="fa-solid fa-user-doctor text-amber-600 dark:text-amber-500"></i> Informações do Médico
                 </h2>
-                <span class="text-xs bg-amber-100 text-amber-800 font-medium px-2.5 py-1 rounded-full">Campos Opcionais</span>
+                <span class="text-xs bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-medium px-2.5 py-1 rounded-full">Campos Opcionais</span>
             </div>
 
             <form id="formNovoMedico" onsubmit="addApp.saveDoctor(event)" class="space-y-4 text-sm">
                 <input type="hidden" id="doctorEditId">
                 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Gênero / Tratamento</label>
-                    <div class="flex items-center gap-4 bg-slate-50 p-2.5 border border-slate-200 rounded-xl">
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Gênero / Tratamento</label>
+                    <div class="flex items-center gap-4 app-input p-2.5 border rounded-xl">
                         <label class="flex items-center gap-2 cursor-pointer font-medium">
                             <input type="radio" name="gender" value="Dr." checked class="text-amber-600 focus:ring-amber-500 h-4 w-4"> Homem (Dr.)
                         </label>
@@ -49,18 +56,18 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Nome Completo</label>
-                    <input type="text" id="name" placeholder="Ex: Carlos Eduardo Silva" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Nome Completo</label>
+                    <input type="text" id="name" placeholder="Ex: Carlos Eduardo Silva" class="w-full px-3.5 py-2.5 app-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">CRM (Identificador único)</label>
-                    <input type="text" id="crm" placeholder="Ex: 54321-MG" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">CRM (Identificador único)</label>
+                    <input type="text" id="crm" placeholder="Ex: 54321-MG" class="w-full px-3.5 py-2.5 app-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Especialização</label>
-                    <select id="specialization" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Especialização</label>
+                    <select id="specialization" class="w-full px-3.5 py-2.5 app-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
                         <option value="">Selecione...</option>
                         <option value="Oftalmo Geral">Oftalmo Geral</option>
                         <option value="Oftalmo Pediatria">Oftalmo Pediatria</option>
@@ -68,33 +75,33 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Subespecializações</label>
-                    <div id="subspec-tags" class="flex flex-wrap gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl"></div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Subespecializações</label>
+                    <div id="subspec-tags" class="flex flex-wrap gap-2 p-3 app-input border rounded-xl"></div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Aniversário (Dia e Mês)</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Aniversário (Dia e Mês)</label>
                         <div class="grid grid-cols-2 gap-2">
-                            <select id="dobDay" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
+                            <select id="dobDay" class="w-full px-3 py-2.5 app-input border rounded-xl text-xs font-medium">
                                 <option value="">Dia</option>
                             </select>
-                            <select id="dobMonth" class="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium">
+                            <select id="dobMonth" class="w-full px-3 py-2.5 app-input border rounded-xl text-xs font-medium">
                                 <option value="">Mês</option>
                                 <option value="01">Janeiro</option><option value="02">Fevereiro</option><option value="03">Março</option><option value="04">Abril</option><option value="05">Maio</option><option value="06">Junho</option><option value="07">Julho</option><option value="08">Agosto</option><option value="09">Setembro</option><option value="10">Outubro</option><option value="11">Novembro</option><option value="12">Dezembro</option>
                             </select>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Data da Visita</label>
-                        <input type="date" id="visitDate" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Data da Visita</label>
+                        <input type="date" id="visitDate" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                     </div>
                 </div>
 
-                <div class="bg-slate-50 p-4 border border-slate-200 rounded-xl space-y-3">
+                <div class="app-input p-4 border rounded-xl space-y-3">
                     <div class="flex items-center justify-between">
-                        <label class="text-xs font-semibold text-slate-700 uppercase tracking-wider">Horários de Atendimento</label>
-                        <button type="button" onclick="addApp.adicionarHorarioLinha()" class="text-xs bg-amber-600 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-700 transition flex items-center gap-1">
+                        <label class="text-xs font-semibold uppercase tracking-wider opacity-80">Horários de Atendimento</label>
+                        <button type="button" onclick="addApp.adicionarHorarioLinha()" class="text-xs bg-amber-600 dark:bg-amber-500 text-white font-semibold px-3 py-1.5 rounded-lg hover:bg-amber-700 dark:hover:bg-amber-600 transition flex items-center gap-1">
                             <i class="fa-solid fa-plus"></i> Adicionar Horário
                         </button>
                     </div>
@@ -102,48 +109,48 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Clínica Vinculada</label>
-                    <select id="selectHospital" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl"></select>
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Clínica Vinculada</label>
+                    <select id="selectHospital" class="w-full px-3.5 py-2.5 app-input border rounded-xl"></select>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Andar / Consultório</label>
-                        <input type="text" id="room" placeholder="Ex: Sala 402" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Andar / Consultório</label>
+                        <input type="text" id="room" placeholder="Ex: Sala 402" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Telefone Comercial</label>
-                        <input type="text" id="phone" placeholder="Ex: (31) 3222-1122" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Telefone Comercial</label>
+                        <input type="text" id="phone" placeholder="Ex: (31) 3222-1122" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">WhatsApp do Médico</label>
-                        <input type="text" id="cellphone" placeholder="Ex: (31) 99887-7665" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">WhatsApp do Médico</label>
+                        <input type="text" id="cellphone" placeholder="Ex: (31) 99887-7665" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Telefone Pessoal</label>
-                        <input type="text" id="personalPhone" placeholder="Ex: (31) 98888-1111" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Telefone Pessoal</label>
+                        <input type="text" id="personalPhone" placeholder="Ex: (31) 98888-1111" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Secretária(s)</label>
-                        <input type="text" id="secretary" placeholder="Ex: Maria" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Secretária(s)</label>
+                        <input type="text" id="secretary" placeholder="Ex: Maria" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Já Indica a Ótica?</label>
-                        <div class="flex items-center gap-3 bg-slate-50 p-2.5 border border-slate-200 rounded-xl flex-wrap">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Já Indica a Ótica?</label>
+                        <div class="flex items-center gap-3 app-input p-2.5 border rounded-xl flex-wrap">
                             <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="sim" class="text-amber-600"> Indica</label>
                             <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="nao" class="text-amber-600"> Não Indica</label>
                             <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="deixou" class="text-amber-600"> Deixou de indicar</label>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Presente Habitual</label>
-                        <select id="present" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Presente Habitual</label>
+                        <select id="present" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                             <option value="">Selecione...</option>
                             <option value="Caixa de Vinho">Caixa de Vinho</option>
                             <option value="Pão de mel">Pão de Mel</option>
@@ -156,16 +163,16 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Responsável</label>
-                        <select id="responsible" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Responsável</label>
+                        <select id="responsible" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                             <option value="">Selecione...</option>
                             <option value="Kelen Mesquita">Kelen Mesquita</option>
                             <option value="Vitório Quites">Vitório Quites</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Status Atendimento</label>
-                        <select id="status" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Status Atendimento</label>
+                        <select id="status" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                             <option value="">Selecione...</option>
                             <option value="Visitar">Visitar</option>
                             <option value="Concluído">Concluído</option>
@@ -176,14 +183,14 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Última Indicação</label>
-                        <input type="date" id="lastIndicationDate" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Última Indicação</label>
+                        <input type="date" id="lastIndicationDate" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Unidade Próxima</label>
-                    <select id="nearbyUnit" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Unidade Próxima</label>
+                    <select id="nearbyUnit" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                         <option value="">Selecione...</option>
                         <option value="BRASIL 80 - SANTA EFIGÊNIA">BRASIL 80 - SANTA EFIGÊNIA</option>
                         <option value="BRASIL 685 - FUNCIONÁRIOS">BRASIL 685 - FUNCIONÁRIOS</option>
@@ -192,15 +199,15 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Observações</label>
-                    <textarea id="notes" rows="3" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl"></textarea>
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Observações</label>
+                    <textarea id="notes" rows="3" class="w-full px-3.5 py-2.5 app-input border rounded-xl"></textarea>
                 </div>
 
                 <div class="flex gap-2 pt-1">
-                    <button type="submit" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
+                    <button type="submit" class="flex-1 app-header font-semibold py-3 rounded-xl transition shadow-md flex items-center justify-center gap-2">
                         <i class="fa-solid fa-floppy-disk text-amber-400"></i> Salvar Médico Completo
                     </button>
-                    <a href="index.html" class="bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-4 py-3 rounded-xl transition text-xs flex items-center justify-center">
+                    <a href="index.html" class="app-btn-secondary font-semibold px-4 py-3 rounded-xl transition text-xs flex items-center justify-center">
                         Cancelar
                     </a>
                 </div>
@@ -209,10 +216,10 @@
     </main>
 
     <div id="modalAlerta" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4">
-            <h4 id="alertaTitulo" class="font-bold text-slate-900 text-base">Aviso</h4>
-            <p id="alertaTexto" class="text-xs text-slate-600 leading-relaxed"></p>
-            <button onclick="addApp.fecharAlerta()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-semibold py-2.5 rounded-xl text-xs">Entendido</button>
+        <div class="app-card w-full max-w-sm rounded-2xl shadow-2xl p-6 text-center space-y-4 border">
+            <h4 id="alertaTitulo" class="font-bold text-base">Aviso</h4>
+            <p id="alertaTexto" class="text-xs opacity-80 leading-relaxed"></p>
+            <button onclick="addApp.fecharAlerta()" class="w-full app-header font-semibold py-2.5 rounded-xl text-xs">Entendido</button>
         </div>
     </div>
 
@@ -228,8 +235,10 @@
             "Estrabismo", "Córnea", "Neurooftalmologia", 
             "Plástica Ocular", "Urgência", "Refrativa",
             "Vítreo", "Doenças Oculares", "Visão Subnormal",
-            "Baixa Visão", "Astigmatismo", "Miopia", "Hipermetropia",
-            "Presbiopia", "Mácula", "Oncologia Ocular"
+            "Baixa Visão", "Astigmatismo", "Miopia",
+            "Hipermetropia", "Presbiopia", "Mácula",
+            "Oncologia Ocular", "Orbita", "Ceratocona",
+            "Vias lacrimais"
         ];
 
         class AddApp {
@@ -258,9 +267,9 @@
                 let html = '';
                 SUBESPECIALIDADES_LISTA.forEach((sub) => {
                     html += `
-                        <label class="inline-flex items-center gap-1.5 bg-white border border-slate-200 px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:border-amber-400 transition select-none">
+                        <label class="inline-flex items-center gap-1.5 app-card border px-3 py-1.5 rounded-lg text-xs cursor-pointer hover:border-amber-400 transition select-none">
                             <input type="checkbox" name="subspecialties" value="${sub}" class="text-amber-600 h-3.5 w-3.5 rounded">
-                            <span class="font-medium text-slate-700">${sub}</span>
+                            <span class="font-medium">${sub}</span>
                         </label>
                     `;
                 });
@@ -274,9 +283,9 @@
                 
                 const div = document.createElement('div');
                 div.id = linhaId;
-                div.className = "flex items-center gap-2 bg-white p-2.5 rounded-xl border border-slate-200";
+                div.className = "flex items-center gap-2 app-card p-2.5 rounded-xl border";
                 div.innerHTML = `
-                    <select class="horario-dia flex-1 bg-slate-50 border rounded-lg p-1.5 text-xs font-semibold">
+                    <select class="horario-dia flex-1 app-input border rounded-lg p-1.5 text-xs font-semibold">
                         <option value="SEG" ${diaPre==='SEG'?'selected':''}>Segunda</option>
                         <option value="TER" ${diaPre==='TER'?'selected':''}>Terça</option>
                         <option value="QUA" ${diaPre==='QUA'?'selected':''}>Quarta</option>
@@ -285,7 +294,7 @@
                         <option value="SAB" ${diaPre==='SAB'?'selected':''}>Sábado</option>
                         <option value="DOM" ${diaPre==='DOM'?'selected':''}>Domingo</option>
                     </select>
-                    <select class="horario-periodo flex-1 bg-slate-50 border rounded-lg p-1.5 text-xs font-semibold">
+                    <select class="horario-periodo flex-1 app-input border rounded-lg p-1.5 text-xs font-semibold">
                         <option value="Manhã (08:00 - 12:00)" ${periodoPre.includes('Manhã')?'selected':''}>Manhã</option>
                         <option value="Tarde (13:00 - 18:00)" ${periodoPre.includes('Tarde')?'selected':''}>Tarde</option>
                         <option value="Noite (18:00 - 21:00)" ${periodoPre.includes('Noite')?'selected':''}>Noite</option>
@@ -331,7 +340,7 @@
 
             prepararEdicao(d) {
                 document.getElementById('header-title').textContent = 'Editar Médico';
-                document.getElementById('form-doctor-title').innerHTML = '<i class="fa-solid fa-user-pen text-amber-600"></i> Editar Informações';
+                document.getElementById('form-doctor-title').innerHTML = '<i class="fa-solid fa-user-pen text-amber-600 dark:text-amber-500"></i> Editar Informações';
                 document.getElementById('doctorEditId').value = d.id;
 
                 let limpoNome = d.name ? d.name.replace('Dr. ', '').replace('Dra. ', '') : '';
@@ -459,10 +468,9 @@
                 const dobMonth = document.getElementById('dobMonth').value;
                 let birthdate = " ";
                 if(dobDay && dobMonth) {
-                    birthdate = `2024-${dobMonth}-${dobDay}`; // Formato completo seguro compatível com texto/data
+                    birthdate = `2024-${dobMonth}-${dobDay}`;
                 }
 
-                // Coletando Horários de Atendimento dinâmicos
                 const horariosLista = [];
                 document.querySelectorAll('#horariosContainer > div').forEach(div => {
                     const dia = div.querySelector('.horario-dia').value;

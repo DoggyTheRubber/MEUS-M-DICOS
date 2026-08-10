@@ -5,11 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Configurações - Ótica La Patrícia</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="colors.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-50 text-slate-800 pb-20">
+<body class="pb-20 transition-colors duration-200">
 
-    <header class="bg-slate-900 text-white shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
+    <header class="app-header shadow-md sticky top-0 z-20 px-4 py-3 flex items-center justify-between">
         <div class="flex items-center space-x-3">
             <a href="index.html" class="text-slate-400 hover:text-white mr-1">
                 <i class="fa-solid fa-arrow-left text-base"></i>
@@ -23,38 +24,78 @@
     <main class="p-4 max-w-2xl mx-auto space-y-6">
         
         <!-- Toggle Notificações -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex items-center justify-between">
+        <div class="app-card p-5 rounded-2xl border shadow-sm flex items-center justify-between">
             <div>
-                <h3 class="font-bold text-slate-900 text-sm">Ativar notificações</h3>
-                <p class="text-xs text-slate-500">Receber alertas automáticos</p>
+                <h3 class="font-bold text-sm">Ativar notificações</h3>
+                <p class="text-xs opacity-75">Receber alertas automáticos</p>
             </div>
             <label class="relative inline-flex items-center cursor-pointer">
                 <input type="checkbox" id="toggleNotif" class="sr-only peer">
-                <div class="w-11 h-6 bg-slate-200 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                <div class="w-11 h-6 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
             </label>
         </div>
 
         <!-- Seletor de Intervalo -->
-        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-            <h3 class="font-bold text-slate-900 text-sm">Intervalo entre Notificações</h3>
-            <select id="intervaloSelect" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+        <div class="app-card p-5 rounded-2xl border shadow-sm space-y-3">
+            <h3 class="font-bold text-sm">Intervalo entre Notificações</h3>
+            <select id="intervaloSelect" class="app-input w-full p-3 border rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
                 <option value="3600000">1 hora</option>
                 <option value="1800000">30 minutos</option>
                 <option value="900000">15 minutos</option>
                 <option value="5000">5 segundos (DEV)</option>
             </select>
         </div>
+
+        <!-- Mudar tema do site -->
+        <div class="app-card p-5 rounded-2xl border shadow-sm space-y-4">
+            <h3 class="font-bold text-sm">Mudar tema do site</h3>
+            
+            <div class="flex items-center justify-between pt-1">
+                <span class="text-xs font-medium opacity-80">Claro</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="toggleThemeLight" class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                </label>
+            </div>
+
+            <div class="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-700">
+                <span class="text-xs font-medium opacity-80">Escuro</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="toggleThemeDark" class="sr-only peer">
+                    <div class="w-11 h-6 bg-slate-300 dark:bg-slate-700 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-amber-600"></div>
+                </label>
+            </div>
+        </div>
     </main>
 
     <script>
+        // Aplica o tema salvo imediatamente antes de renderizar para evitar flash
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        if (savedTheme === 'dark') {
+            document.documentElement.classList.add('dark');
+        } else {
+            document.documentElement.classList.remove('dark');
+        }
+
         const toggle = document.getElementById('toggleNotif');
         const select = document.getElementById('intervaloSelect');
+        const toggleLight = document.getElementById('toggleThemeLight');
+        const toggleDark = document.getElementById('toggleThemeDark');
 
-        // Carregar configurações salvas
+        // Carregar configurações salvas de notificações
         toggle.checked = localStorage.getItem('notif_ativa') === 'true';
         select.value = localStorage.getItem('notif_intervalo') || '3600000';
 
-        // Função para solicitar permissão
+        // Atualizar estado visual dos toggles de tema
+        if (savedTheme === 'dark') {
+            toggleDark.checked = true;
+            toggleLight.checked = false;
+        } else {
+            toggleDark.checked = false;
+            toggleLight.checked = true;
+        }
+
+        // Função para solicitar permissão de Notificação
         async function pedirPermissao() {
             if (!("Notification" in window)) {
                 alert("Este navegador não suporta notificações.");
@@ -72,7 +113,7 @@
             }
         }
 
-        // Salvar ao alterar
+        // Eventos de Notificação
         toggle.addEventListener('change', () => {
             if (toggle.checked) {
                 pedirPermissao();
@@ -83,6 +124,27 @@
 
         select.addEventListener('change', () => {
             localStorage.setItem('notif_intervalo', select.value);
+        });
+
+        // Eventos do Tema (Lógica de exclusão mútua entre Claro e Escuro)
+        toggleLight.addEventListener('change', () => {
+            if (toggleLight.checked) {
+                toggleDark.checked = false;
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else if (!toggleDark.checked) {
+                toggleLight.checked = true;
+            }
+        });
+
+        toggleDark.addEventListener('change', () => {
+            if (toggleDark.checked) {
+                toggleLight.checked = false;
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            } else if (!toggleLight.checked) {
+                toggleDark.checked = true;
+            }
         });
     </script>
 </body>
