@@ -38,6 +38,10 @@
                     <select id="planDoctorId" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl"></select>
                 </div>
                 <div>
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Data do Planejamento *</label>
+                    <input type="date" id="planDate" required class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
+                </div>
+                <div>
                     <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-1">Texto da Tarefa *</label>
                     <input type="text" id="planText" required placeholder="Ex: Entregar presente" class="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl">
                 </div>
@@ -48,8 +52,8 @@
         </div>
 
         <div class="space-y-3">
-            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Itens de Hoje</div>
-            <div id="planning-list-container" class="space-y-3 pb-6"></div>
+            <div class="text-xs font-bold text-slate-500 uppercase tracking-wider px-1">Itens por Dia</div>
+            <div id="planning-list-container" class="space-y-4 pb-6"></div>
         </div>
     </main>
 
@@ -65,7 +69,14 @@
                 this.doctors = [];
                 this.planning = [];
                 this.reports = [];
+                this.initDateInput();
                 this.loadData();
+            }
+
+            initDateInput() {
+                const hojeIso = new Date().toISOString().split('T')[0];
+                const inputDate = document.getElementById('planDate');
+                if (inputDate) inputDate.value = hojeIso;
             }
 
             getDataHojeFormatada() {
@@ -74,6 +85,34 @@
                 const mes = String(agora.getMonth() + 1).padStart(2, '0');
                 const ano = agora.getFullYear();
                 return `${dia}/${mes}/${ano}`;
+            }
+
+            converterIsoParaPtBr(dataIso) {
+                if (!dataIso) return '';
+                if (dataIso.includes('/')) return dataIso; // Já está no formato BR
+                const [ano, mes, dia] = dataIso.split('-');
+                return `${dia}/${mes}/${ano}`;
+            }
+
+            converterPtBrParaDate(dataStr) {
+                if (!dataStr) return new Date();
+                if (dataStr.includes('-')) {
+                    return new Date(dataStr + 'T00:00:00');
+                }
+                const [dia, mes, ano] = dataStr.split('/');
+                return new Date(`${ano}-${mes}-${dia}T00:00:00`);
+            }
+
+            formatarDataExtenso(dataStr) {
+                const dataObj = this.converterPtBrParaDate(dataStr);
+                const diasDaSemana = ['Domingo', 'Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira', 'Sábado'];
+                const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+                
+                const nomeDia = diasDaSemana[dataObj.getDay()];
+                const diaMes = dataObj.getDate();
+                const nomeMes = meses[dataObj.getMonth()];
+                
+                return `${nomeDia}, ${diaMes} de ${nomeMes}`;
             }
 
             async loadData() {
@@ -88,7 +127,8 @@
                         if (!resRep.error && resRep.data) this.reports = resRep.data;
                         
                         if (!resPlan.error && resPlan.data) {
-                            const hojeStr = this.getDataHojeFormatada();
+                            const hoje = new Date();
+                            hoje.setHours(0, 0, 0, 0);
                             let itensValidos = [];
 
                             for (let item of resPlan.data) {
@@ -97,8 +137,12 @@
                                     doctor_id: item.doctor_id !== undefined ? item.doctor_id : item.doctorId 
                                 };
 
-                                const dataItem = mappedItem.dayGroup || "";
-                                if (mappedItem.checked && dataItem && dataItem !== hojeStr) {
+                                const dataItemStr = mappedItem.dayGroup || "";
+                                const dataItemObj = this.converterPtBrParaDate(dataItemStr);
+                                dataItemObj.setHours(0, 0, 0, 0);
+
+                                // Se estiver checked e a data do item for ANTERIOR à data atual, apaga do banco
+                                if (mappedItem.checked && dataItemStr && dataItemObj < hoje) {
                                     await supabaseClient.from('planning').delete().eq('id', mappedItem.id);
                                 } else {
                                     itensValidos.push(mappedItem);
@@ -129,16 +173,17 @@
             async adicionarPlanejamento(e) {
                 e.preventDefault();
                 const doctorId = document.getElementById('planDoctorId').value;
+                const dataInput = document.getElementById('planDate').value;
                 const text = document.getElementById('planText').value.trim();
-                if(!doctorId || !text) return;
+                if(!doctorId || !text || !dataInput) return;
 
-                const hojeStr = this.getDataHojeFormatada();
+                const dataFormatada = this.converterIsoParaPtBr(dataInput);
 
                 const novoItem = {
                     id: Date.now(),
                     doctor_id: String(doctorId),
                     text: text,
-                    dayGroup: hojeStr,
+                    dayGroup: dataFormatada,
                     checked: false
                 };
 
@@ -148,6 +193,7 @@
                     if (error) console.error("Erro ao salvar planejamento:", error);
                 }
                 document.getElementById('formPlanejamento').reset();
+                this.initDateInput();
                 this.renderPlanningList();
             }
 
@@ -185,23 +231,51 @@
                 if(!container) return;
 
                 if(this.planning.length === 0) {
-                    container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border"><p class="text-xs text-slate-500">Nenhum planejamento.</p></div>`;
+                    container.innerHTML = `<div class="bg-white rounded-2xl p-8 text-center border"><p class="text-xs text-slate-500">Nenhum planejamento cadastrado.</p></div>`;
                     return;
                 }
 
-                let html = '';
+                // Agrupar por dayGroup
+                const grupos = {};
                 this.planning.forEach(item => {
-                    const docIdFinal = item.doctor_id || item.doctorId;
-                    const doc = this.doctors.find(d => String(d.id) === String(docIdFinal));
+                    const dia = item.dayGroup || 'Outros';
+                    if (!grupos[dia]) grupos[dia] = [];
+                    grupos[dia].push(item);
+                });
+
+                // Ordenar as chaves dos grupos por data cronológica
+                const chavesOrdenadas = Object.keys(grupos).sort((a, b) => {
+                    return this.converterPtBrParaDate(a) - this.converterPtBrParaDate(b);
+                });
+
+                let html = '';
+                chavesOrdenadas.forEach(diaStr => {
+                    const tituloDia = this.formatarDataExtenso(diaStr);
                     html += `
-                        <div class="flex items-center justify-between p-3 rounded-xl border bg-white">
-                            <div class="flex items-center gap-3">
-                                <input type="checkbox" ${item.checked ? 'checked disabled' : ''} onchange="planApp.togglePlanningItem('${item.id}')" class="w-4 h-4 text-amber-600 rounded">
-                                <span class="text-xs font-semibold">${doc ? doc.name : 'Médico'} - ${item.text}</span>
+                        <div class="space-y-2">
+                            <div class="text-xs font-bold text-amber-700 uppercase tracking-wider px-1 pt-2"><i class="fa-regular fa-calendar mr-1"></i> ${tituloDia}</div>
+                            <div class="space-y-2">
+                    `;
+
+                    grupos[diaStr].forEach(item => {
+                        const docIdFinal = item.doctor_id || item.doctorId;
+                        const doc = this.doctors.find(d => String(d.id) === String(docIdFinal));
+                        html += `
+                            <div class="flex items-center justify-between p-3 rounded-xl border bg-white shadow-sm">
+                                <div class="flex items-center gap-3">
+                                    <input type="checkbox" ${item.checked ? 'checked disabled' : ''} onchange="planApp.togglePlanningItem('${item.id}')" class="w-4 h-4 text-amber-600 rounded">
+                                    <span class="text-xs font-semibold ${item.checked ? 'line-through text-slate-400' : 'text-slate-800'}">${doc ? doc.name : 'Médico'} - ${item.text}</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+
+                    html += `
                             </div>
                         </div>
                     `;
                 });
+
                 container.innerHTML = html;
             }
         }

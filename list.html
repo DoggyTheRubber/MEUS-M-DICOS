@@ -116,12 +116,9 @@
                 this.loadData();
             }
 
-            // Função auxiliar para limpar "Dr.", "Dra." e espaços extras para ordenação alfabética correta pelo nome real
             getCleanNameForSort(name) {
                 if (!name) return '';
-                return name
-                    .replace(/^(dr\.?|dra\.?)\s+/i, '')
-                    .trim();
+                return name.replace(/^(dr\.?|dra\.?)\s+/i, '').trim();
             }
 
             async loadData() {
@@ -308,7 +305,7 @@
 
                     const nomeExibir = (d.name && d.name !== ' ') ? d.name : 'Médico sem nome';
                     const crmExibir = (d.crm && d.crm !== ' ') ? d.crm : 'CRM N/A';
-                    const telExibir = (d.cellphone && d.cellphone !== ' ') ? d.cellphone : ((d.phone && d.phone !== ' ') ? d.phone : 'Sem telefone');
+                    const statusAtendimentoExibir = (d.status && d.status !== ' ') ? d.status : 'Status N/A';
                     
                     const specExibir = (d.specialization && d.specialization !== ' ') ? d.specialization : 'Geral';
                     const subspecExibir = (d.subspecialties && d.subspecialties !== ' ') ? ` • ${d.subspecialties}` : '';
@@ -318,11 +315,12 @@
                             <div class="space-y-1.5 pr-2 flex-1">
                                 <div class="flex items-center justify-between gap-2">
                                     <h4 class="font-bold text-slate-900 text-sm group-hover:text-amber-600 transition truncate">${nomeExibir}</h4>
-                                    <div class="shrink-0">${badge}</div>
+                                    <div class="shrink-0"></div>
                                 </div>
                                 <div class="flex items-center gap-3 text-xs text-slate-500 flex-wrap">
                                     <span class="font-semibold text-slate-700 bg-slate-100 px-2 py-0.5 rounded"><i class="fa-solid fa-id-card text-slate-400"></i> ${crmExibir}</span>
-                                    <span class="truncate"><i class="fa-solid fa-phone text-slate-400"></i> ${telExibir}</span>
+                                    <span class="font-medium text-amber-700 bg-amber-50 px-2 py-0.5 rounded border border-amber-200/50 truncate"><i class="fa-solid fa-clock text-amber-600"></i> ${statusAtendimentoExibir}</span>
+                                    <div class="shrink-0">${badge}</div>
                                 </div>
                                 <div class="flex items-center gap-3 text-[11px] text-slate-400 pt-0.5">
                                     <span><i class="fa-solid fa-stethoscope text-amber-600/70"></i> ${specExibir}${subspecExibir}</span>
@@ -350,6 +348,22 @@
                     const partes = d.birthdate.split('-');
                     if(partes.length === 3) {
                         aniverFormatado = `${partes[2]}/${partes[1]}/${partes[0]}`;
+                    } else if(partes.length === 2) {
+                        aniverFormatado = `${partes[1]}/${partes[0]}`;
+                    } else {
+                        aniverFormatado = d.birthdate;
+                    }
+                }
+
+                let horariosFormatados = 'Não informado';
+                if(d.schedules && d.schedules !== ' ') {
+                    try {
+                        const parsed = typeof d.schedules === 'string' ? JSON.parse(d.schedules) : d.schedules;
+                        if(Array.isArray(parsed) && parsed.length > 0) {
+                            horariosFormatados = parsed.map(h => `${h.dia}: ${h.periodo}`).join(' | ');
+                        }
+                    } catch(e) {
+                        horariosFormatados = d.schedules;
                     }
                 }
 
@@ -372,13 +386,18 @@
                         <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Sala / Consultório</span><span class="font-medium text-slate-800 text-xs">${val(d.room)}</span></div>
                     </div>
 
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-200/60">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Horários de Atendimento</span>
+                        <span class="font-medium text-slate-800 text-xs">${horariosFormatados}</span>
+                    </div>
+
                     <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
                         <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Telefone Comercial</span><span class="font-medium text-slate-800 text-xs">${val(d.phone)}</span></div>
                         <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Celular / WhatsApp</span><span class="font-medium text-slate-800 text-xs">${val(d.cellphone)}</span></div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5 bg-slate-50 p-3 rounded-xl border border-slate-200/60">
-                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Telefone Pessoa (personalPhone)</span><span class="font-medium text-slate-800 text-xs">${val(d.personalPhone)}</span></div>
+                        <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Telefone Pessoal</span><span class="font-medium text-slate-800 text-xs">${val(d.personalPhone)}</span></div>
                         <div><span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Secretária(s)</span><span class="font-medium text-slate-800 text-xs">${val(d.secretary)}</span></div>
                     </div>
 
