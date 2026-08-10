@@ -286,7 +286,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="w-8 h-8 rounded-full app-btn-secondary flex items-center justify-center transition shrink-0 shadow-xs"><i class="fa-solid fa-chevron-right text-xs"></i></div>
+                            <div class="w-8 h-8 rounded-full app-btn-secondary flex items-center justify-center transition shrink-0"><i class="fa-solid fa-chevron-right text-xs"></i></div>
                         </div>
                     `;
                 });
@@ -315,6 +315,21 @@
                     'Domingo': 7
                 };
 
+                const abreviaDia = {
+                    'Segunda-feira': '2ª', 'Segunda': '2ª',
+                    'Terça-feira': '3ª', 'Terça': '3ª',
+                    'Quarta-feira': '4ª', 'Quarta': '4ª',
+                    'Quinta-feira': '5ª', 'Quinta': '5ª',
+                    'Sexta-feira': '6ª', 'Sexta': '6ª'
+                };
+
+                const abreviaPeriodo = {
+                    'Manhã': 'M',
+                    'Tarde': 'T',
+                    'Noite': 'N',
+                    'Dia Todo': 'DT'
+                };
+
                 let html = '';
                 filtered.forEach(d => {
                     let badge = '';
@@ -327,13 +342,12 @@
                     }
 
                     const nomeExibir = (d.name && d.name !== ' ') ? d.name : 'Médico sem nome';
-                    const crmExibir = (d.crm && d.crm !== ' ') ? d.crm : 'CRM N/A';
                     const statusAtendimentoExibir = (d.status && d.status !== ' ') ? d.status : 'Status N/A';
                     
                     const specExibir = (d.specialization && d.specialization !== ' ') ? d.specialization : 'Geral';
                     const subspecExibir = (d.subspecialties && d.subspecialties !== ' ') ? ` • ${d.subspecialties}` : '';
 
-                    // Processar horários ordenados para a agenda estilizada abaixo do card
+                    // Processar horários lado a lado separados por vírgula no formato "3ª - M, 4ª - T"
                     let listaHorariosHtml = '';
                     if (d.schedules && d.schedules !== ' ') {
                         try {
@@ -347,22 +361,20 @@
                                     return valA - valB;
                                 });
 
-                                let itensAgenda = '';
-                                parsed.forEach(h => {
-                                    itensAgenda += `
-                                        <div class="flex items-center justify-between text-xs py-1 border-b border-slate-200/50 dark:border-slate-800/50 last:border-0">
-                                            <span class="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[11px]"></i> ${h.dia || 'Dia'}</span>
-                                            <span class="font-medium opacity-80">${h.periodo || 'Horário'}</span>
-                                        </div>
-                                    `;
-                                });
+                                let itensFormatados = parsed.map(h => {
+                                    const diaOriginal = (h.dia || '').trim();
+                                    const periodoOriginal = (h.periodo || '').trim();
+                                    const diaCurto = abreviaDia[diaOriginal] || diaOriginal;
+                                    const periodoCurto = abreviaPeriodo[periodoOriginal] || periodoOriginal;
+                                    return `${diaCurto} ${periodoCurto}`;
+                                }).join(' - ');
 
                                 listaHorariosHtml = `
                                     <div class="mt-2.5 pt-2.5 border-t border-slate-200/60 dark:border-slate-700/60 bg-amber-50/40 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-200/50 dark:border-amber-900/40 space-y-1">
-                                        <div class="text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                        <div class="text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-0.5 flex items-center gap-1">
                                             <i class="fa-solid fa-clock-rotate-left"></i> Horários de Atendimento
                                         </div>
-                                        ${itensAgenda}
+                                        <p class="text-xs font-semibold text-amber-900 dark:text-amber-200">${itensFormatados}</p>
                                     </div>
                                 `;
                             } else {
@@ -395,9 +407,8 @@
                                         <h4 class="font-bold text-sm group-hover:text-amber-600 transition truncate">${nomeExibir}</h4>
                                         <div class="shrink-0"></div>
                                     </div>
-                                    <div class="flex items-center gap-3 text-xs opacity-80 flex-wrap">
-                                        <span class="font-semibold app-btn-secondary px-2 py-0.5 rounded"><i class="fa-solid fa-id-card opacity-60"></i> ${crmExibir}</span>
-                                        <span class="font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/50 dark:border-amber-900/50 truncate"><i class="fa-solid fa-clock text-amber-600"></i> ${statusAtendimentoExibir}</span>
+                                    <div class="flex items-center gap-2 text-xs opacity-80 flex-wrap">
+                                        <span class="font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2.5 py-1 rounded-lg border border-amber-200/50 dark:border-amber-900/50 truncate"><i class="fa-solid fa-clock text-amber-600"></i> ${statusAtendimentoExibir}</span>
                                         <div class="shrink-0">${badge}</div>
                                     </div>
                                     <div class="flex items-center gap-3 text-[11px] opacity-70 pt-0.5">
@@ -473,11 +484,11 @@
 
                     <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
                         <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Telefone Comercial</span><span class="font-medium text-xs">${val(d.phone)}</span></div>
-                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Celular / WhatsApp</span><span class="font-medium text-xs">${val(d.cellphone)}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">WhatsApp Comercial / WhatsApp</span><span class="font-medium text-xs">${val(d.cellphone)}</span></div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
-                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Telefone Pessoal</span><span class="font-medium text-xs">${val(d.personalPhone)}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Telefone do Médico</span><span class="font-medium text-xs">${val(d.personalPhone)}</span></div>
                         <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Secretária(s)</span><span class="font-medium text-xs">${val(d.secretary)}</span></div>
                     </div>
 

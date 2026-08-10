@@ -42,7 +42,8 @@
             <form id="formPlanejamento" onsubmit="planApp.adicionarPlanejamento(event)" class="space-y-3 text-sm">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Selecione o Médico *</label>
-                    <select id="planDoctorId" required class="w-full px-3.5 py-2.5 app-input border rounded-xl"></select>
+                    <select id="planDoctorId" onchange="planApp.tratarMudancaMedico(this.value)" required class="w-full px-3.5 py-2.5 app-input border rounded-xl mb-2"></select>
+                    <input type="text" id="planDoctorCustom" placeholder="Digite o nome do médico..." class="w-full px-3.5 py-2.5 app-input border rounded-xl hidden">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Data do Planejamento *</label>
@@ -59,7 +60,7 @@
                         <option value="Óculos verificação">Óculos verificação</option>
                         <option value="Visita de apresentação">Visita de apresentação</option>
                         <option value="Visita de rotina">Visita de rotina</option>
-                        <option value="Outros">Outros</option>
+                        <option value="Outros">Outro</option>
                     </select>
                     <input type="text" id="planTextCustom" placeholder="Especifique a tarefa..." class="w-full px-3.5 py-2.5 app-input border rounded-xl hidden">
                 </div>
@@ -138,19 +139,33 @@
                     return new Date(dataStr + 'T00:00:00');
                 }
                 const [dia, mes, ano] = dataStr.split('/');
-                return new Date(`${ano}-${mes}-${dia}T00:00:00`);
+                return new Date(`${ano}-${mes}-${ano ? `${ano}-${mes}-${dia}` : ''}T00:00:00`); // Fallback seguro
             }
 
             formatarDataExtenso(dataStr) {
-                const dataObj = this.converterPtBrParaDate(dataStr);
+                const [dia, mes, ano] = dataStr.split('/');
+                const dataObj = new Date(`${ano}-${mes}-${dia}T00:00:00`);
                 const diasDaSemana = ['Domingo', 'Segunda-Feira', 'Terça-Feira', 'Quarta-Feira', 'Quinta-Feira', 'Sexta-Feira', 'Sábado'];
                 const meses = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
                 
-                const nomeDia = diasDaSemana[dataObj.getDay()];
+                const nomeDia = diasDaSemana[dataObj.getDay()] || '';
                 const diaMes = dataObj.getDate();
-                const nomeMes = meses[dataObj.getMonth()];
+                const nomeMes = meses[dataObj.getMonth()] || '';
                 
                 return `${nomeDia}, ${diaMes} de ${nomeMes}`;
+            }
+
+            tratarMudancaMedico(valor) {
+                const campoCustom = document.getElementById('planDoctorCustom');
+                if (!campoCustom) return;
+                if (valor === 'Outro') {
+                    campoCustom.classList.remove('hidden');
+                    campoCustom.required = true;
+                } else {
+                    campoCustom.classList.add('hidden');
+                    campoCustom.required = false;
+                    campoCustom.value = '';
+                }
             }
 
             tratarMudancaOpcao(valor) {
@@ -185,12 +200,13 @@
                             for (let item of resPlan.data) {
                                 const mappedItem = { 
                                     ...item, 
-                                    doctor_id: item.doctor_id !== undefined ? item.doctor_id : item.doctorId 
+                                    doctor_id: item.doctor_id !== undefined ? item.doctor_id : item.doctorId,
+                                    doctor_name_custom: item.doctor_name_custom || ''
                                 };
 
                                 const dataItemStr = mappedItem.dayGroup || "";
-                                const dataItemObj = this.converterPtBrParaDate(dataItemStr);
-                                dataItemObj.setHours(0, 0, 0, 0);
+                                const [d, m, a] = dataItemStr.split('/');
+                                const dataItemObj = new Date(`${a}-${m}-${d}T00:00:00`);
 
                                 if (mappedItem.checked && dataItemStr && dataItemObj < hoje) {
                                     await supabaseClient.from('planning').delete().eq('id', mappedItem.id);
@@ -209,10 +225,6 @@
             preencherSelectPlanejamentoMedicos() {
                 const select = document.getElementById('planDoctorId');
                 if(!select) return;
-                if(this.doctors.length === 0) {
-                    select.innerHTML = '<option value="">Nenhum médico cadastrado</option>';
-                    return;
-                }
 
                 const extrairNomeLimpo = (nomeCompleto) => {
                     if (!nomeCompleto) return '';
@@ -235,27 +247,39 @@
                 medicosOrdenados.forEach(d => {
                     html += `<option value="${d.id}">${d.name} (${d.hospital || 'Sem clínica'})</option>`;
                 });
+                // Adicionando a opção "Outro" no final
+                html += '<option value="Outro">Outro</option>';
                 select.innerHTML = html;
             }
 
             async adicionarPlanejamento(e) {
                 e.preventDefault();
-                const doctorId = document.getElementById('planDoctorId').value;
+                const selectDoctorVal = document.getElementById('planDoctorId').value;
                 const dataInput = document.getElementById('planDate').value;
                 const selectOpcao = document.getElementById('planSelectOption').value;
                 
+                let doctorId = selectDoctorVal;
+                let doctorNameCustom = '';
+
+                if (selectDoctorVal === 'Outro') {
+                    doctorId = 'outros';
+                    doctorNameCustom = document.getElementById('planDoctorCustom').value.trim();
+                }
+
                 let text = selectOpcao;
                 if (selectOpcao === 'Outros') {
                     text = document.getElementById('planTextCustom').value.trim();
                 }
 
-                if(!doctorId || !text || !dataInput) return;
+                if(!selectDoctorVal || !text || !dataInput) return;
+                if(selectDoctorVal === 'Outro' && !doctorNameCustom) return;
 
                 const dataFormatada = this.converterIsoParaPtBr(dataInput);
 
                 const novoItem = {
                     id: Date.now(),
                     doctor_id: String(doctorId),
+                    doctor_name_custom: doctorNameCustom,
                     text: text,
                     dayGroup: dataFormatada,
                     checked: false
@@ -267,6 +291,7 @@
                     if (error) console.error("Erro ao salvar planejamento:", error);
                 }
                 document.getElementById('formPlanejamento').reset();
+                document.getElementById('planDoctorCustom').classList.add('hidden');
                 document.getElementById('planTextCustom').classList.add('hidden');
                 this.initDateInput();
                 this.renderPlanningList();
@@ -283,13 +308,19 @@
                 }
 
                 const docIdFinal = item.doctor_id || item.doctorId;
+                let nomeMedicoRelatorio = item.doctor_name_custom;
+
+                if (docIdFinal !== 'outros') {
+                    const doc = this.doctors.find(d => String(d.id) === String(docIdFinal));
+                    if (doc) nomeMedicoRelatorio = doc.name;
+                }
 
                 const novoRelatorio = {
                     id: Date.now(),
                     title: `Relatório #${String(Date.now()).slice(-4)}`,
                     date: new Date().toISOString().split('T')[0],
-                    doctor_id: String(docIdFinal),
-                    content: `Planejamento concluído: "${item.text}".`,
+                    doctor_id: docIdFinal === 'outros' ? null : String(docIdFinal),
+                    content: `Planejamento concluído para ${nomeMedicoRelatorio || 'Médico'}: "${item.text}".`,
                     isPending: true
                 };
 
@@ -340,7 +371,6 @@
                     return;
                 }
 
-                // Agrupar por dayGroup
                 const grupos = {};
                 this.planning.forEach(item => {
                     const dia = item.dayGroup || 'Outros';
@@ -348,16 +378,16 @@
                     grupos[dia].push(item);
                 });
 
-                // Ordenar as chaves dos grupos por data cronológica
                 const chavesOrdenadas = Object.keys(grupos).sort((a, b) => {
-                    return this.converterPtBrParaDate(a) - this.converterPtBrParaDate(b);
+                    const [da, ma, aa] = a.split('/');
+                    const [db, mb, ab] = b.split('/');
+                    return new Date(`${aa}-${ma}-${da}`) - new Date(`${ab}-${mb}-${db}`);
                 });
 
                 let html = '';
                 chavesOrdenadas.forEach(diaStr => {
                     const tituloDia = this.formatarDataExtenso(diaStr);
 
-                    // Ordena os itens de cada dia em ordem alfabética pelo nome da tarefa (com "Outros" sempre por último)
                     const itensDoDia = grupos[diaStr].sort((a, b) => {
                         const textoA = a.text || '';
                         const textoB = b.text || '';
@@ -376,12 +406,24 @@
 
                     itensDoDia.forEach(item => {
                         const docIdFinal = item.doctor_id || item.doctorId;
-                        const doc = this.doctors.find(d => String(d.id) === String(docIdFinal));
+                        let nomeExibicao = 'Médico';
+
+                        if (docIdFinal === 'outros' || !docIdFinal) {
+                            nomeExibicao = item.doctor_name_custom || 'Outro Médico';
+                        } else {
+                            const doc = this.doctors.find(d => String(d.id) === String(docIdFinal));
+                            if (doc) {
+                                nomeExibicao = doc.name;
+                            } else if (item.doctor_name_custom) {
+                                nomeExibicao = item.doctor_name_custom;
+                            }
+                        }
+
                         html += `
                             <div class="flex items-center justify-between p-3 rounded-xl border app-card shadow-sm">
                                 <div class="flex items-center gap-3 pr-2 overflow-hidden">
                                     <input type="checkbox" ${item.checked ? 'checked disabled' : ''} onchange="planApp.togglePlanningItem('${item.id}')" class="w-4 h-4 text-amber-600 rounded shrink-0">
-                                    <span class="text-xs font-semibold truncate ${item.checked ? 'line-through opacity-50' : ''}">${doc ? doc.name : 'Médico'} - ${item.text}</span>
+                                    <span class="text-xs font-semibold truncate ${item.checked ? 'line-through opacity-50' : ''}">${nomeExibicao} - ${item.text}</span>
                                 </div>
                                 <button type="button" onclick="planApp.pedirConfirmacaoExclusao('${item.id}')" class="opacity-60 hover:opacity-100 hover:text-rose-600 transition p-1.5 shrink-0" title="Excluir item">
                                     <i class="fa-solid fa-trash text-xs"></i>

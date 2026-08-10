@@ -56,13 +56,13 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Nome Completo</label>
-                    <input type="text" id="name" placeholder="Ex: Carlos Eduardo Silva" class="w-full px-3.5 py-2.5 app-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Nome Completo <span class="text-rose-500">*</span></label>
+                    <input type="text" id="name" placeholder="Ex: Carlos Eduardo Silva" required class="w-full px-3.5 py-2.5 app-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
 
                 <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">CRM (Identificador único)</label>
-                    <input type="text" id="crm" placeholder="Ex: 54321-MG" class="w-full px-3.5 py-2.5 app-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">CRM (Identificador único) <span class="text-rose-500">*</span></label>
+                    <input type="text" id="crm" placeholder="Ex: 54321-MG" required class="w-full px-3.5 py-2.5 app-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
                 </div>
 
                 <div>
@@ -127,11 +127,11 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">WhatsApp do Médico</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">WhatsApp Comercial</label>
                         <input type="text" id="cellphone" placeholder="Ex: (31) 99887-7665" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Telefone Pessoal</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Telefone do Médico</label>
                         <input type="text" id="personalPhone" placeholder="Ex: (31) 98888-1111" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                     </div>
                     <div>
@@ -277,7 +277,7 @@
                 container.innerHTML = html;
             }
 
-            adicionarHorarioLinha(diaPre = 'SEG', periodoPre = 'M') {
+            adicionarHorarioLinha(diaPre = '2ª', periodoPre = 'M') {
                 const container = document.getElementById('horariosContainer');
                 if(!container) return;
                 const linhaId = 'horario_' + Date.now() + Math.floor(Math.random()*1000);
@@ -287,15 +287,17 @@
                 div.className = "flex items-center gap-2 app-card p-2.5 rounded-xl border";
                 div.innerHTML = `
                     <select class="horario-dia flex-1 app-input border rounded-lg p-1.5 text-xs font-semibold">
-                        <option value="SEG" ${diaPre==='SEG'?'selected':''}>Segunda</option>
-                        <option value="TER" ${diaPre==='TER'?'selected':''}>Terça</option>
-                        <option value="QUA" ${diaPre==='QUA'?'selected':''}>Quarta</option>
-                        <option value="QUI" ${diaPre==='QUI'?'selected':''}>Quinta</option>
-                        <option value="SEX" ${diaPre==='SEX'?'selected':''}>Sexta</option>
+                        <option value="2ª" ${diaPre==='2ª'?'selected':''}>Segunda</option>
+                        <option value="3ª" ${diaPre==='3ª'?'selected':''}>Terça</option>
+                        <option value="4ª" ${diaPre==='4ª'?'selected':''}>Quarta</option>
+                        <option value="5ª" ${diaPre==='5ª'?'selected':''}>Quinta</option>
+                        <option value="6ª" ${diaPre==='6ª'?'selected':''}>Sexta</option>
+                        <option value="2ª à 6ª" ${diaPre==='2ª à 6ª'?'selected':''}>De Segunda à Sexta</option>
                     </select>
                     <select class="horario-periodo flex-1 app-input border rounded-lg p-1.5 text-xs font-semibold">
                         <option value="M" ${periodoPre.includes('Manhã')?'selected':''}>Manhã</option>
                         <option value="T" ${periodoPre.includes('Tarde')?'selected':''}>Tarde</option>
+                        <option value="M e T" ${periodoPre.includes('Manhã e Tarde')?'selected':''}>Manhã e Tarde</option>
                     </select>
                     <button type="button" onclick="document.getElementById('${linhaId}').remove()" class="text-rose-500 p-1.5 text-xs"><i class="fa-solid fa-trash-can"></i></button>
                 `;
@@ -416,6 +418,15 @@
                 this.preencherSelectClinicas(d.hospital);
             }
 
+            // Função auxiliadora para normalizar strings (remove acentos, espaços extras e converte para minúsculas)
+            normalizarTexto(texto) {
+                if (!texto) return '';
+                return texto
+                    .toLowerCase()
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
+                    .replace(/\s+/g, ''); // Remove todos os espaços em branco
+            }
+
             async saveDoctor(e) {
                 e.preventDefault();
                 const editId = document.getElementById('doctorEditId').value;
@@ -423,9 +434,44 @@
                 const gender = genderElement ? genderElement.value : 'Dr.';
                 
                 const rawName = document.getElementById('name').value.trim();
-                const name = rawName ? (rawName.toLowerCase().startsWith('dr') ? rawName : `${gender} ${rawName}`) : " ";
-                
-                const crm = document.getElementById('crm').value.trim() || " ";
+                const rawCrm = document.getElementById('crm').value.trim();
+
+                // Validação de campos obrigatórios
+                if (!rawName || !rawCrm) {
+                    this.showAlert('Atenção', 'Os campos Nome Completo e CRM são obrigatórios.');
+                    return;
+                }
+
+                const name = rawName.toLowerCase().startsWith('dr') ? rawName : `${gender} ${rawName}`;
+                const crm = rawCrm;
+
+                // Verificação de repetição inteligente (Nome e CRM)
+                const normNovoNome = this.normalizarTexto(rawName);
+                const normNovoCrm = this.normalizarTexto(crm);
+
+                const duplicado = this.doctors.find(doc => {
+                    // Ignora o próprio médico caso esteja editando
+                    if (editId && String(doc.id) === String(editId)) return false;
+
+                    // Limpa o nome salvo no banco removendo "Dr. " ou "Dra. " para comparar apenas o nome real
+                    const nomeBancoLimpo = doc.name ? doc.name.replace(/^Dr\.?\s*/i, '').replace(/^Dra\.?\s*/i, '') : '';
+                    const normBancoNome = this.normalizarTexto(nomeBancoLimpo);
+                    const normBancoCrm = this.normalizarTexto(doc.crm);
+
+                    return normBancoNome === normNovoNome || normBancoCrm === normNovoCrm;
+                });
+
+                if (duplicado) {
+                    const nomeBancoLimpo = duplicado.name ? duplicado.name.replace(/^Dr\.?\s*/i, '').replace(/^Dra\.?\s*/i, '') : '';
+                    if (this.normalizarTexto(nomeBancoLimpo) === normNovoNome) {
+                        this.showAlert('Médico Duplicado', `Já existe um médico cadastrado com o nome "${nomeBancoLimpo}".`);
+                        return;
+                    } else {
+                        this.showAlert('CRM Duplicado', `O número de CRM "${duplicado.crm}" já pertence a outro médico cadastrado.`);
+                        return;
+                    }
+                }
+
                 const specialization = document.getElementById('specialization').value || " ";
                 
                 const subspecChecked = Array.from(document.querySelectorAll('input[name="subspecialties"]:checked'))
