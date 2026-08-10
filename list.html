@@ -80,7 +80,7 @@
         </div>
 
         <!-- Container de Listagem Principal -->
-        <div id="doctor-list" class="space-y-3 pb-6"></div>
+        <div id="doctor-list" class="space-y-4 pb-6"></div>
     </main>
 
     <!-- Modal de Detalhes -->
@@ -305,6 +305,16 @@
                     return;
                 }
 
+                const ordemDias = {
+                    'Segunda-feira': 1, 'Segunda': 1,
+                    'Terça-feira': 2, 'Terça': 2,
+                    'Quarta-feira': 3, 'Quarta': 3,
+                    'Quinta-feira': 4, 'Quinta': 4,
+                    'Sexta-feira': 5, 'Sexta': 5,
+                    'Sábado': 6,
+                    'Domingo': 7
+                };
+
                 let html = '';
                 filtered.forEach(d => {
                     let badge = '';
@@ -323,23 +333,80 @@
                     const specExibir = (d.specialization && d.specialization !== ' ') ? d.specialization : 'Geral';
                     const subspecExibir = (d.subspecialties && d.subspecialties !== ' ') ? ` • ${d.subspecialties}` : '';
 
+                    // Processar horários ordenados para a agenda estilizada abaixo do card
+                    let listaHorariosHtml = '';
+                    if (d.schedules && d.schedules !== ' ') {
+                        try {
+                            let parsed = typeof d.schedules === 'string' ? JSON.parse(d.schedules) : d.schedules;
+                            if (Array.isArray(parsed) && parsed.length > 0) {
+                                parsed.sort((a, b) => {
+                                    const diaA = (a.dia || '').trim();
+                                    const diaB = (b.dia || '').trim();
+                                    const valA = ordemDias[diaA] || 99;
+                                    const valB = ordemDias[diaB] || 99;
+                                    return valA - valB;
+                                });
+
+                                let itensAgenda = '';
+                                parsed.forEach(h => {
+                                    itensAgenda += `
+                                        <div class="flex items-center justify-between text-xs py-1 border-b border-slate-200/50 dark:border-slate-800/50 last:border-0">
+                                            <span class="font-bold text-amber-700 dark:text-amber-400 flex items-center gap-1.5"><i class="fa-regular fa-calendar text-[11px]"></i> ${h.dia || 'Dia'}</span>
+                                            <span class="font-medium opacity-80">${h.periodo || 'Horário'}</span>
+                                        </div>
+                                    `;
+                                });
+
+                                listaHorariosHtml = `
+                                    <div class="mt-2.5 pt-2.5 border-t border-slate-200/60 dark:border-slate-700/60 bg-amber-50/40 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-200/50 dark:border-amber-900/40 space-y-1">
+                                        <div class="text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-1 flex items-center gap-1">
+                                            <i class="fa-solid fa-clock-rotate-left"></i> Horários de Atendimento
+                                        </div>
+                                        ${itensAgenda}
+                                    </div>
+                                `;
+                            } else {
+                                listaHorariosHtml = `
+                                    <div class="mt-2.5 pt-2.5 border-t border-slate-200/60 dark:border-slate-700/60 bg-amber-50/40 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-200/50 dark:border-amber-900/40">
+                                        <div class="text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                                            <i class="fa-solid fa-clock-rotate-left"></i> Horários de Atendimento
+                                        </div>
+                                        <p class="text-xs opacity-70">${typeof d.schedules === 'string' ? d.schedules : 'Não informado'}</p>
+                                    </div>
+                                `;
+                            }
+                        } catch(e) {
+                            listaHorariosHtml = `
+                                <div class="mt-2.5 pt-2.5 border-t border-slate-200/60 dark:border-slate-700/60 bg-amber-50/40 dark:bg-amber-950/20 p-3 rounded-xl border border-amber-200/50 dark:border-amber-900/40">
+                                    <div class="text-[10px] font-bold text-amber-800 dark:text-amber-300 uppercase tracking-wider mb-0.5 flex items-center gap-1">
+                                        <i class="fa-solid fa-clock-rotate-left"></i> Horários de Atendimento
+                                    </div>
+                                    <p class="text-xs opacity-70">${d.schedules}</p>
+                                </div>
+                            `;
+                        }
+                    }
+
                     html += `
-                        <div onclick="app.abrirDetalhes('${d.id}')" class="app-card p-4 rounded-2xl border shadow-2xs hover:border-amber-400 hover:shadow-md transition cursor-pointer flex items-center justify-between group">
-                            <div class="space-y-1.5 pr-2 flex-1">
-                                <div class="flex items-center justify-between gap-2">
-                                    <h4 class="font-bold text-sm group-hover:text-amber-600 transition truncate">${nomeExibir}</h4>
-                                    <div class="shrink-0"></div>
+                        <div class="app-card p-4 rounded-2xl border shadow-2xs hover:border-amber-400 hover:shadow-md transition space-y-2">
+                            <div class="flex items-center justify-between cursor-pointer group" onclick="app.abrirDetalhes('${d.id}')">
+                                <div class="space-y-1.5 pr-2 flex-1">
+                                    <div class="flex items-center justify-between gap-2">
+                                        <h4 class="font-bold text-sm group-hover:text-amber-600 transition truncate">${nomeExibir}</h4>
+                                        <div class="shrink-0"></div>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-xs opacity-80 flex-wrap">
+                                        <span class="font-semibold app-btn-secondary px-2 py-0.5 rounded"><i class="fa-solid fa-id-card opacity-60"></i> ${crmExibir}</span>
+                                        <span class="font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/50 dark:border-amber-900/50 truncate"><i class="fa-solid fa-clock text-amber-600"></i> ${statusAtendimentoExibir}</span>
+                                        <div class="shrink-0">${badge}</div>
+                                    </div>
+                                    <div class="flex items-center gap-3 text-[11px] opacity-70 pt-0.5">
+                                        <span><i class="fa-solid fa-stethoscope text-amber-600/70"></i> ${specExibir}${subspecExibir}</span>
+                                    </div>
                                 </div>
-                                <div class="flex items-center gap-3 text-xs opacity-80 flex-wrap">
-                                    <span class="font-semibold app-btn-secondary px-2 py-0.5 rounded"><i class="fa-solid fa-id-card opacity-60"></i> ${crmExibir}</span>
-                                    <span class="font-medium text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded border border-amber-200/50 dark:border-amber-900/50 truncate"><i class="fa-solid fa-clock text-amber-600"></i> ${statusAtendimentoExibir}</span>
-                                    <div class="shrink-0">${badge}</div>
-                                </div>
-                                <div class="flex items-center gap-3 text-[11px] opacity-70 pt-0.5">
-                                    <span><i class="fa-solid fa-stethoscope text-amber-600/70"></i> ${specExibir}${subspecExibir}</span>
-                                </div>
+                                <div class="w-8 h-8 rounded-full app-btn-secondary flex items-center justify-center transition shrink-0 ml-2 shadow-xs"><i class="fa-solid fa-chevron-right text-xs"></i></div>
                             </div>
-                            <div class="w-8 h-8 rounded-full app-btn-secondary flex items-center justify-center transition shrink-0 ml-2 shadow-xs"><i class="fa-solid fa-chevron-right text-xs"></i></div>
+                            ${listaHorariosHtml}
                         </div>
                     `;
                 });

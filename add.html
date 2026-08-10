@@ -82,7 +82,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Aniversário (Dia e Mês)</label>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Aniversário</label>
                         <div class="grid grid-cols-2 gap-2">
                             <select id="dobDay" class="w-full px-3 py-2.5 app-input border rounded-xl text-xs font-medium">
                                 <option value="">Dia</option>
@@ -233,7 +233,7 @@
 
         const SUBESPECIALIDADES_LISTA = [
             "Retina", "Uveite", "Glaucoma", "Catarata", 
-            "Estrabismo", "Córnea", "Neurooftalmologia", 
+            "Estrabismo", "Córnea", "Neuro-oftalmologia", 
             "Plástica Ocular", "Urgência", "Refrativa",
             "Vítreo", "Doenças Oculares", "Visão Subnormal",
             "Baixa Visão", "Astigmatismo", "Miopia",
@@ -277,7 +277,7 @@
                 container.innerHTML = html;
             }
 
-            adicionarHorarioLinha(diaPre = 'SEG', periodoPre = 'Manhã (08:00 - 12:00)') {
+            adicionarHorarioLinha(diaPre = 'SEG', periodoPre = 'M') {
                 const container = document.getElementById('horariosContainer');
                 if(!container) return;
                 const linhaId = 'horario_' + Date.now() + Math.floor(Math.random()*1000);
@@ -292,13 +292,10 @@
                         <option value="QUA" ${diaPre==='QUA'?'selected':''}>Quarta</option>
                         <option value="QUI" ${diaPre==='QUI'?'selected':''}>Quinta</option>
                         <option value="SEX" ${diaPre==='SEX'?'selected':''}>Sexta</option>
-                        <option value="SAB" ${diaPre==='SAB'?'selected':''}>Sábado</option>
-                        <option value="DOM" ${diaPre==='DOM'?'selected':''}>Domingo</option>
                     </select>
                     <select class="horario-periodo flex-1 app-input border rounded-lg p-1.5 text-xs font-semibold">
-                        <option value="Manhã (08:00 - 12:00)" ${periodoPre.includes('Manhã')?'selected':''}>Manhã</option>
-                        <option value="Tarde (13:00 - 18:00)" ${periodoPre.includes('Tarde')?'selected':''}>Tarde</option>
-                        <option value="Noite (18:00 - 21:00)" ${periodoPre.includes('Noite')?'selected':''}>Noite</option>
+                        <option value="M" ${periodoPre.includes('Manhã')?'selected':''}>Manhã</option>
+                        <option value="T" ${periodoPre.includes('Tarde')?'selected':''}>Tarde</option>
                     </select>
                     <button type="button" onclick="document.getElementById('${linhaId}').remove()" class="text-rose-500 p-1.5 text-xs"><i class="fa-solid fa-trash-can"></i></button>
                 `;

@@ -50,7 +50,18 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Texto da Tarefa *</label>
-                    <input type="text" id="planText" required placeholder="Ex: Entregar presente" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
+                    <select id="planSelectOption" onchange="planApp.tratarMudancaOpcao(this.value)" required class="w-full px-3.5 py-2.5 app-input border rounded-xl mb-2">
+                        <option value="">Selecione a tarefa...</option>
+                        <option value="Entregar cartões de visita">Entregar cartões de visita</option>
+                        <option value="Entregar presente">Entregar presente</option>
+                        <option value="Entregar revistinhas">Entregar revistinhas</option>
+                        <option value="Entregar vinho">Entregar vinho</option>
+                        <option value="Óculos verificação">Óculos verificação</option>
+                        <option value="Visita de apresentação">Visita de apresentação</option>
+                        <option value="Visita de rotina">Visita de rotina</option>
+                        <option value="Outros">Outros</option>
+                    </select>
+                    <input type="text" id="planTextCustom" placeholder="Especifique a tarefa..." class="w-full px-3.5 py-2.5 app-input border rounded-xl hidden">
                 </div>
                 <button type="submit" class="w-full app-header font-semibold py-3 rounded-xl transition shadow-sm text-xs flex items-center justify-center gap-1.5">
                     <i class="fa-solid fa-plus text-amber-400"></i> Adicionar Planejamento
@@ -64,6 +75,25 @@
         </div>
     </main>
 
+    <!-- Modal de Confirmação de Exclusão -->
+    <div id="modalConfirmarExclusao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4 hidden">
+        <div class="app-card w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col border p-5 space-y-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-300 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-triangle-exclamation text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm">Excluir Planejamento</h3>
+                    <p class="text-xs opacity-70">Deseja realmente apagar este item?</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 justify-end pt-2">
+                <button type="button" onclick="planApp.fecharModalExclusao()" class="app-btn-secondary text-xs font-semibold px-4 py-2.5 rounded-xl">Cancelar</button>
+                <button type="button" id="btnConfirmarExclusao" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-md transition">Confirmar</button>
+            </div>
+        </div>
+    </div>
+
     <script src="app.js"></script>
 
     <script>
@@ -76,6 +106,7 @@
                 this.doctors = [];
                 this.planning = [];
                 this.reports = [];
+                this.itemParaExcluirId = null;
                 this.initDateInput();
                 this.loadData();
             }
@@ -96,7 +127,7 @@
 
             converterIsoParaPtBr(dataIso) {
                 if (!dataIso) return '';
-                if (dataIso.includes('/')) return dataIso; // Já está no formato BR
+                if (dataIso.includes('/')) return dataIso;
                 const [ano, mes, dia] = dataIso.split('-');
                 return `${dia}/${mes}/${ano}`;
             }
@@ -120,6 +151,19 @@
                 const nomeMes = meses[dataObj.getMonth()];
                 
                 return `${nomeDia}, ${diaMes} de ${nomeMes}`;
+            }
+
+            tratarMudancaOpcao(valor) {
+                const campoCustom = document.getElementById('planTextCustom');
+                if (!campoCustom) return;
+                if (valor === 'Outros') {
+                    campoCustom.classList.remove('hidden');
+                    campoCustom.required = true;
+                } else {
+                    campoCustom.classList.add('hidden');
+                    campoCustom.required = false;
+                    campoCustom.value = '';
+                }
             }
 
             async loadData() {
@@ -148,7 +192,6 @@
                                 const dataItemObj = this.converterPtBrParaDate(dataItemStr);
                                 dataItemObj.setHours(0, 0, 0, 0);
 
-                                // Se estiver checked e a data do item for ANTERIOR à data atual, apaga do banco
                                 if (mappedItem.checked && dataItemStr && dataItemObj < hoje) {
                                     await supabaseClient.from('planning').delete().eq('id', mappedItem.id);
                                 } else {
@@ -170,8 +213,26 @@
                     select.innerHTML = '<option value="">Nenhum médico cadastrado</option>';
                     return;
                 }
+
+                const extrairNomeLimpo = (nomeCompleto) => {
+                    if (!nomeCompleto) return '';
+                    let limpo = nomeCompleto.trim();
+                    if (/^dr\.?/i.test(limpo)) {
+                        limpo = limpo.replace(/^dr\.?\s*/i, '');
+                    } else if (/^dra\.?/i.test(limpo)) {
+                        limpo = limpo.replace(/^dra\.?\s*/i, '');
+                    }
+                    return limpo.trim();
+                };
+
+                const medicosOrdenados = [...this.doctors].sort((a, b) => {
+                    const nomeA = extrairNomeLimpo(a.name);
+                    const nomeB = extrairNomeLimpo(b.name);
+                    return nomeA.localeCompare(nomeB, 'pt-BR', { sensitivity: 'accent' });
+                });
+
                 let html = '<option value="">Selecione o Médico...</option>';
-                this.doctors.forEach(d => {
+                medicosOrdenados.forEach(d => {
                     html += `<option value="${d.id}">${d.name} (${d.hospital || 'Sem clínica'})</option>`;
                 });
                 select.innerHTML = html;
@@ -181,7 +242,13 @@
                 e.preventDefault();
                 const doctorId = document.getElementById('planDoctorId').value;
                 const dataInput = document.getElementById('planDate').value;
-                const text = document.getElementById('planText').value.trim();
+                const selectOpcao = document.getElementById('planSelectOption').value;
+                
+                let text = selectOpcao;
+                if (selectOpcao === 'Outros') {
+                    text = document.getElementById('planTextCustom').value.trim();
+                }
+
                 if(!doctorId || !text || !dataInput) return;
 
                 const dataFormatada = this.converterIsoParaPtBr(dataInput);
@@ -200,6 +267,7 @@
                     if (error) console.error("Erro ao salvar planejamento:", error);
                 }
                 document.getElementById('formPlanejamento').reset();
+                document.getElementById('planTextCustom').classList.add('hidden');
                 this.initDateInput();
                 this.renderPlanningList();
             }
@@ -233,6 +301,36 @@
                 this.renderPlanningList();
             }
 
+            pedirConfirmacaoExclusao(id) {
+                this.itemParaExcluirId = id;
+                const modal = document.getElementById('modalConfirmarExclusao');
+                const btnConfirmar = document.getElementById('btnConfirmarExclusao');
+                if (modal && btnConfirmar) {
+                    btnConfirmar.onclick = () => this.executarExclusaoItem();
+                    modal.classList.remove('hidden');
+                }
+            }
+
+            fecharModalExclusao() {
+                this.itemParaExcluirId = null;
+                const modal = document.getElementById('modalConfirmarExclusao');
+                if (modal) modal.classList.add('hidden');
+            }
+
+            async executarExclusaoItem() {
+                if (!this.itemParaExcluirId) return;
+                const id = this.itemParaExcluirId;
+
+                this.planning = this.planning.filter(p => String(p.id) !== String(id));
+                if (supabaseClient) {
+                    const { error } = await supabaseClient.from('planning').delete().eq('id', id);
+                    if (error) console.error("Erro ao excluir planejamento:", error);
+                }
+
+                this.fecharModalExclusao();
+                this.renderPlanningList();
+            }
+
             renderPlanningList() {
                 const container = document.getElementById('planning-list-container');
                 if(!container) return;
@@ -258,21 +356,36 @@
                 let html = '';
                 chavesOrdenadas.forEach(diaStr => {
                     const tituloDia = this.formatarDataExtenso(diaStr);
+
+                    // Ordena os itens de cada dia em ordem alfabética pelo nome da tarefa (com "Outros" sempre por último)
+                    const itensDoDia = grupos[diaStr].sort((a, b) => {
+                        const textoA = a.text || '';
+                        const textoB = b.text || '';
+                        
+                        if (textoA === 'Outros' && textoB !== 'Outros') return 1;
+                        if (textoB === 'Outros' && textoA !== 'Outros') return -1;
+                        
+                        return textoA.localeCompare(textoB, 'pt-BR', { sensitivity: 'accent' });
+                    });
+
                     html += `
                         <div class="space-y-2">
                             <div class="text-xs font-bold text-amber-700 dark:text-amber-400 uppercase tracking-wider px-1 pt-2"><i class="fa-regular fa-calendar mr-1"></i> ${tituloDia}</div>
                             <div class="space-y-2">
                     `;
 
-                    grupos[diaStr].forEach(item => {
+                    itensDoDia.forEach(item => {
                         const docIdFinal = item.doctor_id || item.doctorId;
                         const doc = this.doctors.find(d => String(d.id) === String(docIdFinal));
                         html += `
                             <div class="flex items-center justify-between p-3 rounded-xl border app-card shadow-sm">
-                                <div class="flex items-center gap-3">
-                                    <input type="checkbox" ${item.checked ? 'checked disabled' : ''} onchange="planApp.togglePlanningItem('${item.id}')" class="w-4 h-4 text-amber-600 rounded">
-                                    <span class="text-xs font-semibold ${item.checked ? 'line-through opacity-50' : ''}">${doc ? doc.name : 'Médico'} - ${item.text}</span>
+                                <div class="flex items-center gap-3 pr-2 overflow-hidden">
+                                    <input type="checkbox" ${item.checked ? 'checked disabled' : ''} onchange="planApp.togglePlanningItem('${item.id}')" class="w-4 h-4 text-amber-600 rounded shrink-0">
+                                    <span class="text-xs font-semibold truncate ${item.checked ? 'line-through opacity-50' : ''}">${doc ? doc.name : 'Médico'} - ${item.text}</span>
                                 </div>
+                                <button type="button" onclick="planApp.pedirConfirmacaoExclusao('${item.id}')" class="opacity-60 hover:opacity-100 hover:text-rose-600 transition p-1.5 shrink-0" title="Excluir item">
+                                    <i class="fa-solid fa-trash text-xs"></i>
+                                </button>
                             </div>
                         `;
                     });
