@@ -118,28 +118,11 @@
                 if (inputDate) inputDate.value = hojeIso;
             }
 
-            getDataHojeFormatada() {
-                const agora = new Date();
-                const dia = String(agora.getDate()).padStart(2, '0');
-                const mes = String(agora.getMonth() + 1).padStart(2, '0');
-                const ano = agora.getFullYear();
-                return `${dia}/${mes}/${ano}`;
-            }
-
             converterIsoParaPtBr(dataIso) {
                 if (!dataIso) return '';
                 if (dataIso.includes('/')) return dataIso;
                 const [ano, mes, dia] = dataIso.split('-');
                 return `${dia}/${mes}/${ano}`;
-            }
-
-            converterPtBrParaDate(dataStr) {
-                if (!dataStr) return new Date();
-                if (dataStr.includes('-')) {
-                    return new Date(dataStr + 'T00:00:00');
-                }
-                const [dia, mes, ano] = dataStr.split('/');
-                return new Date(`${ano}-${mes}-${ano ? `${ano}-${mes}-${dia}` : ''}T00:00:00`); // Fallback seguro
             }
 
             formatarDataExtenso(dataStr) {
@@ -198,20 +181,14 @@
                             let itensValidos = [];
 
                             for (let item of resPlan.data) {
-                                const mappedItem = { 
-                                    ...item, 
-                                    doctor_id: item.doctor_id !== undefined ? item.doctor_id : item.doctorId,
-                                    doctor_name_custom: item.doctor_name_custom || ''
-                                };
-
-                                const dataItemStr = mappedItem.dayGroup || "";
+                                const dataItemStr = item.dayGroup || "";
                                 const [d, m, a] = dataItemStr.split('/');
                                 const dataItemObj = new Date(`${a}-${m}-${d}T00:00:00`);
 
-                                if (mappedItem.checked && dataItemStr && dataItemObj < hoje) {
-                                    await supabaseClient.from('planning').delete().eq('id', mappedItem.id);
+                                if (item.checked && dataItemStr && dataItemObj < hoje) {
+                                    await supabaseClient.from('planning').delete().eq('id', item.id);
                                 } else {
-                                    itensValidos.push(mappedItem);
+                                    itensValidos.push(item);
                                 }
                             }
                             this.planning = itensValidos;
@@ -247,7 +224,6 @@
                 medicosOrdenados.forEach(d => {
                     html += `<option value="${d.id}">${d.name} (${d.hospital || 'Sem clínica'})</option>`;
                 });
-                // Adicionando a opção "Outro" no final
                 html += '<option value="Outro">Outro</option>';
                 select.innerHTML = html;
             }
@@ -258,12 +234,13 @@
                 const dataInput = document.getElementById('planDate').value;
                 const selectOpcao = document.getElementById('planSelectOption').value;
                 
-                let doctorId = selectDoctorVal;
-                let doctorNameCustom = '';
+                let doctorIdFinal = selectDoctorVal;
 
                 if (selectDoctorVal === 'Outro') {
-                    doctorId = 'outros';
-                    doctorNameCustom = document.getElementById('planDoctorCustom').value.trim();
+                    const nomeCustom = document.getElementById('planDoctorCustom').value.trim();
+                    if (!nomeCustom) return;
+                    // Armazena de forma segura usando o prefixo 'custom:' na coluna doctor_id existente
+                    doctorIdFinal = `custom:${nomeCustom}`;
                 }
 
                 let text = selectOpcao;
@@ -272,14 +249,13 @@
                 }
 
                 if(!selectDoctorVal || !text || !dataInput) return;
-                if(selectDoctorVal === 'Outro' && !doctorNameCustom) return;
 
                 const dataFormatada = this.converterIsoParaPtBr(dataInput);
 
+                // Objeto limpo contendo estritamente as colunas do banco de dados (sem colunas extras)
                 const novoItem = {
                     id: Date.now(),
-                    doctor_id: String(doctorId),
-                    doctor_name_custom: doctorNameCustom,
+                    doctor_id: String(doctorIdFinal),
                     text: text,
                     dayGroup: dataFormatada,
                     checked: false
@@ -287,8 +263,12 @@
 
                 this.planning.unshift(novoItem);
                 if (supabaseClient) {
-                    const { error } = await supabaseClient.from('planning').upsert([novoItem]);
-                    if (error) console.error("Erro ao salvar planejamento:", error);
+                    const { error } = await supabaseClient.from('planning').insert([novoItem]);
+                    if (error) {
+                        console.error("Erro ao salvar planejamento:", error);
+                        alert("Erro ao salvar no banco de dados. Verifique o console.");
+                        return;
+                    }
                 }
                 document.getElementById('formPlanejamento').reset();
                 document.getElementById('planDoctorCustom').classList.add('hidden');
@@ -307,11 +287,14 @@
                     if (error) console.error("Erro ao atualizar planejamento:", error);
                 }
 
-                const docIdFinal = item.doctor_id || item.doctorId;
-                let nomeMedicoRelatorio = item.doctor_name_custom;
+                let nomeMedicoRelatorio = 'Médico';
+                let realDoctorId = null;
 
-                if (docIdFinal !== 'outros') {
-                    const doc = this.doctors.find(d => String(d.id) === String(docIdFinal));
+                if (item.doctor_id && item.doctor_id.startsWith('custom:')) {
+                    nomeMedicoRelatorio = item.doctor_id.replace('custom:', '');
+                } else {
+                    realDoctorId = item.doctor_id;
+                    const doc = this.doctors.find(d => String(d.id) === String(realDoctorId));
                     if (doc) nomeMedicoRelatorio = doc.name;
                 }
 
@@ -319,8 +302,8 @@
                     id: Date.now(),
                     title: `Relatório #${String(Date.now()).slice(-4)}`,
                     date: new Date().toISOString().split('T')[0],
-                    doctor_id: docIdFinal === 'outros' ? null : String(docIdFinal),
-                    content: `Planejamento concluído para ${nomeMedicoRelatorio || 'Médico'}: "${item.text}".`,
+                    doctor_id: realDoctorId,
+                    content: `Planejamento concluído para ${nomeMedicoRelatorio}: "${item.text}".`,
                     isPending: true
                 };
 
@@ -405,18 +388,13 @@
                     `;
 
                     itensDoDia.forEach(item => {
-                        const docIdFinal = item.doctor_id || item.doctorId;
                         let nomeExibicao = 'Médico';
 
-                        if (docIdFinal === 'outros' || !docIdFinal) {
-                            nomeExibicao = item.doctor_name_custom || 'Outro Médico';
+                        if (item.doctor_id && item.doctor_id.startsWith('custom:')) {
+                            nomeExibicao = item.doctor_id.replace('custom:', '');
                         } else {
-                            const doc = this.doctors.find(d => String(d.id) === String(docIdFinal));
-                            if (doc) {
-                                nomeExibicao = doc.name;
-                            } else if (item.doctor_name_custom) {
-                                nomeExibicao = item.doctor_name_custom;
-                            }
+                            const doc = this.doctors.find(d => String(d.id) === String(item.doctor_id));
+                            if (doc) nomeExibicao = doc.name;
                         }
 
                         html += `

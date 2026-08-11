@@ -71,7 +71,7 @@
                         <option value="">Selecione...</option>
                         <option value="Oftalmo Geral">Oftalmo Geral</option>
                         <option value="Oftalmo Pediatria">Oftalmo Pediatria</option>
-                        <option value="Oftalmo Pediatria">Optometrista</option>
+                        <option value="Optometrista">Optometrista</option>
                     </select>
                 </div>
 
@@ -232,16 +232,14 @@
         let supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
 
         const SUBESPECIALIDADES_LISTA = [
-            "Retina", "Uveite", "Glaucoma", "Catarata", 
-            "Estrabismo", "Córnea", "Neuro-oftalmologia", 
-            "Plástica Ocular", "Urgência", "Refrativa",
-            "Vítreo", "Doenças Oculares", "Visão Subnormal",
-            "Baixa Visão", "Astigmatismo", "Miopia",
-            "Hipermetropia", "Presbiopia", "Mácula",
-            "Oncologia Ocular", "Orbita", "Ceratocone",
-            "Vias lacrimais", "Ametropia", "Erros de refração",
-            "Diplopia", "Dioptrias", "Lentes de Contato",
-            "Refratometria", "Blefaroplastia"
+            "Ametropia", "Ambliopia", "Astigmatismo", "Baixa Visão", 
+            "Blefaroplastia", "Catarata", "Ceratocone", "Córnea", 
+            "Dioptrias", "Diplopia", "Doenças Oculares", "Erros de refração", 
+            "Estrabismo", "Glaucoma", "Hipermetropia", "Lentes de Contato", 
+            "Mácula", "Miopia", "Neuro-oftalmologia", "Oncologia Ocular", 
+            "Orbita", "Plástica Ocular", "Presbiopia", "Refrativa", 
+            "Refratometria", "Retina", "Urgência", "Uveite", 
+            "Vias lacrimais", "Vítreo", "Visão Subnormal"
         ];
 
         class AddApp {
@@ -420,13 +418,12 @@
                 this.preencherSelectClinicas(d.hospital);
             }
 
-            // Função auxiliadora para normalizar strings (remove acentos, espaços extras e converte para minúsculas)
             normalizarTexto(texto) {
                 if (!texto) return '';
                 return texto
                     .toLowerCase()
-                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
-                    .replace(/\s+/g, ''); // Remove todos os espaços em branco
+                    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                    .replace(/\s+/g, '');
             }
 
             async saveDoctor(e) {
@@ -438,7 +435,6 @@
                 const rawName = document.getElementById('name').value.trim();
                 const rawCrm = document.getElementById('crm').value.trim();
 
-                // Validação de campos obrigatórios
                 if (!rawName || !rawCrm) {
                     this.showAlert('Atenção', 'Os campos Nome Completo e CRM são obrigatórios.');
                     return;
@@ -447,15 +443,12 @@
                 const name = rawName.toLowerCase().startsWith('dr') ? rawName : `${gender} ${rawName}`;
                 const crm = rawCrm;
 
-                // Verificação de repetição inteligente (Nome e CRM)
                 const normNovoNome = this.normalizarTexto(rawName);
                 const normNovoCrm = this.normalizarTexto(crm);
 
                 const duplicado = this.doctors.find(doc => {
-                    // Ignora o próprio médico caso esteja editando
                     if (editId && String(doc.id) === String(editId)) return false;
 
-                    // Limpa o nome salvo no banco removendo "Dr. " ou "Dra. " para comparar apenas o nome real
                     const nomeBancoLimpo = doc.name ? doc.name.replace(/^Dr\.?\s*/i, '').replace(/^Dra\.?\s*/i, '') : '';
                     const normBancoNome = this.normalizarTexto(nomeBancoLimpo);
                     const normBancoCrm = this.normalizarTexto(doc.crm);
