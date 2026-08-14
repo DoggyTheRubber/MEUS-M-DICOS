@@ -72,8 +72,7 @@
                         <option value="Oftalmo Adulto e Idoso">Oftalmo Adulto e Idoso</option>
                         <option value="Oftalmo Adulto">Oftalmo Adulto</option>
                         <option value="Oftalmo Adulto e Criança">Oftalmo Adulto e Criança</option>
-                        <option value="Oftalmo Pediatria">Oftalmo Pediatria</option>
-                        <option value="Oftalmo Geriatria">Oftalmo Geriatria</option>
+                        <option value="Oftalmo Pediatria e Geriatria">Oftalmo Pediatria e Geriatria</option>
                         <option value="Optometrista">Optometrista</option>
                     </select>
                 </div>
@@ -167,10 +166,10 @@
                         <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Presente Especial</label>
                         <select id="specialPresent" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                             <option value="">Selecione...</option>
-                            <option value="LIMPA LENTES">Limpa lentes</option>
-                            <option value="FLANELA">Flanela</option>
-                            <option value="VINHO">Vinho</option>
-                            <option value="AVANTIM">Avantim</option>
+                            <option value="Limpa lentes">Limpa lentes</option>
+                            <option value="Flanela">Flanela</option>
+                            <option value="Vinho">Vinho</option>
+                            <option value="Avantim">Avantim</option>
                         </select>
                     </div>
                 </div>
@@ -530,19 +529,23 @@
                 });
                 const schedules = horariosLista.length > 0 ? JSON.stringify(horariosLista) : " ";
 
-                const finalId = editId ? (isNaN(editId) ? editId : Number(editId)) : Date.now();
+                const finalId = editId ? Number(editId) : undefined;
 
                 const obj = {
-                    id: finalId,
                     name, crm, specialization, subspecialties, hospital, room, phone, cellphone, personalPhone, secretary, notes, indicates,
                     present, specialPresent, responsible, status, nearbyUnit, visitDate, lastIndicationDate, birthdate, schedules
                 };
+
+                // Só adiciona o id no objeto se for uma edição
+                if (finalId) {
+                    obj.id = finalId;
+                }
 
                 if (supabaseClient) {
                     const { error } = await supabaseClient.from('doctors').upsert(obj);
                     if (error) {
                         console.error('Erro ao salvar no Supabase:', error);
-                        this.showAlert('Erro', 'Não foi possível salvar as alterações no banco de dados.');
+                        this.showAlert('Erro', `Não foi possível salvar: ${error.message}`);
                         return;
                     }
                 }

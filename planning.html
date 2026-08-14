@@ -40,11 +40,22 @@
             </div>
 
             <form id="formPlanejamento" onsubmit="planApp.adicionarPlanejamento(event)" class="space-y-3 text-sm">
-                <div>
+                <!-- Campo de Médico com Autocomplete -->
+                <div class="relative">
                     <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Selecione o Médico *</label>
-                    <select id="planDoctorId" onchange="planApp.tratarMudancaMedico(this.value)" required class="w-full px-3.5 py-2.5 app-input border rounded-xl mb-2"></select>
-                    <input type="text" id="planDoctorCustom" placeholder="Digite o nome do médico..." class="w-full px-3.5 py-2.5 app-input border rounded-xl hidden">
+                    <div class="relative">
+                        <input type="text" id="planDoctorSearch" placeholder="Digite para buscar o médico..." autocomplete="off" oninput="planApp.filtrarMedicos(this.value)" onfocus="planApp.abrirDropdownMedicos()" required class="w-full px-3.5 py-2.5 app-input border rounded-xl pr-10">
+                        <span class="absolute right-3 top-1/2 -translate-y-1/2 opacity-50 pointer-events-none">
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
+                        </span>
+                    </div>
+                    <!-- Dropdown de Sugestões -->
+                    <div id="doctorDropdownList" class="absolute left-0 right-0 mt-1 app-card border rounded-xl shadow-lg max-h-48 overflow-y-auto z-30 hidden"></div>
+                    <!-- Campos ocultos para guardar a seleção real -->
+                    <input type="hidden" id="planDoctorId">
+                    <input type="text" id="planDoctorCustom" placeholder="Digite o nome do médico..." class="w-full px-3.5 py-2.5 app-input border rounded-xl mt-2 hidden">
                 </div>
+
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Data do Planejamento *</label>
                     <input type="date" id="planDate" required class="w-full px-3.5 py-2.5 app-input border rounded-xl">
@@ -110,6 +121,18 @@
                 this.itemParaExcluirId = null;
                 this.initDateInput();
                 this.loadData();
+                this.initGlobalClickListeners();
+            }
+
+            initGlobalClickListeners() {
+                // Fecha o dropdown se clicar fora dele
+                document.addEventListener('click', (e) => {
+                    const container = document.getElementById('planDoctorSearch');
+                    const dropdown = document.getElementById('doctorDropdownList');
+                    if (container && dropdown && !container.contains(e.target) && !dropdown.contains(e.target)) {
+                        dropdown.classList.add('hidden');
+                    }
+                });
             }
 
             initDateInput() {
@@ -136,19 +159,6 @@
                 const nomeMes = meses[dataObj.getMonth()] || '';
                 
                 return `${nomeDia}, ${diaMes} de ${nomeMes}`;
-            }
-
-            tratarMudancaMedico(valor) {
-                const campoCustom = document.getElementById('planDoctorCustom');
-                if (!campoCustom) return;
-                if (valor === 'Outro') {
-                    campoCustom.classList.remove('hidden');
-                    campoCustom.required = true;
-                } else {
-                    campoCustom.classList.add('hidden');
-                    campoCustom.required = false;
-                    campoCustom.value = '';
-                }
             }
 
             tratarMudancaOpcao(valor) {
@@ -194,15 +204,11 @@
                             this.planning = itensValidos;
                         }
                     }
-                    this.preencherSelectPlanejamentoMedicos();
                     this.renderPlanningList();
                 } catch(e) { console.error(e); }
             }
 
-            preencherSelectPlanejamentoMedicos() {
-                const select = document.getElementById('planDoctorId');
-                if(!select) return;
-
+            getMedicosOrdenados() {
                 const extrairNomeLimpo = (nomeCompleto) => {
                     if (!nomeCompleto) return '';
                     let limpo = nomeCompleto.trim();
@@ -214,33 +220,106 @@
                     return limpo.trim();
                 };
 
-                const medicosOrdenados = [...this.doctors].sort((a, b) => {
+                return [...this.doctors].sort((a, b) => {
                     const nomeA = extrairNomeLimpo(a.name);
                     const nomeB = extrairNomeLimpo(b.name);
                     return nomeA.localeCompare(nomeB, 'pt-BR', { sensitivity: 'accent' });
                 });
+            }
 
-                let html = '<option value="">Selecione o Médico...</option>';
-                medicosOrdenados.forEach(d => {
-                    html += `<option value="${d.id}">${d.name} (${d.hospital || 'Sem clínica'})</option>`;
+            abrirDropdownMedicos() {
+                const input = document.getElementById('planDoctorSearch');
+                this.filtrarMedicos(input.value);
+            }
+
+            filtrarMedicos(termo) {
+                const dropdown = document.getElementById('doctorDropdownList');
+                if (!dropdown) return;
+
+                const termoLower = termo.toLowerCase().trim();
+                const medicos = this.getMedicosOrdenados();
+
+                // Filtra os médicos com base no texto digitado
+                const filtrados = medicos.filter(d => {
+                    const nome = (d.name || '').toLowerCase();
+                    const hospital = (d.hospital || '').toLowerCase();
+                    return nome.includes(termoLower) || hospital.includes(termoLower);
                 });
-                html += '<option value="Outro">Outro</option>';
-                select.innerHTML = html;
+
+                let html = '';
+
+                // Renderiza os médicos encontrados em ordem alfabética
+                filtrados.forEach(d => {
+                    html += `
+                        <div onclick="planApp.selecionarMedico('${d.id}', '${d.name.replace(/'/g, "\\'")}', '${(d.hospital || 'Sem clínica').replace(/'/g, "\\'")}')" 
+                             class="px-3.5 py-2.5 hover:bg-amber-50 dark:hover:bg-amber-950/40 cursor-pointer text-xs border-b border-slate-100 dark:border-slate-800 transition">
+                            <span class="font-semibold">${d.name}</span> <span class="opacity-60">(${d.hospital || 'Sem clínica'})</span>
+                        </div>
+                    `;
+                });
+
+                // Sempre adiciona a opção "Outro" no final da lista
+                html += `
+                    <div onclick="planApp.selecionarOutroMedico()" 
+                         class="px-3.5 py-2.5 hover:bg-amber-50 dark:hover:bg-amber-950/40 cursor-pointer text-xs font-bold text-amber-600 dark:text-amber-400 transition">
+                        <i class="fa-solid fa-plus mr-1"></i> Outro
+                    </div>
+                `;
+
+                dropdown.innerHTML = html;
+                dropdown.classList.remove('hidden');
+
+                // Se o usuário limpou o campo de busca, limpa os IDs ocultos relacionados
+                if (!termoLower) {
+                    document.getElementById('planDoctorId').value = '';
+                }
+            }
+
+            selecionarMedico(id, nome, hospital) {
+                document.getElementById('planDoctorSearch').value = `${nome} (${hospital})`;
+                document.getElementById('planDoctorId').value = id;
+                
+                // Esconde campo customizado se estivesse visível
+                const campoCustom = document.getElementById('planDoctorCustom');
+                campoCustom.classList.add('hidden');
+                campoCustom.required = false;
+                campoCustom.value = '';
+
+                document.getElementById('doctorDropdownList').classList.add('hidden');
+            }
+
+            selecionarOutroMedico() {
+                document.getElementById('planDoctorSearch').value = 'Outro';
+                document.getElementById('planDoctorId').value = 'Outro';
+
+                const campoCustom = document.getElementById('planDoctorCustom');
+                campoCustom.classList.remove('hidden');
+                campoCustom.required = true;
+                campoCustom.value = '';
+                campoCustom.focus();
+
+                document.getElementById('doctorDropdownList').classList.add('hidden');
             }
 
             async adicionarPlanejamento(e) {
                 e.preventDefault();
-                const selectDoctorVal = document.getElementById('planDoctorId').value;
+                const tipoMedicoSelecao = document.getElementById('planDoctorId').value;
+                const searchInputVal = document.getElementById('planDoctorSearch').value.trim();
                 const dataInput = document.getElementById('planDate').value;
                 const selectOpcao = document.getElementById('planSelectOption').value;
                 
-                let doctorIdFinal = selectDoctorVal;
+                let doctorIdFinal = '';
 
-                if (selectDoctorVal === 'Outro') {
+                if (tipoMedicoSelecao === 'Outro' || searchInputVal === 'Outro') {
                     const nomeCustom = document.getElementById('planDoctorCustom').value.trim();
                     if (!nomeCustom) return;
-                    // Armazena de forma segura usando o prefixo 'custom:' na coluna doctor_id existente
                     doctorIdFinal = `custom:${nomeCustom}`;
+                } else if (tipoMedicoSelecao) {
+                    doctorIdFinal = tipoMedicoSelecao;
+                } else {
+                    // Caso o usuário digite um nome diretamente sem clicar nas opções da lista, assume como custom
+                    if (!searchInputVal) return;
+                    doctorIdFinal = `custom:${searchInputVal}`;
                 }
 
                 let text = selectOpcao;
@@ -248,11 +327,10 @@
                     text = document.getElementById('planTextCustom').value.trim();
                 }
 
-                if(!selectDoctorVal || !text || !dataInput) return;
+                if(!doctorIdFinal || !text || !dataInput) return;
 
                 const dataFormatada = this.converterIsoParaPtBr(dataInput);
 
-                // Objeto limpo contendo estritamente as colunas do banco de dados (sem colunas extras)
                 const novoItem = {
                     id: Date.now(),
                     doctor_id: String(doctorIdFinal),
@@ -270,7 +348,11 @@
                         return;
                     }
                 }
+
+                // Reseta o formulário
                 document.getElementById('formPlanejamento').reset();
+                document.getElementById('planDoctorId').value = '';
+                document.getElementById('planDoctorSearch').value = '';
                 document.getElementById('planDoctorCustom').classList.add('hidden');
                 document.getElementById('planTextCustom').classList.add('hidden');
                 this.initDateInput();
