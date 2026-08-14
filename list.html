@@ -347,7 +347,6 @@
                     const specExibir = (d.specialization && d.specialization !== ' ') ? d.specialization : 'Geral';
                     const subspecExibir = (d.subspecialties && d.subspecialties !== ' ') ? ` • ${d.subspecialties}` : '';
 
-                    // Processar horários lado a lado separados por vírgula no formato "3ª - M, 4ª - T"
                     let listaHorariosHtml = '';
                     if (d.schedules && d.schedules !== ' ') {
                         try {
@@ -498,18 +497,23 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Presente Especial</span><span class="font-medium text-xs">${val(d.specialPresent)}</span></div>
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Potencial</span><span class="font-medium text-xs">${val(d.lastIndicationDate)}</span></div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
                         <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Data da Visita</span><span class="font-medium text-xs">${val(d.visitDate)}</span></div>
-                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Última Indicação</span><span class="font-medium text-xs">${val(d.lastIndicationDate)}</span></div>
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
                         <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Responsável</span><span class="font-medium text-xs">${val(d.responsible)}</span></div>
-                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Status Atendimento</span><span class="font-medium text-xs">${val(d.status)}</span></div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-2.5 app-btn-secondary p-3 rounded-xl border">
+                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Status Atendimento</span><span class="font-medium text-xs">${val(d.status)}</span></div>
                         <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Status Indicação</span><span class="inline-block mt-0.5 px-2 py-0.5 rounded text-xs font-bold border ${indicaCor}">${statusIndicaTexto}</span></div>
-                        <div><span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block">Unidade Próxima</span><span class="font-medium text-xs">${val(d.nearbyUnit)}</span></div>
+                    </div>
+
+                    <div class="app-btn-secondary p-3 rounded-xl border">
+                        <span class="text-[10px] font-bold opacity-60 uppercase tracking-wider block mb-0.5">Unidade Próxima</span>
+                        <span class="font-medium text-xs">${val(d.nearbyUnit)}</span>
                     </div>
 
                     <div class="app-btn-secondary p-3 rounded-xl border">

@@ -69,8 +69,11 @@
                     <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Especialização</label>
                     <select id="specialization" class="w-full px-3.5 py-2.5 app-input border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-500">
                         <option value="">Selecione...</option>
-                        <option value="Oftalmo Geral">Oftalmo Geral</option>
+                        <option value="Oftalmo Adulto e Idoso">Oftalmo Adulto e Idoso</option>
+                        <option value="Oftalmo Adulto">Oftalmo Adulto</option>
+                        <option value="Oftalmo Adulto e Criança">Oftalmo Adulto e Criança</option>
                         <option value="Oftalmo Pediatria">Oftalmo Pediatria</option>
+                        <option value="Oftalmo Geriatria">Oftalmo Geriatria</option>
                         <option value="Optometrista">Optometrista</option>
                     </select>
                 </div>
@@ -140,24 +143,34 @@
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Já Indica a Ótica?</label>
-                        <div class="flex items-center gap-3 app-input p-2.5 border rounded-xl flex-wrap">
-                            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="sim" class="text-amber-600"> Indica</label>
-                            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="nao" class="text-amber-600"> Não Indica</label>
-                            <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="deixou" class="text-amber-600"> Deixou de indicar</label>
-                        </div>
+                <div>
+                    <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Já Indica a Ótica?</label>
+                    <div class="flex items-center gap-3 app-input p-2.5 border rounded-xl flex-wrap">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="sim" class="text-amber-600"> Indica</label>
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="nao" class="text-amber-600"> Não Indica</label>
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-xs"><input type="radio" name="indicates" value="deixou" class="text-amber-600"> Deixou de indicar</label>
                     </div>
+                </div>
+
+                <!-- Presente Habitual e Presente Especial lado a lado -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Presente Habitual</label>
                         <select id="present" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
                             <option value="">Selecione...</option>
-                            <option value="Caixa de Vinho">Caixa de Vinho</option>
-                            <option value="Pão de mel">Pão de Mel</option>
-                            <option value="Limpa Lentes">Limpa Lentes</option>
-                            <option value="Kit Adulto">Kit Adulto(Folders, Cartões de Visita, Pão de mel)</option>
-                            <option value="Kit Infantil">Kit Infantil(Folders, Cartões de Visita, Pão de mel, Revistinha)</option>
+                            <option value="Kit adulto">Kit adulto</option>
+                            <option value="Kit infantil">Kit infantil</option>
+                            <option value="Não precisou de cartoes">Não precisou de cartoes</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Presente Especial</label>
+                        <select id="specialPresent" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
+                            <option value="">Selecione...</option>
+                            <option value="LIMPA LENTES">Limpa lentes</option>
+                            <option value="FLANELA">Flanela</option>
+                            <option value="VINHO">Vinho</option>
+                            <option value="AVANTIM">Avantim</option>
                         </select>
                     </div>
                 </div>
@@ -184,8 +197,13 @@
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Última Indicação</label>
-                        <input type="date" id="lastIndicationDate" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Potencial</label>
+                        <select id="lastIndicationDate" class="w-full px-3.5 py-2.5 app-input border rounded-xl">
+                            <option value="">Selecione...</option>
+                            <option value="Alto">Alto</option>
+                            <option value="Médio">Médio</option>
+                            <option value="Baixo">Baixo</option>
+                        </select>
                     </div>
                 </div>
 
@@ -234,12 +252,15 @@
         const SUBESPECIALIDADES_LISTA = [
             "Ametropia", "Ambliopia", "Astigmatismo", "Baixa Visão", 
             "Blefaroplastia", "Catarata", "Ceratocone", "Córnea", 
-            "Dioptrias", "Diplopia", "Doenças externas", "Doenças Oculares", "Erros de refração", 
-            "Estrabismo", "Glaucoma", "Hipermetropia", "Lentes de Contato", 
-            "Mácula", "Miopia", "Neuro-oftalmologia", "Oncologia Ocular", 
-            "Orbita", "Plástica Ocular", "Presbiopia", "Refrativa", 
-            "Refratometria", "Retina", "Urgência", "Uveite", 
-            "Vias lacrimais", "Vítreo", "Visão Subnormal"
+            "Dioptrias", "Diplopia", "Doenças externas", "Doenças Oculares",
+            "Erros de refração", "Estrabismo", "Glaucoma", "Hipermetropia",
+            "Lentes de Contato", "Mácula", "Miopia", "Neuro-oftalmologia",
+            "Oncologia Ocular", "Orbita", "Plástica Ocular", "Presbiopia",
+            "Refrativa", "Refratometria", "Retina", "Urgência", "Uveite", 
+            "Vias lacrimais", "Vítreo", "Visão Subnormal", "Patologias neonatal",
+            "Progressão de miopia", "Teste do olinho", "Exoftalmia",
+            "Alteração dos músculos oculares", "Traumas oculares",
+            "Pterígio", "Olho seco"
         ];
 
         class AddApp {
@@ -354,6 +375,7 @@
                 document.getElementById('secretary').value = (d.secretary && d.secretary !== ' ') ? d.secretary : '';
                 document.getElementById('notes').value = (d.notes && d.notes !== ' ') ? d.notes : '';
                 if(d.present && d.present !== ' ') document.getElementById('present').value = d.present;
+                if(d.specialPresent && d.specialPresent !== ' ') document.getElementById('specialPresent').value = d.specialPresent;
                 if(d.responsible && d.responsible !== ' ') document.getElementById('responsible').value = d.responsible;
                 if(d.status && d.status !== ' ') document.getElementById('status').value = d.status;
                 if(d.nearbyUnit && d.nearbyUnit !== ' ') document.getElementById('nearbyUnit').value = d.nearbyUnit;
@@ -367,12 +389,7 @@
                     document.getElementById('visitDate').value = d.visitDate;
                 }
 
-                if (d.lastIndicationDate && d.lastIndicationDate !== ' ' && d.lastIndicationDate.includes('/')) {
-                    const partes = d.lastIndicationDate.split('/');
-                    if(partes.length === 3) {
-                        document.getElementById('lastIndicationDate').value = `${partes[2]}-${partes[1]}-${partes[0]}`;
-                    }
-                } else if (d.lastIndicationDate && d.lastIndicationDate !== ' ') {
+                if (d.lastIndicationDate && d.lastIndicationDate !== ' ') {
                     document.getElementById('lastIndicationDate').value = d.lastIndicationDate;
                 }
 
@@ -485,22 +502,17 @@
                 const indicates = indicatesEl ? indicatesEl.value : " ";
                 
                 const present = document.getElementById('present').value || " ";
+                const specialPresent = document.getElementById('specialPresent').value || " ";
                 const responsible = document.getElementById('responsible').value || " ";
                 const status = document.getElementById('status').value || " ";
                 const nearbyUnit = document.getElementById('nearbyUnit').value || " ";
+                const lastIndicationDate = document.getElementById('lastIndicationDate').value || " ";
                 
                 const rawVisitDate = document.getElementById('visitDate').value;
                 let visitDate = " ";
                 if (rawVisitDate) {
                     const p = rawVisitDate.split('-');
                     if (p.length === 3) visitDate = `${p[2]}/${p[1]}/${p[0]}`;
-                }
-
-                const rawLastInd = document.getElementById('lastIndicationDate').value;
-                let lastIndicationDate = " ";
-                if (rawLastInd) {
-                    const p = rawLastInd.split('-');
-                    if (p.length === 3) lastIndicationDate = `${p[2]}/${p[1]}/${p[0]}`;
                 }
 
                 const dobDay = document.getElementById('dobDay').value;
@@ -523,7 +535,7 @@
                 const obj = {
                     id: finalId,
                     name, crm, specialization, subspecialties, hospital, room, phone, cellphone, personalPhone, secretary, notes, indicates,
-                    present, responsible, status, nearbyUnit, visitDate, lastIndicationDate, birthdate, schedules
+                    present, specialPresent, responsible, status, nearbyUnit, visitDate, lastIndicationDate, birthdate, schedules
                 };
 
                 if (supabaseClient) {
