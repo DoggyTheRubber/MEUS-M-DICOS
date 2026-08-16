@@ -152,7 +152,6 @@
                     </div>
                 </div>
 
-                <!-- Presente Habitual e Presente Especial lado a lado -->
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-semibold uppercase tracking-wider mb-1 opacity-80">Presente Habitual</label>
@@ -304,6 +303,11 @@
                 if(!container) return;
                 const linhaId = 'horario_' + Date.now() + Math.floor(Math.random()*1000);
                 
+                // Normaliza o período recebido para garantir compatibilidade com as siglas ('M', 'T', 'M e T')
+                let pClean = 'M';
+                if (periodoPre === 'Tarde' || periodoPre === 'T') pClean = 'T';
+                else if (periodoPre === 'Manhã e Tarde' || periodoPre === 'M e T') pClean = 'M e T';
+
                 const div = document.createElement('div');
                 div.id = linhaId;
                 div.className = "flex items-center gap-2 app-card p-2.5 rounded-xl border";
@@ -317,9 +321,9 @@
                         <option value="2ª à 6ª" ${diaPre==='2ª à 6ª'?'selected':''}>De Segunda à Sexta</option>
                     </select>
                     <select class="horario-periodo flex-1 app-input border rounded-lg p-1.5 text-xs font-semibold">
-                        <option value="M" ${periodoPre.includes('Manhã')?'selected':''}>Manhã</option>
-                        <option value="T" ${periodoPre.includes('Tarde')?'selected':''}>Tarde</option>
-                        <option value="M e T" ${periodoPre.includes('Manhã e Tarde')?'selected':''}>Manhã e Tarde</option>
+                        <option value="M" ${pClean==='M'?'selected':''}>Manhã</option>
+                        <option value="T" ${pClean==='T'?'selected':''}>Tarde</option>
+                        <option value="M e T" ${pClean==='M e T'?'selected':''}>Manhã e Tarde</option>
                     </select>
                     <button type="button" onclick="document.getElementById('${linhaId}').remove()" class="text-rose-500 p-1.5 text-xs"><i class="fa-solid fa-trash-can"></i></button>
                 `;
@@ -538,7 +542,6 @@
                     present, specialPresent, responsible, status, nearbyUnit, visitDate, lastIndicationDate, birthdate, schedules
                 };
 
-                // Só adiciona o id no objeto se for uma edição
                 if (finalId) {
                     obj.id = finalId;
                 }
